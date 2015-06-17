@@ -10,6 +10,8 @@ class CryptoHelper {
 public:
 	CryptoHelper();
 	KeyPair generateKeyPair();
+	std::string encode(std::string message, std::string iv, std::string recipientPublicKey,
+		std::string senderPrivateKey);
 
 };
 
