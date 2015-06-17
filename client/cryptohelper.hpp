@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <sodium.h>
-#include "keypair.hpp"
+#include "KeyPair.hpp"
 
 class CryptoHelper {
 
