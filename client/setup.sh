@@ -10,3 +10,9 @@ cd ../3rdparty/libsodium/
 if [[ "$unamestr" == 'Darwin' ]]; then
 	./dist-build/osx.sh
 fi
+
+if [[ "$unamestr" == 'Linux' ]] ; then
+	echo "Linux"
+	cd dist-build
+	make
+fi
