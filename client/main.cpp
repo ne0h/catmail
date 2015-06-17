@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "cryptohelper.hpp"
-#include "KeyPair.hpp"
+#include "keypair.hpp"
 
 using namespace std;
 

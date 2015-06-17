@@ -16,5 +16,5 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 
 
-add_executable(catmail-client main.cpp KeyPair.cpp cryptohelper.cpp)
+add_executable(catmail-client main.cpp keypair.cpp cryptohelper.cpp)
 target_link_libraries(catmail-client sodium)
