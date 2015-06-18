@@ -19,7 +19,7 @@ KeyPair CryptoHelper::generateKeyPair() {
 std::string CryptoHelper::encodeAsym(std::string message, std::string nonce, std::string recipientPublicKey,
 		std::string senderPrivateKey) {
 	
-	unsigned char cipherText[message.size()];
+	unsigned char cipherText[message.size() + crypto_box_MACBYTES];
 	if (crypto_box_easy(cipherText, (const unsigned char*) message.c_str(), message.size(),
 			(const unsigned char*) nonce.c_str(), (const unsigned char*) recipientPublicKey.c_str(),
 			(const unsigned char*) senderPrivateKey.c_str()) != 0) {
