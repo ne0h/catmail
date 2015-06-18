@@ -16,8 +16,8 @@ int main() {
 	randombytes_buf(nonce, sizeof nonce);
 	std::string n = string((char*) nonce);
 
-	std::string cypherText = cryptoHelper->encodeAsym(message, n, bob.getPublicKey(), alice.getPrivateKey());
-	std::string result     = cryptoHelper->decodeAsym(cypherText, n, bob.getPrivateKey(), alice.getPublicKey());
+	std::string cipherText = cryptoHelper->encodeAsym(message, n, bob.getPublicKey(), alice.getPrivateKey());
+	std::string result     = cryptoHelper->decodeAsym(cipherText, n, bob.getPrivateKey(), alice.getPublicKey());
 
 	cout << result << endl;
 
