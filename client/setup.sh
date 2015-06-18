@@ -12,7 +12,9 @@ if [[ "$unamestr" == 'Darwin' ]]; then
 fi
 
 if [[ "$unamestr" == 'Linux' ]] ; then
-	echo "Linux"
-	cd dist-build
-	make
+	export PREFIX="$(pwd)/libsodium-linux"
+	mkdir $PREFIX
+	./configure --enable-minimal --prefix="$PREFIX"
+	make -j3 check && make -j3 install
+	make distclean > /dev/null
 fi
