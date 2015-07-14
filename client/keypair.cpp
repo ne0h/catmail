@@ -1,13 +1,13 @@
 #include "keypair.hpp"
 
-KeyPair::KeyPair(std::string privateKey, std::string publicKey) {
+KeyPair::KeyPair(std::string secretKey, std::string publicKey) {
 
-	m_privateKey = privateKey;
+	m_secretKey = secretKey;
 	m_publicKey  = publicKey;
 }
 
-std::string KeyPair::getPrivateKey() {
-	return m_privateKey;
+std::string KeyPair::getSecretKey() {
+	return m_secretKey;
 }
 
 std::string KeyPair::getPublicKey() {

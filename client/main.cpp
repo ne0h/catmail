@@ -1,4 +1,6 @@
 #include <iostream>
+#include <string>
+#include <sodium.h>
 
 #include "cryptohelper.hpp"
 #include "keypair.hpp"
@@ -7,19 +9,24 @@ using namespace std;
 
 int main() {
 
+	string text = "dasistdergeheimetextxxx";
 	CryptoHelper *cryptoHelper;
 	KeyPair alice = cryptoHelper->generateKeyPair();
-	KeyPair bob   = cryptoHelper->generateKeyPair();
 
-	std::string message = "secrettesttext";
 	unsigned char nonce[crypto_box_NONCEBYTES];
 	randombytes_buf(nonce, sizeof nonce);
-	std::string n = string((char*) nonce);
+	unsigned char ciphertext[text.size()];
 
-	std::string cipherText = cryptoHelper->encodeAsym(message, n, bob.getPublicKey(), alice.getPrivateKey());
-	std::string result     = cryptoHelper->decodeAsym(cipherText, n, bob.getPrivateKey(), alice.getPublicKey());
+	crypto_box_easy(ciphertext, (const unsigned char *)text.c_str(), text.size(), nonce,
+		(const unsigned char *)alice.getPublicKey().c_str(),
+		(const unsigned char *)alice.getSecretKey().c_str());
 
-	cout << result << endl;
+	unsigned char decrypted[text.size()];
+	crypto_box_open_easy(decrypted, ciphertext, crypto_box_MACBYTES + text.size(), nonce,
+		(const unsigned char *)alice.getPublicKey().c_str(),
+		(const unsigned char *)alice.getSecretKey().c_str());
+
+	cout << decrypted << endl;
 
 	return 0;
 }
