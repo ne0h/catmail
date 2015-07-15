@@ -8,6 +8,8 @@ Run `git submodule update --init`
 
 ### Client
 
+1. `cd client`
+1. `./setup.sh`
 1. `mkdir build && cd build`
 2. `cmake ..`
 3. `make`
