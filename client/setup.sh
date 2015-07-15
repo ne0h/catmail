@@ -22,5 +22,5 @@ fi
 
 cd ../cppunit/
 ./autogen.sh
-./configure
+./configure --prefix=`pwd`/lib
 make -j3

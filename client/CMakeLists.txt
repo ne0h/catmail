@@ -1,17 +1,29 @@
 cmake_minimum_required(VERSION 2.8)
 
-project("catmail-client")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+PROJECT("catmail-client")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    include_directories(/usr/local/include ../3rdparty/libsodium/libsodium-osx/include)
-    link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/libsodium/libsodium-osx/lib/)
+    INCLUDE_DIRECTORIES(/usr/local/include ../3rdparty/libsodium/libsodium-osx/include)
+    LINK_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/libsodium/libsodium-osx/lib/)
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-    include_directories(../3rdparty/libsodium/libsodium-linux/include)
-    link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/libsodium/libsodium-linux/lib/)    
+    INCLUDE_DIRECTORIES(../3rdparty/libsodium/libsodium-linux/include)
+    LINK_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/libsodium/libsodium-linux/lib/)    
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
-add_executable(catmail-client main.cpp keypair.cpp cryptohelper.cpp user.cpp contact.cpp)
-target_link_libraries(catmail-client sodium)
+INCLUDE_DIRECTORIES(../3rdparty/cppunit/lib/include)
+LINK_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/cppunit/lib/lib)
+
+ADD_EXECUTABLE(catmail-client main.cpp keypair.cpp cryptohelper.cpp user.cpp contact.cpp)
+TARGET_LINK_LIBRARIES(catmail-client sodium)
+
+FILE(GLOB UnitTests_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/tests "*Test.cpp" )
+ADD_EXECUTABLE(testrunner testrunner.cpp ${UnitTests_SRCS})
+TARGET_LINK_LIBRARIES(testrunner cppunit)
+FOREACH(test ${UnitTests_SRCS})
+        GET_FILENAME_COMPONENT(TestName ${test} NAME_WE)
+        ADD_TEST(${TestName} UnitTester ${TestName})
+ENDFOREACH(test)
+
