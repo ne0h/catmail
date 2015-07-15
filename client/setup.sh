@@ -18,3 +18,9 @@ if [[ "$unamestr" == 'Linux' ]] ; then
 	make -j3 check && make -j3 install
 	make distclean > /dev/null
 fi
+
+
+cd ../cppunit/
+./autogen.sh
+./configure
+make -j3
