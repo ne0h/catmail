@@ -4,12 +4,17 @@
 
 #include "cryptohelper.hpp"
 #include "keypair.hpp"
+#include "user.hpp"
+#include "contact.hpp"
 
 using namespace std;
 
 int main() {
 
-	string text = "dasistdergeheimetextxxx";
+	CryptoHelper *cryptoHelper;
+	User ne0h("ne0h", cryptoHelper);
+
+	/*string text = "dasistdergeheimetextxxx";
 	CryptoHelper *cryptoHelper;
 	KeyPair alice = cryptoHelper->generateKeyPair();
 
@@ -26,7 +31,7 @@ int main() {
 		(const unsigned char *)alice.getPublicKey().c_str(),
 		(const unsigned char *)alice.getSecretKey().c_str());
 
-	cout << decrypted << endl;
+	cout << decrypted << endl;*/
 
 	return 0;
 }

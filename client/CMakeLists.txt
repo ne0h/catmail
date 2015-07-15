@@ -13,5 +13,5 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/libsodium/libsodium-linux/lib/)    
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
-add_executable(catmail-client main.cpp keypair.cpp cryptohelper.cpp)
+add_executable(catmail-client main.cpp keypair.cpp cryptohelper.cpp user.cpp contact.cpp)
 target_link_libraries(catmail-client sodium)
