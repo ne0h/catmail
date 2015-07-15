@@ -1,13 +1,12 @@
 #include <cppunit/extensions/TestFactoryRegistry.h>
 #include <cppunit/ui/text/TestRunner.h>
 
-int main () {
+int main (int argc, char* argv[]) {
 
 	CppUnit::TextUi::TestRunner runner;
 	CppUnit::TestFactoryRegistry& registry = CppUnit::TestFactoryRegistry::getRegistry();
 
-	CppUnit::Test* test_to_run = registry.makeTest();
-	runner.addTest( test_to_run );
+	runner.addTest(registry.makeTest());
 	bool failed = runner.run("", false);
 
 	return !failed;

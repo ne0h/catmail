@@ -9,7 +9,7 @@
 
 using namespace std;
 
-int main() {
+int main(int argc, char* argv[]) {
 
 	CryptoHelper *cryptoHelper;
 	User ne0h("ne0h", cryptoHelper);

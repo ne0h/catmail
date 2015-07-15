@@ -14,13 +14,13 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 INCLUDE_DIRECTORIES(../3rdparty/cppunit/lib/include)
-LINK_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/cppunit/lib/lib)
+LINK_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/cppunit/lib)
 
 ADD_EXECUTABLE(catmail-client main.cpp keypair.cpp cryptohelper.cpp user.cpp contact.cpp)
 TARGET_LINK_LIBRARIES(catmail-client sodium)
 
-FILE(GLOB UnitTests_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/tests "*Test.cpp" )
-ADD_EXECUTABLE(testrunner testrunner.cpp ${UnitTests_SRCS})
+FILE(GLOB UnitTests_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "tests/*Test.cpp" )
+ADD_EXECUTABLE(testrunner tests/testrunner.cpp ${UnitTests_SRCS})
 TARGET_LINK_LIBRARIES(testrunner cppunit)
 FOREACH(test ${UnitTests_SRCS})
         GET_FILENAME_COMPONENT(TestName ${test} NAME_WE)
