@@ -2,13 +2,17 @@
 #define USER_HPP
 
 #include <string>
+#include "keypair.hpp"
 
-#include "cryptohelper.hpp"
+class CryptoHelper;
 
 class User {
 
 public:
 	User(std::string username, CryptoHelper *cryptoHelper);
+	KeyPair* getUserKeyPair();
+	KeyPair* getExchangeKeyPair();
+	std::string getUsername();
 
 private:
 	CryptoHelper *m_cryptoHelper;

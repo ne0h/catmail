@@ -1,5 +1,9 @@
 #include <cppunit/extensions/HelperMacros.h>
 
+#include "../cryptohelper.hpp"
+#include "../user.hpp"
+#include "../contact.hpp"
+
 class CryptoHelperTest : public CppUnit::TestFixture {
 
 	CPPUNIT_TEST_SUITE(CryptoHelperTest);
@@ -7,8 +11,19 @@ class CryptoHelperTest : public CppUnit::TestFixture {
 	CPPUNIT_TEST_SUITE_END();
 
 public:
+	// send an encrypted message to oneself
 	void testAsymCrypto() {
-		CPPUNIT_ASSERT(false);
+
+		std::string text("topsecrettest");
+
+		CryptoHelper *cryptoHelper;
+		User me("me", cryptoHelper);
+		Contact colleague("Colleague", me.getUserKeyPair()->getPublicKey(), me.getExchangeKeyPair()->getPublicKey());
+
+		Message message    = cryptoHelper->encryptAsym(&me, &colleague, text);
+		std::string result = cryptoHelper->decryptAsym(&me, &colleague, &message);
+		
+		CPPUNIT_ASSERT(text.compare(result) == 0);
 	}
 
 };

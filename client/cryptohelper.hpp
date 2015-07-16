@@ -1,19 +1,20 @@
 #ifndef CRYPTOHELPER_HPP
 #define CRYPTOHELPER_HPP
 
-#include <iostream>
 #include <sodium.h>
+
 #include "keypair.hpp"
+#include "user.hpp"
+#include "message.hpp"
+#include "contact.hpp"
 
 class CryptoHelper {
 
 public:
 	CryptoHelper();
 	KeyPair generateKeyPair();
-	std::string encodeAsym(std::string message, std::string nonce, std::string recipientPublicKey,
-		std::string senderSecretKey);
-	std::string decodeAsym(std::string cipherText, std::string nonce, std::string recipientSecretKey,
-		std::string senderPublicKey);
+	Message encryptAsym(User *user, Contact *recipient, std::string message);
+	std::string decryptAsym(User *user, Contact *sender, Message *message);
 
 };
 

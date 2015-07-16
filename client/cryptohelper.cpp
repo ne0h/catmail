@@ -16,32 +16,27 @@ KeyPair CryptoHelper::generateKeyPair() {
 	return KeyPair(secretKey, publicKey);
 }
 
-std::string CryptoHelper::encodeAsym(std::string message, std::string nonce, std::string recipientPublicKey,
-		std::string senderSecretKey) {
-	
+Message CryptoHelper::encryptAsym(User *user, Contact *recipient, std::string message) {
+
+	unsigned char nonce[crypto_box_NONCEBYTES];
+	randombytes_buf(nonce, sizeof nonce);
 	unsigned char cipherText[message.size() + crypto_box_MACBYTES];
-	if (crypto_box_easy(cipherText, (const unsigned char*) message.c_str(), message.size(),
-			(const unsigned char*) nonce.c_str(), (const unsigned char*) recipientPublicKey.c_str(),
-			(const unsigned char*) senderSecretKey.c_str()) != 0) {
 
-		std::cout << "error while encoding" << std::endl;
-	}
+	crypto_box_easy(cipherText, (const unsigned char *)message.c_str(), message.size(), nonce,
+		(const unsigned char *)recipient->getUserPublicKey().c_str(),
+		(const unsigned char *)user->getUserKeyPair()->getSecretKey().c_str());
 
-	std::string result((char*) cipherText);
-	return result;
+	return Message(user->getUsername(), recipient->getUsername(), (const char*)cipherText,
+		(const char*)nonce);
 }
 
-std::string CryptoHelper::decodeAsym(std::string cypherText, std::string nonce, std::string recipientSecretKey,
-		std::string senderPublicKey) {
+std::string CryptoHelper::decryptAsym(User *user, Contact *sender, Message *message) {
 
-	unsigned char message[cypherText.size() - crypto_box_MACBYTES];
-	if (crypto_box_open_easy(message, (const unsigned char*) cypherText.c_str(), cypherText.size(),
-			(const unsigned char*) nonce.c_str(), (const unsigned char*) senderPublicKey.c_str(),
-			(const unsigned char*) recipientSecretKey.c_str()) != 0) {
-
-		std::cout << "error while decoding" << std::endl;
-	}
-
-	std::string result((char*) message);
-	return result;
+	unsigned char decrypted[message->getMessage().size() - crypto_box_MACBYTES];
+	return (crypto_box_open_easy(decrypted,
+			(const unsigned char *)message->getMessage().c_str(),
+			message->getMessage().size(),
+			(const unsigned char *)message->getNonce().c_str(),
+			(const unsigned char *)sender->getUserPublicKey().c_str(),
+			(const unsigned char *)user->getUserKeyPair()->getSecretKey().c_str()) == 0) ? (const char*)decrypted : "Fehler";
 }
