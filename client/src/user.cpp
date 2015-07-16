@@ -1,5 +1,5 @@
-#include "user.hpp"
-#include "cryptohelper.hpp"
+#include "../include/user.hpp"
+#include "../include/cryptohelper.hpp"
 
 User::User(std::string username, CryptoHelper *cryptoHelper)
 		: m_username(username), m_cryptoHelper(cryptoHelper), m_userKeyPair(m_cryptoHelper->generateKeyPair()),

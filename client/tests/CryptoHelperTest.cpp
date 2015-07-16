@@ -1,8 +1,8 @@
 #include <cppunit/extensions/HelperMacros.h>
 
-#include "../cryptohelper.hpp"
-#include "../user.hpp"
-#include "../contact.hpp"
+#include "../include/cryptohelper.hpp"
+#include "../include/user.hpp"
+#include "../include/contact.hpp"
 
 class CryptoHelperTest : public CppUnit::TestFixture {
 

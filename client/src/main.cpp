@@ -2,10 +2,10 @@
 #include <string>
 #include <sodium.h>
 
-#include "cryptohelper.hpp"
-#include "keypair.hpp"
-#include "user.hpp"
-#include "contact.hpp"
+#include "../include/cryptohelper.hpp"
+#include "../include/keypair.hpp"
+#include "../include/user.hpp"
+#include "../include/contact.hpp"
 
 using namespace std;
 

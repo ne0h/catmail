@@ -1,4 +1,4 @@
-#include "cryptohelper.hpp"
+#include "../include/cryptohelper.hpp"
 
 CryptoHelper::CryptoHelper() {
 	sodium_init();

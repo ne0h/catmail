@@ -1,4 +1,4 @@
-#include "message.hpp"
+#include "../include/message.hpp"
 
 Message::Message(std::string sender, std::string recipient, std::string message, std::string nonce)
 		: m_sender(sender), m_recipient(recipient), m_message(message), m_nonce(nonce) {
