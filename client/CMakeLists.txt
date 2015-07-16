@@ -13,7 +13,6 @@ SET(SRCS
     src/contact.cpp
     src/cryptohelper.cpp
     src/keypair.cpp
-    src/mainwindow.cpp
     src/message.cpp
     src/user.cpp
 )
@@ -32,18 +31,29 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 FIND_PACKAGE(Qt5Core REQUIRED)
 FIND_PACKAGE(Qt5Widgets REQUIRED)
 FIND_PACKAGE(Qt5Gui REQUIRED)
+
+SET(QT_SRCS
+    src/mainwindow.cpp
+)
+
 SET(UIS
     ui/mainwindow.ui
 )
 QT5_WRAP_UI(UIS_H ${UIS})
 
+SET(MUCS
+    include/mainwindow.hpp
+)
+QT5_WRAP_CPP(MUCS_HEADER ${MUCS})
+
 # main application
 ADD_EXECUTABLE(catmail-client
     src/main.cpp
     ${SRCS}
+    ${QT_SRCS}
     ${UIS_H}
+    ${MUCS_HEADER}
 )
-QT5_USE_MODULES(catmail-client Core Gui Widgets)
 TARGET_LINK_LIBRARIES(catmail-client
     sodium
     Qt5::Widgets
