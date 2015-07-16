@@ -7,12 +7,16 @@
 #include "../include/user.hpp"
 #include "../include/contact.hpp"
 
+#include <QApplication>
+#include "../include/mainwindow.hpp"
+
 using namespace std;
 
 int main(int argc, char* argv[]) {
 
-	CryptoHelper *cryptoHelper;
-	User me("me", cryptoHelper);
+	QApplication a(argc, argv);
+    MainWindow w;
+    w.show();
 
-	return 0;
+    return a.exec();
 }
