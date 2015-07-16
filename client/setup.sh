@@ -24,3 +24,4 @@ cd ../cppunit/
 ./autogen.sh
 ./configure --prefix=`pwd`/lib
 make -j3
+make install
