@@ -16,14 +16,22 @@ public:
 
 		std::string text("topsecrettest");
 
-		CryptoHelper *cryptoHelper;
-		User me("me", cryptoHelper);
-		Contact colleague("Colleague", me.getUserKeyPair()->getPublicKey(), me.getExchangeKeyPair()->getPublicKey());
+		unsigned int failed = 0;
+		for (unsigned int i = 0; i < 1000; i++) {
+			CryptoHelper *cryptoHelper;
+			User me("me", cryptoHelper);
+			Contact colleague("Colleague", me.getUserKeyPair()->getPublicKey(),
+				me.getExchangeKeyPair()->getPublicKey());
 
-		Message message    = cryptoHelper->encryptAsym(&me, &colleague, text);
-		std::string result = cryptoHelper->decryptAsym(&me, &colleague, &message);
-		
-		CPPUNIT_ASSERT(text.compare(result) == 0);
+			Message message    = cryptoHelper->encryptAsym(&me, &colleague, text);
+			std::string result = cryptoHelper->decryptAsym(&me, &colleague, &message);
+
+			if (text.compare(result) != 0) {
+				failed++;
+			}
+		}
+
+		CPPUNIT_ASSERT(failed == 0);
 	}
 
 };
