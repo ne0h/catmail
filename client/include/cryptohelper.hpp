@@ -16,6 +16,10 @@ public:
 	Message encryptAsym(User *user, Contact *recipient, std::string message);
 	std::string decryptAsym(User *user, Contact *sender, Message *message);
 
+	std::string generateSecretKey();
+	Message encrypt(User *user, Contact *recipient, std::string message, std::string key);
+	std::string decrypt(User *user, Message *message, std::string key);
+
 };
 
 #endif

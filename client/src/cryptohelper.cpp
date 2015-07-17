@@ -1,5 +1,5 @@
 #include "../include/cryptohelper.hpp"
-
+#include <iostream>
 CryptoHelper::CryptoHelper() {
 	sodium_init();
 }
@@ -43,5 +43,41 @@ std::string CryptoHelper::decryptAsym(User *user, Contact *sender, Message *mess
 			(const unsigned char *)sender->getUserPublicKey().c_str(),
 			(const unsigned char *)user->getUserKeyPair()->getSecretKey().c_str()) == 0)
 
-		? std::string((const char*)decrypted, decryptLength) : "Fehler";
+		? std::string((const char*)decrypted, decryptLength) : "error";
+}
+
+std::string CryptoHelper::generateSecretKey() {
+
+	unsigned char key[crypto_secretbox_KEYBYTES];
+	randombytes_buf(key, sizeof key);
+
+	return std::string((const char*)key, crypto_secretbox_KEYBYTES);
+}
+
+Message CryptoHelper::encrypt(User *user, Contact *recipient, std::string message, std::string key) {
+
+	unsigned char nonce[crypto_box_NONCEBYTES];
+	randombytes_buf(nonce, sizeof nonce);
+
+	const unsigned int cipherLength = crypto_secretbox_MACBYTES + message.size();
+	unsigned char cipherText[cipherLength];
+
+	crypto_secretbox_easy(cipherText, (const unsigned char *)message.c_str(), message.size(), nonce,
+		(const unsigned char *)key.c_str());
+
+	return Message(user->getUsername(), recipient->getUsername(), std::string((const char*)cipherText, cipherLength),
+		std::string((const char*)nonce, crypto_box_NONCEBYTES));
+}
+
+std::string CryptoHelper::decrypt(User *user, Message *message, std::string key) {
+
+	const unsigned int decryptLength = message->getMessage().size() - crypto_secretbox_MACBYTES;
+	unsigned char decrypted[decryptLength];
+
+	return (crypto_secretbox_open_easy(decrypted,
+			(const unsigned char *)message->getMessage().c_str(),
+			message->getMessage().size(),
+			(const unsigned char *)message->getNonce().c_str(),
+			(const unsigned char *)key.c_str()) == 0) 
+		? std::string((const char*)decrypted, decryptLength) : std::string("error");
 }
