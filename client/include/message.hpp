@@ -3,14 +3,14 @@
 
 #include <string>
 
-class Message {
+#include "cryptobox.hpp"
+
+class Message : public CryptoBox {
 
 public:
 	Message(std::string sender, std::string recipient, std::string message, std::string nonce);
 	const std::string getSender();
 	const std::string getRecipient();
-	std::string getMessage();
-	std::string getNonce();
 
 private:
 	const std::string m_sender;
