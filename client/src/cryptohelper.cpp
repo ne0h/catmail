@@ -16,7 +16,7 @@ KeyPair CryptoHelper::generateKeyPair() {
 	return KeyPair(secretKey, publicKey);
 }
 
-Message CryptoHelper::encryptAsym(std::shared_ptr<User> user, Contact *recipient, std::string message) {
+Message CryptoHelper::encryptAsym(std::shared_ptr<User> user, std::shared_ptr<Contact> recipient, std::string message) {
 
 	unsigned char nonce[crypto_box_NONCEBYTES];
 	randombytes_buf(nonce, sizeof nonce);
@@ -31,7 +31,8 @@ Message CryptoHelper::encryptAsym(std::shared_ptr<User> user, Contact *recipient
 		std::string((const char*)nonce, crypto_box_NONCEBYTES));
 }
 
-std::string CryptoHelper::decryptAsym(User *user, Contact *sender, Message *message) {
+std::string CryptoHelper::decryptAsym(std::shared_ptr<User> user, std::shared_ptr<Contact> sender,
+		std::shared_ptr<Message> message) {
 
 	const unsigned int decryptLength = message->getMessage().size() - crypto_box_MACBYTES;
 	unsigned char decrypted[decryptLength];
@@ -54,7 +55,8 @@ std::string CryptoHelper::generateSecretKey() {
 	return std::string((const char*)key, crypto_secretbox_KEYBYTES);
 }
 
-Message CryptoHelper::encrypt(User *user, Contact *recipient, std::string message, std::string key) {
+Message CryptoHelper::encrypt(std::shared_ptr<User> user, std::shared_ptr<Contact> recipient, std::string message,
+		std::string key) {
 
 	unsigned char nonce[crypto_box_NONCEBYTES];
 	randombytes_buf(nonce, sizeof nonce);
@@ -69,7 +71,7 @@ Message CryptoHelper::encrypt(User *user, Contact *recipient, std::string messag
 		std::string((const char*)nonce, crypto_box_NONCEBYTES));
 }
 
-std::string CryptoHelper::decrypt(User *user, Message *message, std::string key) {
+std::string CryptoHelper::decrypt(std::shared_ptr<User> user, std::shared_ptr<Message> message, std::string key) {
 
 	const unsigned int decryptLength = message->getMessage().size() - crypto_secretbox_MACBYTES;
 	unsigned char decrypted[decryptLength];
