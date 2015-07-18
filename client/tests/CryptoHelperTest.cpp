@@ -17,14 +17,13 @@ public:
 	void testAsymCrypto() {
 
 		std::string text("topsecrettest");
+		std::shared_ptr<CryptoHelper> cryptoHelper(new CryptoHelper);
+		User me("me", cryptoHelper);
+		Contact colleague("Colleague", me.getUserKeyPair()->getPublicKey(),
+			me.getExchangeKeyPair()->getPublicKey());
 
 		unsigned int failed = 0;
 		for (unsigned int i = 0; i < 1000; i++) {
-			CryptoHelper *cryptoHelper;
-			User me("me", cryptoHelper);
-			Contact colleague("Colleague", me.getUserKeyPair()->getPublicKey(),
-				me.getExchangeKeyPair()->getPublicKey());
-
 			Message message    = cryptoHelper->encryptAsym(&me, &colleague, text);
 			std::string result = cryptoHelper->decryptAsym(&me, &colleague, &message);
 

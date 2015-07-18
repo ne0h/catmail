@@ -13,7 +13,7 @@ class CryptoHelper {
 public:
 	CryptoHelper();
 	KeyPair generateKeyPair();
-	Message encryptAsym(User *user, Contact *recipient, std::string message);
+	Message encryptAsym(std::shared_ptr<User> user, Contact *recipient, std::string message);
 	std::string decryptAsym(User *user, Contact *sender, Message *message);
 
 	std::string generateSecretKey();

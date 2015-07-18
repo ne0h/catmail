@@ -16,7 +16,7 @@ KeyPair CryptoHelper::generateKeyPair() {
 	return KeyPair(secretKey, publicKey);
 }
 
-Message CryptoHelper::encryptAsym(User *user, Contact *recipient, std::string message) {
+Message CryptoHelper::encryptAsym(std::shared_ptr<User> user, Contact *recipient, std::string message) {
 
 	unsigned char nonce[crypto_box_NONCEBYTES];
 	randombytes_buf(nonce, sizeof nonce);
