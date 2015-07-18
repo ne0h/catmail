@@ -10,6 +10,7 @@ INCLUDE_DIRECTORIES(
 )
 
 SET(SRCS
+    src/base64.cpp
     src/contact.cpp
     src/cryptohelper.cpp
     src/keypair.cpp

@@ -3,12 +3,15 @@
 #include "../include/cryptohelper.hpp"
 #include "../include/user.hpp"
 #include "../include/contact.hpp"
+#include "../include/base64.hpp"
+
 #include <iostream>
 class CryptoHelperTest : public CppUnit::TestFixture {
 
 	CPPUNIT_TEST_SUITE(CryptoHelperTest);
 	CPPUNIT_TEST(testAsymCrypto);
 	CPPUNIT_TEST(testCrypto);
+	CPPUNIT_TEST(testBase64);
 	CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -46,10 +49,22 @@ public:
 			me->getExchangeKeyPair()->getPublicKey()));
 
 		std::string secretKey = cryptoHelper->generateSecretKey();
-		Message message    = cryptoHelper->encrypt(me, colleague, text, secretKey);
-		std::string result = cryptoHelper->decrypt(me, std::make_shared<Message>(message), secretKey);
+		Message message       = cryptoHelper->encrypt(me, colleague, text, secretKey);
+		std::string result    = cryptoHelper->decrypt(me, std::make_shared<Message>(message), secretKey);
 
 		CPPUNIT_ASSERT(text.compare(result) == 0);
+	}
+
+	// en- and decode a random string
+	void testBase64() {
+
+		std::shared_ptr<CryptoHelper> cryptoHelper(new CryptoHelper());
+		std::string secretKey = cryptoHelper->generateSecretKey();
+
+		std::string encoded = base64_encode(secretKey);
+		std::string decoded = base64_decode(std::make_shared<std::string>(encoded));
+
+		CPPUNIT_ASSERT(decoded.compare(secretKey) == 0);
 	}
 
 };
