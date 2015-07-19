@@ -12,6 +12,7 @@ class CryptoHelperTest : public CppUnit::TestFixture {
 	CPPUNIT_TEST(testAsymCrypto);
 	CPPUNIT_TEST(testCrypto);
 	CPPUNIT_TEST(testBase64);
+	CPPUNIT_TEST(testBase64SecretKey);
 	CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -48,23 +49,36 @@ public:
 		std::shared_ptr<Contact> colleague(new Contact("Colleague", me->getUserKeyPair()->getPublicKey(),
 			me->getExchangeKeyPair()->getPublicKey()));
 
-		std::string secretKey = cryptoHelper->generateSecretKey();
-		Message message       = cryptoHelper->encrypt(me, colleague, text, secretKey);
-		std::string result    = cryptoHelper->decrypt(me, std::make_shared<Message>(message), secretKey);
+		std::string symKey = cryptoHelper->generateSymKey();
+		Message message    = cryptoHelper->encrypt(me, colleague, text, symKey);
+		std::string result = cryptoHelper->decrypt(me, std::make_shared<Message>(message), symKey);
 
 		CPPUNIT_ASSERT(text.compare(result) == 0);
 	}
 
-	// en- and decode a random string
+	// en- and decode base64 a secret key
 	void testBase64() {
 
 		std::shared_ptr<CryptoHelper> cryptoHelper(new CryptoHelper());
-		std::string secretKey = cryptoHelper->generateSecretKey();
+		std::string symKey = cryptoHelper->generateSymKey();
 
-		std::string encoded = base64_encode(secretKey);
+		std::string encoded = base64_encode(symKey);
 		std::string decoded = base64_decode(std::make_shared<std::string>(encoded));
 
-		CPPUNIT_ASSERT(decoded.compare(secretKey) == 0);
+		CPPUNIT_ASSERT(decoded.compare(symKey) == 0);
+	}
+
+	// en- and decrypt a base64 encoded secret key from a keypair
+	void testBase64SecretKey() {
+
+		std::shared_ptr<CryptoHelper> cryptoHelper(new CryptoHelper());
+		KeyPair keyPair    = cryptoHelper->generateKeyPair();
+		std::string symKey = cryptoHelper->generateSymKey();
+
+		CryptoBox encodedAndEncrypted = cryptoHelper->encryptAndEncodeBase64(keyPair.getSecretKey(), symKey);
+		std::cout << encodedAndEncrypted.getMessage() << std::endl;
+
+		CPPUNIT_ASSERT(true);
 	}
 
 };

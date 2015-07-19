@@ -12,3 +12,11 @@ std::string CryptoBox::getMessage() {
 std::string CryptoBox::getNonce() {
 	return m_nonce;
 }
+
+void CryptoBox::setMessage(std::string message) {
+	m_message = message;
+}
+
+void CryptoBox::setNonce(std::string nonce) {
+	m_nonce = nonce;
+}
