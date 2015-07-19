@@ -1,5 +1,9 @@
 #include "cryptobox.hpp"
 
+CryptoBox::CryptoBox() {
+	
+}
+
 CryptoBox::CryptoBox(std::string message, std::string nonce)
 		: m_message(message), m_nonce(nonce) {
 

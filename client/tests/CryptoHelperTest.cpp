@@ -76,7 +76,6 @@ public:
 		std::string symKey = cryptoHelper->generateSymKey();
 
 		CryptoBox encodedAndEncrypted = cryptoHelper->encryptAndEncodeBase64(keyPair.getSecretKey(), symKey);
-		std::cout << encodedAndEncrypted.getMessage() << std::endl;
 
 		CPPUNIT_ASSERT(true);
 	}

@@ -6,6 +6,7 @@
 class CryptoBox {
 
 public:
+	CryptoBox();
 	CryptoBox(std::string message, std::string nonce);
 	std::string getMessage();
 	std::string getNonce();
