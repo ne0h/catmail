@@ -66,5 +66,8 @@ def RemoveContact(sessionCookie=str, otherUser=""):
 def BlockContact(sessionCookie="", otherUser="", silent=False):
     raise Exception("Not implemented yet")
 
+@jsonrpc.method("CreateUser(username=str, password=str, encryptedUserKeyPair=str, publicKey=str, privateKey=str) -> dict") 
+def CreateUser(username="", password="", encryptedUserKeyPair="", publicKey="", privateKey=""):
+    return xmpp2.CreateUser(username, password, encryptedUserKeyPair, publicKey, privateKey)
 if __name__ == '__main__':
     app.run()
