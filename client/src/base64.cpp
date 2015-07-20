@@ -115,3 +115,11 @@ void base64_encode(std::shared_ptr<CryptoBox> input) {
 	input->setMessage(message);
 	input->setNonce(nonce);
 }
+
+void base64_decode(std::shared_ptr<CryptoBox> input) {
+	std::string message = base64_decode(std::make_shared<std::string>(input->getMessage()));
+	std::string nonce   = base64_decode(std::make_shared<std::string>(input->getNonce()));
+
+	input->setMessage(message);
+	input->setNonce(nonce);
+}

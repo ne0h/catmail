@@ -5,14 +5,13 @@
 #include "../include/contact.hpp"
 #include "../include/base64.hpp"
 
-#include <iostream>
 class CryptoHelperTest : public CppUnit::TestFixture {
 
 	CPPUNIT_TEST_SUITE(CryptoHelperTest);
 	CPPUNIT_TEST(testAsymCrypto);
 	CPPUNIT_TEST(testCrypto);
 	CPPUNIT_TEST(testBase64);
-	CPPUNIT_TEST(testBase64SecretKey);
+	CPPUNIT_TEST(testEncryptedBase64SecretKey);
 	CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -69,15 +68,17 @@ public:
 	}
 
 	// en- and decrypt a base64 encoded secret key from a keypair
-	void testBase64SecretKey() {
+	void testEncryptedBase64SecretKey() {
 
 		std::shared_ptr<CryptoHelper> cryptoHelper(new CryptoHelper());
 		KeyPair keyPair    = cryptoHelper->generateKeyPair();
 		std::string symKey = cryptoHelper->generateSymKey();
 
-		CryptoBox encodedAndEncrypted = cryptoHelper->encryptAndEncodeBase64(keyPair.getSecretKey(), symKey);
+		CryptoBox in = cryptoHelper->encryptAndEncodeBase64(keyPair.getSecretKey(), symKey);
+		std::shared_ptr<CryptoBox> out(new CryptoBox(in.getMessage(), in.getNonce()));
+		std::string result = cryptoHelper->decodeBase64AndDecrypt(out, symKey);
 
-		CPPUNIT_ASSERT(true);
+		CPPUNIT_ASSERT(keyPair.getSecretKey().compare(result) == 0);
 	}
 
 };

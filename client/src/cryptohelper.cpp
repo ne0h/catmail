@@ -1,5 +1,5 @@
 #include "../include/cryptohelper.hpp"
-#include <iostream>
+
 CryptoHelper::CryptoHelper() {
 	sodium_init();
 }
@@ -119,6 +119,7 @@ CryptoBox CryptoHelper::encryptAndEncodeBase64(std::string input, std::string ke
 	return encrypted;
 }
 
-std::string CryptoHelper::decodeBase64AndDecrypt(std::shared_ptr<CryptoBox> input) {
-
+std::string CryptoHelper::decodeBase64AndDecrypt(std::shared_ptr<CryptoBox> input, std::string key) {
+	base64_decode(input);
+	return decrypt(input, key);
 }

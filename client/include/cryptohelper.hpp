@@ -31,7 +31,7 @@ public:
 	std::string decrypt(std::shared_ptr<User> user, std::shared_ptr<Message> message, std::string key);
 
 	CryptoBox encryptAndEncodeBase64(std::string input, std::string key);
-	std::string decodeBase64AndDecrypt(std::shared_ptr<CryptoBox> input);
+	std::string decodeBase64AndDecrypt(std::shared_ptr<CryptoBox> input, std::string key);
 
 };
 
