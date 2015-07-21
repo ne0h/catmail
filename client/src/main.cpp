@@ -8,6 +8,7 @@
 #include "../include/contact.hpp"
 
 #include <QApplication>
+#include "../include/firstrunwindow.hpp"
 #include "../include/mainwindow.hpp"
 
 using namespace std;
@@ -15,7 +16,7 @@ using namespace std;
 int main(int argc, char* argv[]) {
 
 	QApplication a(argc, argv);
-    MainWindow w;
+    FirstRunWindow w;
     w.show();
 
     return a.exec();

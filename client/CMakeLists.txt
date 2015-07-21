@@ -35,15 +35,18 @@ FIND_PACKAGE(Qt5Widgets REQUIRED)
 FIND_PACKAGE(Qt5Gui REQUIRED)
 
 SET(QT_SRCS
+    src/firstrunwindow.cpp
     src/mainwindow.cpp
 )
 
 SET(UIS
+    ui/firstrunwindow.ui
     ui/mainwindow.ui
 )
 QT5_WRAP_UI(UIS_H ${UIS})
 
 SET(MUCS
+    include/firstrunwindow.hpp
     include/mainwindow.hpp
 )
 QT5_WRAP_CPP(MUCS_HEADER ${MUCS})
