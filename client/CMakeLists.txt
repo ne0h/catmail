@@ -37,17 +37,20 @@ FIND_PACKAGE(Qt5Gui REQUIRED)
 SET(QT_SRCS
     src/firstrunwindow.cpp
     src/mainwindow.cpp
+    src/newuserdialog.cpp
 )
 
 SET(UIS
     ui/firstrunwindow.ui
     ui/mainwindow.ui
+    ui/newuserdialog.ui
 )
 QT5_WRAP_UI(UIS_H ${UIS})
 
 SET(MUCS
     include/firstrunwindow.hpp
     include/mainwindow.hpp
+    include/newuserdialog.hpp
 )
 QT5_WRAP_CPP(MUCS_HEADER ${MUCS})
 
