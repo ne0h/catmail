@@ -8,6 +8,10 @@ Run `git submodule update --init`
 
 ### Client
 
+#### Dependencies
+
+* libjson-rpc-cpp
+
 1. `cd client`
 1. `./setup.sh`
 1. `mkdir build && cd build`
