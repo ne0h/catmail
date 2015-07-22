@@ -44,13 +44,14 @@ class XMPP2:
     def CreateUser(self, username, password, encryptedKeypair, publicKey, privatKey):
         self.openDatabaseConnection()
         print("SELECT count(*) FROM user_table WHERE USERNAME = '" + username + "';")
-        if self.sqlite_connection.execute("SELECT count(*) FROM user_table where USERNAME = '" + username + "';").fetchone()[0] == 0:
+        if self.sqlite_connection.execute("SELECT count(*) FROM user_table where USERNAME = '" + username + "';").fetchone()[0] == 0: #check if the username already exists
             self.sqlite_connection.execute("INSERT INTO user_table (USERNAME, PASSWORD, ENCRYPTED_KEYPAIR, PUBLIC_KEY, PRIVAT_KEY) VALUES ('" + username +"','" + password + "','" + encryptedKeypair + "','" + publicKey + "','" + privatKey + "');")
             self.sqlite_connection.commit()
             self.closeDatabaseConnection()
-            return {}
+            return {"result": 0}
         else:
-            raise Exception("Username already taken")
+            return {"result": -1}
+            
 
     def __exit__(self, type, value, traceback):
         return
