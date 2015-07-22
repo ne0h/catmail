@@ -12,8 +12,14 @@ Run `git submodule update --init`
 
 * libjson-rpc-cpp
 
+#### Build && Run
+
 1. `cd client`
 1. `./setup.sh`
 1. `mkdir build && cd build`
 2. `cmake ..`
 3. `make`
+
+#### Run Tests
+
+Run `./build/testrunner` to execute unit tests.
