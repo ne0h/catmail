@@ -1,21 +1,25 @@
 import time
 import sqlite3
 from helpfunctions import getRandomChallenge
-
 __author__ = 'adrian'
 class XMPP2:
     randomChallenges = {}
     def __init__(self):
-        sqlite_connection = sqlite3.connect('database.sqlite')
-        sqlite_connection.cursor()
+        pass
+
+    def openDatabaseConnection(self):
+        self.sqlite_connection = sqlite3.connect('database.sqlite')
+        self.sqlite_connection.cursor()
 
 
         #Check if Databse is alread initiliase else initilise Database
-        if sqlite_connection.execute("SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name = 'user_table';").fetchone()[0] == 1:
+        if self.sqlite_connection.execute("SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name = 'user_table';").fetchone()[0] == 1:
             pass
         else :
-            sqlite_connection.execute("CREATE TABLE user_table(USERNAME CHAR(50) PRIMARY KEY NOT NULL, PASSWORD CHAR(50) NOT NULL, ENCRYPTED_KEYPAIR CHAR(50) NOT NULL, PRIVAT_KEY CHAR(50) NOT NULL, PUBLIC_KEY CHAR(50) NOT NULL);")
-           
+            self.sqlite_connection.execute("CREATE TABLE user_table(USERNAME TEXT PRIMARY KEY NOT NULL, PASSWORD TEXT NOT NULL, ENCRYPTED_KEYPAIR TEXT NOT NULL, PRIVAT_KEY TEXT NOT NULL, PUBLIC_KEY TEXT NOT NULL);")
+       
+    def closeDatabaseConnection(self):
+        self.sqlite_connection.close()
     def RequestLoginChallenge(self, user, protocolVersion):
         randomChallenge = getRandomChallenge()
         self.randomChallenges[randomChallenge] = [time.time() + 60, user]
@@ -38,12 +42,15 @@ class XMPP2:
         raise Exception("Not implemented yet")
         pass
     def CreateUser(self, username, password, encryptedKeypair, publicKey, privatKey):
-        if sqlite_connection.execute("SELECT count(*) FROM user_table WHERE USERNAME = " + user_table + ";").fetchone()[0] == 0:
-            sqlite_connection.execute("INSERT INTO user_table (USERNAME, PASSWORD, ENCRYPTED_KEYPAIR, PUBLIC_KEY, PRIVAT_KEY) VALUES (" + username +"," + password + "," + encryptedKeypair + "," + publicKey + "," + privatKey +");")
-            sqlite_connection.commit()
-            return()
+        self.openDatabaseConnection()
+        print("SELECT count(*) FROM user_table WHERE USERNAME = '" + username + "';")
+        if self.sqlite_connection.execute("SELECT count(*) FROM user_table where USERNAME = '" + username + "';").fetchone()[0] == 0:
+            self.sqlite_connection.execute("INSERT INTO user_table (USERNAME, PASSWORD, ENCRYPTED_KEYPAIR, PUBLIC_KEY, PRIVAT_KEY) VALUES ('" + username +"','" + password + "','" + encryptedKeypair + "','" + publicKey + "','" + privatKey + "');")
+            self.sqlite_connection.commit()
+            self.closeDatabaseConnection()
+            return {}
         else:
             raise Exception("Username already taken")
 
     def __exit__(self, type, value, traceback):
-        sqlite_connection.close()
+        return
