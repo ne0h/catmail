@@ -1,0 +1,16 @@
+[
+	{
+		"name": "createUser",
+		"params": {
+			"username": "cat",
+			"password": "password"
+		},
+		"returns": {
+			"id": "0",
+			"jsonrpc": "2.0",
+			"result": {
+				"result": 0
+			}
+		}
+	}
+]

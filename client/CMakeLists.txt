@@ -9,8 +9,14 @@ INCLUDE_DIRECTORIES(
     include/
 )
 
+SET(LIBS
+    sodium
+    jsoncpp curl jsonrpccpp-common jsonrpccpp-client
+)
+
 SET(SRCS
     src/base64.cpp
+    src/client.cpp
     src/contact.cpp
     src/cryptobox.cpp
     src/cryptohelper.cpp
@@ -63,7 +69,7 @@ ADD_EXECUTABLE(catmail-client
     ${MUCS_HEADER}
 )
 TARGET_LINK_LIBRARIES(catmail-client
-    sodium
+    ${LIBS}
     Qt5::Widgets
 )
 
@@ -74,7 +80,10 @@ INCLUDE_DIRECTORIES(../3rdparty/cppunit/lib/include)
 
 FILE(GLOB UnitTests_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "tests/*Test.cpp" )
 ADD_EXECUTABLE(testrunner tests/testrunner.cpp ${UnitTests_SRCS} ${SRCS})
-TARGET_LINK_LIBRARIES(testrunner cppunit sodium)
+TARGET_LINK_LIBRARIES(testrunner
+    cppunit
+    ${LIBS}
+)
 FOREACH(test ${UnitTests_SRCS})
         GET_FILENAME_COMPONENT(TestName ${test} NAME_WE)
         ADD_TEST(${TestName} UnitTester ${TestName})

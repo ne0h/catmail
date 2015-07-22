@@ -3,7 +3,7 @@
 # identify platform
 unamestr=`uname`
 
-
+# build libsodium
 cd ../3rdparty/libsodium/
 ./autogen.sh
 
@@ -19,9 +19,14 @@ if [[ "$unamestr" == 'Linux' ]] ; then
 	make distclean > /dev/null
 fi
 
-
+# build cppunit
 cd ../cppunit/
 ./autogen.sh
 ./configure --prefix=`pwd`/lib
 make -j3
 make install
+
+# build api
+mkdir -p api
+jsonrpcstub spec.json --cpp-client=ClientHandler
+mv clienthandler.h api/clienthandler.hpp
