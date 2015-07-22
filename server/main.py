@@ -10,7 +10,7 @@ app = Flask(__name__)
 
 
 app.debug=True
-jsonrpc = JSONRPC(app, '/api')
+jsonrpc = JSONRPC(app,'/')
 
 #TODO Implement authentication the flask rpc way
 
@@ -66,8 +66,8 @@ def removeContact(sessionCookie=str, otherUser=""):
 def blockContact(sessionCookie="", otherUser="", silent=False):
     raise Exception("Not implemented yet")
 
-@jsonrpc.method("createUser(username=str, password=str, encryptedUserKeyPair=str, publicKey=str, privateKey=str) -> dict") 
-def createUser(username="", password="", encryptedUserKeyPair="", publicKey="", privateKey=""):
-    return xmpp2.createUser(username, password, encryptedUserKeyPair, publicKey, privateKey)
+@jsonrpc.method("createUser(username=str, password=str, userKey=str, exchangeKey=str) -> dict") 
+def createUser(username="", password="", userKey="", exchangeKey="", ):
+    return xmpp2.createUser(username, password, userKey, exchangeKey)
 if __name__ == '__main__':
     app.run()

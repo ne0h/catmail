@@ -16,7 +16,7 @@ class XMPP2:
         if self.sqlite_connection.execute("SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name = 'user_table';").fetchone()[0] == 1:
             pass
         else :
-            self.sqlite_connection.execute("CREATE TABLE user_table(USERNAME TEXT PRIMARY KEY NOT NULL, PASSWORD TEXT NOT NULL, ENCRYPTED_KEYPAIR TEXT NOT NULL, PRIVAT_KEY TEXT NOT NULL, PUBLIC_KEY TEXT NOT NULL);")
+            self.sqlite_connection.execute("CREATE TABLE user_table(USERNAME TEXT PRIMARY KEY NOT NULL, PASSWORD TEXT NOT NULL, USERKEY TEXT NOT NULL, EXCHANGEKEY TEXT NOT NULL);")
        
     def closeDatabaseConnection(self):
         self.sqlite_connection.close()
@@ -41,11 +41,11 @@ class XMPP2:
     def pollChatMessages(self, sessionCookie):
         raise Exception("Not implemented yet")
         pass
-    def createUser(self, username, password, encryptedKeypair, publicKey, privatKey):
+    def createUser(self, username, password, userKey, exchangeKey):
         self.openDatabaseConnection()
         print("SELECT count(*) FROM user_table WHERE USERNAME = '" + username + "';")
         if self.sqlite_connection.execute("SELECT count(*) FROM user_table where USERNAME = '" + username + "';").fetchone()[0] == 0: #check if the username already exists
-            self.sqlite_connection.execute("INSERT INTO user_table (USERNAME, PASSWORD, ENCRYPTED_KEYPAIR, PUBLIC_KEY, PRIVAT_KEY) VALUES ('" + username +"','" + password + "','" + encryptedKeypair + "','" + publicKey + "','" + privatKey + "');")
+            self.sqlite_connection.execute("INSERT INTO user_table (USERNAME, PASSWORD, USERKEY, EXCHANGEKEY) VALUES ('" + username +"','" + password + "','" + userKey + "','" + exchangeKey +  "');")
             self.sqlite_connection.commit()
             self.closeDatabaseConnection()
             return {"result": 0}
