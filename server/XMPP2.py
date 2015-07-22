@@ -20,28 +20,28 @@ class XMPP2:
        
     def closeDatabaseConnection(self):
         self.sqlite_connection.close()
-    def RequestLoginChallenge(self, user, protocolVersion):
+    def requestLoginChallenge(self, user, protocolVersion):
         randomChallenge = getRandomChallenge()
         self.randomChallenges[randomChallenge] = [time.time() + 60, user]
         return {"challenge": randomChallenge}
 
-    def Login(self, user, clientID, loginChallenge, loginSignature):
+    def login(self, user, clientID, loginChallenge, loginSignature):
         challenges = [self.randomChallenges[n] for n in self.randomChallenges if n == loginChallenge]
         raise Exception("Not implemented yet")
         
 
-    def Logout(self, sessionCookie):
+    def logout(self, sessionCookie):
         raise Exception("Not implemented yet")
         pass
 
-    def GetUserPublicKeys(self, sessionCookie, otherUser):
+    def getUserPublicKeys(self, sessionCookie, otherUser):
         raise Exception("Not implemented yet")
         pass
 
-    def PollChatMessages(self, sessionCookie):
+    def pollChatMessages(self, sessionCookie):
         raise Exception("Not implemented yet")
         pass
-    def CreateUser(self, username, password, encryptedKeypair, publicKey, privatKey):
+    def createUser(self, username, password, encryptedKeypair, publicKey, privatKey):
         self.openDatabaseConnection()
         print("SELECT count(*) FROM user_table WHERE USERNAME = '" + username + "';")
         if self.sqlite_connection.execute("SELECT count(*) FROM user_table where USERNAME = '" + username + "';").fetchone()[0] == 0: #check if the username already exists
