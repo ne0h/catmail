@@ -2,6 +2,7 @@
 #define CLIENT_HPP
 
 #include <string>
+#include <memory>
 #include <iostream>
 
 #include "../include/keypair.hpp"
