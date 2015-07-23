@@ -10,19 +10,6 @@
 #include <jsonrpccpp/client/connectors/httpclient.h>
 #include "../api/clienthandler.hpp"
 
-class KeyPairValue : public Json::Value {
-
-public:
-	KeyPairValue(std::string secretKey, std::string publicKey) : m_secretKey(secretKey), m_publicKey(publicKey) {}
-	std::string getSecretKey() {return m_secretKey;}
-	std::string getPublicKey() {return m_publicKey;}
-
-private:
-	std::string m_secretKey;
-	std::string m_publicKey;
-
-};
-
 class Client {
 
 public:

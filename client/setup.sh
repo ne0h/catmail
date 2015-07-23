@@ -27,6 +27,4 @@ make -j3
 make install
 
 # build api
-mkdir -p api
-jsonrpcstub spec.json --cpp-client=ClientHandler
-mv clienthandler.h api/clienthandler.hpp
+./genapi.sh

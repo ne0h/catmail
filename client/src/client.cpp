@@ -11,7 +11,7 @@ int Client::createUser(std::string username, std::string password, std::shared_p
 
 	try {
 		Json::Value result = m_clientHandler.createUser(password, username);
-		std::cout << result["id"].asInt();
+		std::cout << result << std::endl;
 	} catch (jsonrpc::JsonRpcException e) {
         std::cerr << e.what() << std::endl;
     }

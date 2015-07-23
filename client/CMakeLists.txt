@@ -9,11 +9,6 @@ INCLUDE_DIRECTORIES(
     include/
 )
 
-SET(LIBS
-    sodium
-    jsoncpp curl jsonrpccpp-common jsonrpccpp-client
-)
-
 SET(SRCS
     src/base64.cpp
     src/client.cpp
@@ -34,6 +29,16 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     INCLUDE_DIRECTORIES(../3rdparty/libsodium/libsodium-linux/include)
     LINK_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/libsodium/libsodium-linux/lib/ ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/cppunit/lib/lib)    
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+
+# other 3rdparty stuff
+
+INCLUDE_DIRECTORIES(
+    ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/libjson-rpc-cpp/build/include/
+)
+
+LINK_DIRECTORIES(
+    ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/libjson-rpc-cpp/build/lib
+)
 
 # QT5
 FIND_PACKAGE(Qt5Core REQUIRED)
@@ -59,6 +64,11 @@ SET(MUCS
     include/newuserdialog.hpp
 )
 QT5_WRAP_CPP(MUCS_HEADER ${MUCS})
+
+SET(LIBS
+    sodium
+    jsoncpp curl jsonrpccpp-common jsonrpccpp-client
+)
 
 # main application
 ADD_EXECUTABLE(catmail-client
