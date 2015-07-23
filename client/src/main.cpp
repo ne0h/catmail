@@ -28,24 +28,5 @@ int main(int argc, char* argv[]) {
     FirstRunWindow w;
     w.show();
 
-    return a.exec();
-
-
-   POST / HTTP/1.1
-Host: localhost:5000
-Accept: 
-Content-Type: application/json
-charsets: utf-8
-Content-Length: 96
-
-{"id":1,"jsonrpc":"2.0","method":"createUser","params":{"password":"cat_key","username":"cat"}}
-HTTP/1.1 200 OK
-Connection: Keep-Alive
-Content-Length: 43
-Access-Control-Allow-Origin: *
-Content-Type: application/json
-Date: Wed, 22 Jul 2015 15:24:59 GMT
-
-{"id":1,"jsonrpc":"2.0","result":"Hello "}
-*/
+	return a.exec();*/
 }

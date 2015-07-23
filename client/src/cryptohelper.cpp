@@ -34,12 +34,12 @@ Message CryptoHelper::encryptAsym(std::shared_ptr<User> user, std::shared_ptr<Co
 std::string CryptoHelper::decryptAsym(std::shared_ptr<User> user, std::shared_ptr<Contact> sender,
 		std::shared_ptr<Message> message) {
 
-	const unsigned int decryptLength = message->getMessage().size() - crypto_box_MACBYTES;
+	const unsigned int decryptLength = message->getValue().size() - crypto_box_MACBYTES;
 	unsigned char decrypted[decryptLength];
 
 	return (crypto_box_open_easy(decrypted,
-			(const unsigned char *)message->getMessage().c_str(),
-			message->getMessage().size(),
+			(const unsigned char *)message->getValue().c_str(),
+			message->getValue().size(),
 			(const unsigned char *)message->getNonce().c_str(),
 			(const unsigned char *)sender->getUserPublicKey().c_str(),
 			(const unsigned char *)user->getUserKeyPair()->getSecretKey().c_str()) == 0)
@@ -74,18 +74,18 @@ Message CryptoHelper::encrypt(std::shared_ptr<User> user, std::shared_ptr<Contac
 		std::string key) {
 
 	CryptoBox encrypted = encrypt(message, key);
-	return Message(user->getUsername(), recipient->getUsername(), encrypted.getMessage(),
+	return Message(user->getUsername(), recipient->getUsername(), encrypted.getValue(),
 		encrypted.getNonce());
 }
 
 std::string CryptoHelper::decrypt(std::shared_ptr<CryptoBox> message, std::string key) {
 
-	const unsigned int decryptLength = message->getMessage().size() - crypto_secretbox_MACBYTES;
+	const unsigned int decryptLength = message->getValue().size() - crypto_secretbox_MACBYTES;
 	unsigned char decrypted[decryptLength];
 
 	return (crypto_secretbox_open_easy(decrypted,
-			(const unsigned char *)message->getMessage().c_str(),
-			message->getMessage().size(),
+			(const unsigned char *)message->getValue().c_str(),
+			message->getValue().size(),
 			(const unsigned char *)message->getNonce().c_str(),
 			(const unsigned char *)key.c_str()) == 0) 
 		? std::string((const char*)decrypted, decryptLength) : std::string("error");
@@ -93,12 +93,12 @@ std::string CryptoHelper::decrypt(std::shared_ptr<CryptoBox> message, std::strin
 
 std::string CryptoHelper::decrypt(std::shared_ptr<User> user, std::shared_ptr<Message> message, std::string key) {
 
-	const unsigned int decryptLength = message->getMessage().size() - crypto_secretbox_MACBYTES;
+	const unsigned int decryptLength = message->getValue().size() - crypto_secretbox_MACBYTES;
 	unsigned char decrypted[decryptLength];
 
 	return (crypto_secretbox_open_easy(decrypted,
-			(const unsigned char *)message->getMessage().c_str(),
-			message->getMessage().size(),
+			(const unsigned char *)message->getValue().c_str(),
+			message->getValue().size(),
 			(const unsigned char *)message->getNonce().c_str(),
 			(const unsigned char *)key.c_str()) == 0) 
 		? std::string((const char*)decrypted, decryptLength) : std::string("error");
@@ -110,10 +110,10 @@ std::string CryptoHelper::decrypt(std::shared_ptr<User> user, std::shared_ptr<Me
 CryptoBox CryptoHelper::encryptAndEncodeBase64(std::string input, std::string key) {
 
 	CryptoBox encrypted = encrypt(input, key);	
-	std::shared_ptr<CryptoBox> encryptedAndEncoded(new CryptoBox(encrypted.getMessage(), encrypted.getNonce()));
+	std::shared_ptr<CryptoBox> encryptedAndEncoded(new CryptoBox(encrypted.getValue(), encrypted.getNonce()));
 	base64_encode(encryptedAndEncoded);
 
-	encrypted.setMessage(encryptedAndEncoded->getMessage());
+	encrypted.setMessage(encryptedAndEncoded->getValue());
 	encrypted.setNonce(encryptedAndEncoded->getNonce());
 
 	return encrypted;
@@ -122,4 +122,9 @@ CryptoBox CryptoHelper::encryptAndEncodeBase64(std::string input, std::string ke
 std::string CryptoHelper::decodeBase64AndDecrypt(std::shared_ptr<CryptoBox> input, std::string key) {
 	base64_decode(input);
 	return decrypt(input, key);
+}
+
+KeyPairBox CryptoHelper::encryptAndEncodeBase64(std::shared_ptr<KeyPair> keyPair, std::string symKey) {
+	CryptoBox box = encryptAndEncodeBase64(keyPair->getSecretKey(), symKey);
+	std::string encodedPublicKey = base64_encode(keyPair->getPublicKey());
 }

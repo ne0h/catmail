@@ -11,6 +11,7 @@
 #include "contact.hpp"
 #include "cryptobox.hpp"
 #include "base64.hpp"
+#include "keypairbox.hpp"
 
 class CryptoHelper {
 
@@ -31,6 +32,7 @@ public:
 	std::string decrypt(std::shared_ptr<User> user, std::shared_ptr<Message> message, std::string key);
 
 	CryptoBox encryptAndEncodeBase64(std::string input, std::string key);
+	KeyPairBox encryptAndEncodeBase64(std::shared_ptr<KeyPair> keyPair, std::string symKey);
 	std::string decodeBase64AndDecrypt(std::shared_ptr<CryptoBox> input, std::string key);
 
 };

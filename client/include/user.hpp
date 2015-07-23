@@ -12,9 +12,9 @@ class User {
 
 public:
 	User(std::string username, std::shared_ptr<CryptoHelper> cryptoHelper);
-	KeyPair* getUserKeyPair();
-	KeyPair* getExchangeKeyPair();
-	std::string getUsername();
+	KeyPair* getUserKeyPair() {return &m_userKeyPair;}
+	KeyPair* getExchangeKeyPair() {return &m_exchangeKeyPair;}
+	std::string getUsername() {return m_username;}
 
 private:
 	std::shared_ptr<CryptoHelper> m_cryptoHelper;

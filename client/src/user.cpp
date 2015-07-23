@@ -7,14 +7,3 @@ User::User(std::string username, std::shared_ptr<CryptoHelper> cryptoHelper)
 
 }
 
-KeyPair* User::getUserKeyPair() {
-	return &m_userKeyPair;
-}
-
-KeyPair* User::getExchangeKeyPair() {
-	return &m_exchangeKeyPair;
-}
-
-std::string User::getUsername() {
-	return m_username;
-}

@@ -93,7 +93,7 @@ public:
 		std::string symKey = cryptoHelper->generateSymKey();
 
 		CryptoBox in = cryptoHelper->encryptAndEncodeBase64(keyPair.getSecretKey(), symKey);
-		std::shared_ptr<CryptoBox> out(new CryptoBox(in.getMessage(), in.getNonce()));
+		std::shared_ptr<CryptoBox> out(new CryptoBox(in.getValue(), in.getNonce()));
 		std::string result = cryptoHelper->decodeBase64AndDecrypt(out, symKey);
 
 		CPPUNIT_ASSERT(keyPair.getSecretKey().compare(result) == 0);

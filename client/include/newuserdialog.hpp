@@ -3,6 +3,8 @@
 
 #include <QDialog>
 
+#include "cryptohelper.hpp"
+
 namespace Ui {
 class NewUserDialog;
 }
@@ -12,8 +14,12 @@ class NewUserDialog : public QDialog
 	Q_OBJECT
 
 public:
-	explicit NewUserDialog(QWidget *parent = 0);
-	~NewUserDialog();
+    explicit NewUserDialog(QWidget *parent = 0);
+    ~NewUserDialog();
+
+private slots:
+    void on_createUserBtn_released();
+    void on_cancelBtn_released();
 
 private:
 	Ui::NewUserDialog *ui;

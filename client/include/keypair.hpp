@@ -6,12 +6,10 @@
 class KeyPair {
 
 public:
-	KeyPair(std::string secretKey, std::string publicKey);
+	KeyPair(std::string secretKey, std::string publicKey) : m_secretKey(secretKey), m_publicKey(publicKey) {}
 
-	std::string getSecretKey();
-	std::string getPublicKey();	
-	std::string getEncodedPrivateKey();
-	std::string getEncodedPublicKey();
+	std::string getSecretKey() {return m_secretKey;}
+	std::string getPublicKey() {return m_publicKey;}
 
 private:
 	std::string m_secretKey;

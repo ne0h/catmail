@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 PROJECT("catmail-client")
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g")
 SET(CMAKE_AUTOMOC ON)
 SET(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -13,10 +13,7 @@ SET(SRCS
     src/base64.cpp
     src/client.cpp
     src/contact.cpp
-    src/cryptobox.cpp
     src/cryptohelper.cpp
-    src/keypair.cpp
-    src/message.cpp
     src/user.cpp
 )
 
