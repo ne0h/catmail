@@ -1,16 +1,10 @@
 [
 	{
 		"name": "createUser",
-		"jsonrpc": "2.0",
-		"id": "111",
 		"params": {
 			"username": "cat",
 			"password": "password"
 		},
-		"returns": {
-			"id": "111",
-			"jsonrpc": "2.0",
-			"result": 0
-		}
+		"returns": 0
 	}
 ]
