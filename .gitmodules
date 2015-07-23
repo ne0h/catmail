@@ -4,3 +4,9 @@
 [submodule "3rdparty/cppunit"]
 	path = 3rdparty/cppunit
 	url = git://anongit.freedesktop.org/git/libreoffice/cppunit/
+[submodule "3rdparty/libjson-rpc-cpp"]
+	path = 3rdparty/libjson-rpc-cpp
+	url = https://github.com/cinemast/libjson-rpc-cpp.git
+[submodule "3rdparty/jsoncpp"]
+	path = 3rdparty/jsoncpp
+	url = https://github.com/open-source-parsers/jsoncpp.git

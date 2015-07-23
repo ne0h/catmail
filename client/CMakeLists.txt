@@ -7,6 +7,7 @@ SET(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 INCLUDE_DIRECTORIES(
     include/
+    ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/libjson-rpc-cpp/build/include/
 )
 
 SET(SRCS
