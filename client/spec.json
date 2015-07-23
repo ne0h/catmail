@@ -8,7 +8,7 @@
 			"password": "password"
 		},
 		"returns": {
-			"id": "0",
+			"id": "111",
 			"jsonrpc": "2.0",
 			"result": 0
 		}

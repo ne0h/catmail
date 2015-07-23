@@ -30,16 +30,6 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     LINK_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/libsodium/libsodium-linux/lib/ ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/cppunit/lib/lib)    
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
-# other 3rdparty stuff
-
-INCLUDE_DIRECTORIES(
-    ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/libjson-rpc-cpp/build/include/
-)
-
-LINK_DIRECTORIES(
-    ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/libjson-rpc-cpp/build/lib
-)
-
 # QT5
 FIND_PACKAGE(Qt5Core REQUIRED)
 FIND_PACKAGE(Qt5Widgets REQUIRED)
