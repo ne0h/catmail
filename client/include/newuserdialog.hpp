@@ -2,6 +2,7 @@
 #define NEWUSERDIALOG_HPP
 
 #include <QDialog>
+#include <QMessageBox>
 
 #include "cryptohelper.hpp"
 

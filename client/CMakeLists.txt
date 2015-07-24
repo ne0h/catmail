@@ -10,6 +10,10 @@ INCLUDE_DIRECTORIES(
     ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/libjson-rpc-cpp/build/include/
 )
 
+LINK_DIRECTORIES(
+    ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/libjson-rpc-cpp/build/lib
+)
+
 SET(SRCS
     src/base64.cpp
     src/client.cpp
