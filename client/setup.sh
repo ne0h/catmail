@@ -55,5 +55,9 @@ cd ../../
 # build api
 cd ../client
 mkdir -p api
+if [[ "$unamestr" == 'Darwin' ]]; then
+	export DYLD_LIBRARY_PATH="../3rdparty/libjson-rpc-cpp/build/lib"
+fi
+
 ../3rdparty/libjson-rpc-cpp/build/bin/jsonrpcstub spec.json --cpp-client=ClientHandler
 mv clienthandler.h api/clienthandler.hpp

@@ -22,14 +22,22 @@ SET(SRCS
     src/user.cpp
 )
 
+# libsodium for osx and linux
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    INCLUDE_DIRECTORIES(/usr/local/include ../3rdparty/libsodium/libsodium-osx/include)
-    LINK_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/libsodium/libsodium-osx/lib/ ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/cppunit/lib)
+    INCLUDE_DIRECTORIES(
+        ../3rdparty/libsodium/libsodium-osx/include
+    )
+    LINK_DIRECTORIES(
+        ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/libsodium/libsodium-osx/lib/ ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/cppunit/lib
+    )
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-    INCLUDE_DIRECTORIES(../3rdparty/libsodium/libsodium-linux/include)
-    LINK_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/libsodium/libsodium-linux/lib/ ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/cppunit/lib/lib)    
+    INCLUDE_DIRECTORIES(
+        ../3rdparty/libsodium/libsodium-linux/include
+    )
+    LINK_DIRECTORIES(
+        ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/libsodium/libsodium-linux/lib/ ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/cppunit/lib/lib
+    )    
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 # QT5
