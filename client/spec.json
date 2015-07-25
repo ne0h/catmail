@@ -3,7 +3,17 @@
 		"name": "createUser",
 		"params": {
 			"username": "cat",
-			"password": "password"
+			"password": "password",
+			"userKey": {
+				"secretKey": "secretKey",
+				"nonce": "nonce",
+				"publicKey": "publicKey"
+			},
+			"exchangeKey": {
+				"secretKey": "secretKey",
+				"nonce": "nonce",
+				"publicKey": "publicKey"
+			}
 		},
 		"returns": 0
 	}
