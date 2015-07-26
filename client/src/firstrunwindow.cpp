@@ -1,10 +1,10 @@
 #include "../include/firstrunwindow.hpp"
-#include "../include/newuserdialog.hpp"
 #include "ui_firstrunwindow.h"
 
-FirstRunWindow::FirstRunWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::FirstRunWindow) {
-    ui->setupUi(this);
+FirstRunWindow::FirstRunWindow(std::shared_ptr<Client> client, QWidget *parent) : QMainWindow(parent),
+		ui(new Ui::FirstRunWindow), m_client(client) {
 
+	ui->setupUi(this);
 }
 
 FirstRunWindow::~FirstRunWindow() {
@@ -12,6 +12,6 @@ FirstRunWindow::~FirstRunWindow() {
 }
 
 void FirstRunWindow::on_newUserBtn_released() {
-	NewUserDialog *newUserDialog = new NewUserDialog();
+	NewUserDialog *newUserDialog = new NewUserDialog(m_client);
 	newUserDialog->show();
 }

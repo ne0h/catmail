@@ -1,7 +1,9 @@
 #include "../include/newuserdialog.hpp"
 #include "ui_newuserdialog.h"
 
-NewUserDialog::NewUserDialog(QWidget *parent) :	QDialog(parent), ui(new Ui::NewUserDialog) {
+NewUserDialog::NewUserDialog(std::shared_ptr<Client> client, QWidget *parent) :	QDialog(parent),
+		ui(new Ui::NewUserDialog), m_client(client) {
+
 	ui->setupUi(this);
 }
 

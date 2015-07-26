@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QMessageBox>
 
+#include "client.hpp"
 #include "cryptohelper.hpp"
 
 namespace Ui {
@@ -15,7 +16,7 @@ class NewUserDialog : public QDialog
 	Q_OBJECT
 
 public:
-    explicit NewUserDialog(QWidget *parent = 0);
+    explicit NewUserDialog(std::shared_ptr<Client> client, QWidget *parent = 0);
     ~NewUserDialog();
 
 private slots:
@@ -24,6 +25,7 @@ private slots:
 
 private:
 	Ui::NewUserDialog *ui;
+	std::shared_ptr<Client> m_client;
 };
 
 #endif // NEWUSERDIALOG_HPP

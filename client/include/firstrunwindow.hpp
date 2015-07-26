@@ -3,6 +3,10 @@
 
 #include <QMainWindow>
 
+#include "newuserdialog.hpp"
+
+#include "client.hpp"
+
 namespace Ui {
 class FirstRunWindow;
 }
@@ -11,7 +15,7 @@ class FirstRunWindow : public QMainWindow {
     Q_OBJECT
 
 public:
-    explicit FirstRunWindow(QWidget *parent = 0);
+    explicit FirstRunWindow(std::shared_ptr<Client> client, QWidget *parent = 0);
     ~FirstRunWindow();
 
 private slots:
@@ -19,6 +23,7 @@ private slots:
 
 private:
     Ui::FirstRunWindow *ui;
+    std::shared_ptr<Client> m_client;
 };
 
 #endif // FIRSTRUNWINDOW_HPP

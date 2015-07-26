@@ -16,17 +16,11 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
 
-	std::unique_ptr<Client> client(new Client("miauuu.de", 5000));
-	std::shared_ptr<KeyPair> userKeyPair(new KeyPair("secretKey", "publicKey"));
-	std::shared_ptr<KeyPair> exchangeKeyPair(new KeyPair("11secretKey", "11publicKey"));
+	std::shared_ptr<Client> client(new Client("miauuu.de", 5000));
 
-	client->createUser("cat", "cat_key", userKeyPair, exchangeKeyPair);
-
-	return 0;
-
-	/*QApplication a(argc, argv);
-    FirstRunWindow w;
+	QApplication a(argc, argv);
+	FirstRunWindow w(client);
     w.show();
 
-	return a.exec();*/
+	return a.exec();
 }

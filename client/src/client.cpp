@@ -10,8 +10,8 @@ int Client::createUser(std::string username, std::string password, std::shared_p
 		std::shared_ptr<KeyPair> exchangeKeyPair) {
 
 	try {
-		Json::Value result = m_clientHandler.createUser(password, username);
-		std::cout << result << std::endl;
+		//Json::Value result = m_clientHandler.createUser(password, username);
+		//std::cout << result << std::endl;
 	} catch (jsonrpc::JsonRpcException e) {
         std::cerr << e.what() << std::endl;
     }
