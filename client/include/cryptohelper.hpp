@@ -23,6 +23,8 @@ public:
 		std::shared_ptr<Message> message);
 
 	std::string generateSymKey();
+	std::string hash(std::shared_ptr<std::string> input);
+	bool verifyHash(std::shared_ptr<std::string> input, std::shared_ptr<std::string> hash);
 
 	CryptoBox encrypt(std::string message, std::string key);
 	Message encrypt(std::shared_ptr<User> user, std::shared_ptr<Contact> recipient, std::string message,

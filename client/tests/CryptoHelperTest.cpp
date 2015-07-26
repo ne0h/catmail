@@ -15,6 +15,7 @@ class CryptoHelperTest : public CppUnit::TestFixture {
 	CPPUNIT_TEST(testLongCrypto);
 	CPPUNIT_TEST(testBase64);
 	CPPUNIT_TEST(testEncryptedBase64SecretKey);
+	CPPUNIT_TEST(testHashing);
 	CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -97,6 +98,16 @@ public:
 		std::string result = cryptoHelper->decodeBase64AndDecrypt(out, symKey);
 
 		CPPUNIT_ASSERT(keyPair.getSecretKey().compare(result) == 0);
+	}
+
+	// test password hashing
+	void testHashing() {
+
+		std::shared_ptr<CryptoHelper> cryptoHelper(new CryptoHelper());
+		std::shared_ptr<std::string> password(new std::string("topsecureandextremlypowerfulpassword"));
+
+		std::string hash = cryptoHelper->hash(password);
+		CPPUNIT_ASSERT(cryptoHelper->verifyHash(password, std::make_shared<std::string>(hash)));
 	}
 
 };

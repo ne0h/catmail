@@ -55,6 +55,20 @@ std::string CryptoHelper::generateSymKey() {
 	return std::string((const char*)key, crypto_secretbox_KEYBYTES);
 }
 
+std::string CryptoHelper::hash(std::shared_ptr<std::string> input) {
+
+	char hash[crypto_pwhash_scryptsalsa208sha256_STRBYTES];
+	crypto_pwhash_scryptsalsa208sha256_str(hash, (const char *)input->c_str(), input->size(),
+		 crypto_pwhash_scryptsalsa208sha256_OPSLIMIT_SENSITIVE, crypto_pwhash_scryptsalsa208sha256_MEMLIMIT_SENSITIVE);
+
+	return std::string((const char*)hash, crypto_pwhash_scryptsalsa208sha256_STRBYTES);
+}
+
+bool CryptoHelper::verifyHash(std::shared_ptr<std::string> input, std::shared_ptr<std::string> hash) {
+	return (crypto_pwhash_scryptsalsa208sha256_str_verify((const char *)hash->c_str(),
+														  (const char *)input->c_str(), input->size()) == 0);
+}
+
 CryptoBox CryptoHelper::encrypt(std::string message, std::string key) {
 
 	unsigned char nonce[crypto_box_NONCEBYTES];
