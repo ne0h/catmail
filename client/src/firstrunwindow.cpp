@@ -1,8 +1,9 @@
 #include "../include/firstrunwindow.hpp"
 #include "ui_firstrunwindow.h"
 
-FirstRunWindow::FirstRunWindow(std::shared_ptr<Client> client, QWidget *parent) : QMainWindow(parent),
-		ui(new Ui::FirstRunWindow), m_client(client) {
+FirstRunWindow::FirstRunWindow(std::shared_ptr<CryptoHelper> cryptoHelper, std::shared_ptr<Client> client,
+							   QWidget *parent) : QMainWindow(parent), ui(new Ui::FirstRunWindow),
+								m_cryptoHelper(cryptoHelper), m_client(client) {
 
 	ui->setupUi(this);
 }
@@ -12,6 +13,6 @@ FirstRunWindow::~FirstRunWindow() {
 }
 
 void FirstRunWindow::on_newUserBtn_released() {
-	NewUserDialog *newUserDialog = new NewUserDialog(m_client);
+	NewUserDialog *newUserDialog = new NewUserDialog(m_cryptoHelper, m_client);
 	newUserDialog->show();
 }

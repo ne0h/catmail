@@ -16,7 +16,8 @@ class NewUserDialog : public QDialog
 	Q_OBJECT
 
 public:
-    explicit NewUserDialog(std::shared_ptr<Client> client, QWidget *parent = 0);
+    explicit NewUserDialog(std::shared_ptr<CryptoHelper> cryptoHelper, std::shared_ptr<Client> client,
+			   QWidget *parent = 0);
     ~NewUserDialog();
 
 private slots:
@@ -25,6 +26,7 @@ private slots:
 
 private:
 	Ui::NewUserDialog *ui;
+	std::shared_ptr<CryptoHelper> m_cryptoHelper;
 	std::shared_ptr<Client> m_client;
 };
 

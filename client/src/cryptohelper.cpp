@@ -134,11 +134,15 @@ CryptoBox CryptoHelper::encryptAndEncodeBase64(std::string input, std::string ke
 }
 
 std::string CryptoHelper::decodeBase64AndDecrypt(std::shared_ptr<CryptoBox> input, std::string key) {
+
 	base64_decode(input);
 	return decrypt(input, key);
 }
 
 KeyPairBox CryptoHelper::encryptAndEncodeBase64(std::shared_ptr<KeyPair> keyPair, std::string symKey) {
+
 	CryptoBox box = encryptAndEncodeBase64(keyPair->getSecretKey(), symKey);
 	std::string encodedPublicKey = base64_encode(keyPair->getPublicKey());
+
+	return KeyPairBox(box.getValue(), box.getNonce(), encodedPublicKey);
 }

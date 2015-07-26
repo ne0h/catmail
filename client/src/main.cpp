@@ -16,10 +16,11 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
 
+	std::shared_ptr<CryptoHelper> cryptoHelper(new CryptoHelper);
 	std::shared_ptr<Client> client(new Client("miauuu.de", 5000));
 
 	QApplication a(argc, argv);
-	FirstRunWindow w(client);
+	FirstRunWindow w(cryptoHelper, client);
     w.show();
 
 	return a.exec();
