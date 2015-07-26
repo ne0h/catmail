@@ -19,8 +19,8 @@ Run `git submodule update --init`
 1. `mkdir build && cd build`
 2. `cmake ..`
 3. `make`
-4. `./catmail-client`
+4. `DYLD_LIBRARY_PATH="../../3rdparty/libjson-rpc-cpp/build/lib" ./catmail-client`
 
 #### Run Tests
 
-Run `./testrunner` to execute unit tests.
+Run `DYLD_LIBRARY_PATH="../../3rdparty/libjson-rpc-cpp/build/lib" ./testrunner` to execute unit tests.
