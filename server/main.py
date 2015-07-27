@@ -70,4 +70,4 @@ def blockContact(sessionCookie="", otherUser="", silent=False):
 def createUser(username="", password="", userKey="", exchangeKey="", ):
     return xmpp2.createUser(username, password, userKey, exchangeKey)
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0')
