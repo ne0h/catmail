@@ -19,14 +19,28 @@ int Client::createUser(std::string username, std::string password, std::shared_p
 	exchangeKey["nonce"]     = exchangeKeyPair->getNonce();
 	exchangeKey["publicKey"] = exchangeKeyPair->getPublicKey();
 
-	try {
-		Json::Value result = m_clientHandler.createUser(exchangeKey, password, userKey, username);
-		std::cout << result << std::endl;
+	Json::Value response;
 
-		return result["result"].asInt();
+	try {
+		response = m_clientHandler.createUser(exchangeKey, password, userKey, username);
+		std::cout << response << std::endl;
 	} catch (jsonrpc::JsonRpcException e) {
         std::cerr << e.what() << std::endl;
     }
 
-	return 1;
+	return response["result"].asInt();
+}
+
+KeyPairBox Client::login(std::string username, std::string password) {
+	
+	Json::Value response;
+
+	try {
+		response = m_clientHandler.login(password, username);
+		std::cout << response << std::endl;
+	} catch (jsonrpc::JsonRpcException e) {
+		std::cerr << e.what() << std::endl;
+	}
+	
+	return KeyPairBox(response["secretKey"].asString(), response["nonce"].asString(), response["publicKey"].asString());
 }

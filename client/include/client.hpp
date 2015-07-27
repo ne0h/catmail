@@ -16,6 +16,7 @@ public:
 	Client(std::string hostname, int port);
 	int createUser(std::string username, std::string password, std::shared_ptr<KeyPairBox> userKeyPair,
 		std::shared_ptr<KeyPairBox> exchangeKeyPair);
+	KeyPairBox login(std::string username, std::string password);
 
 private:
 	std::string m_hostname;
