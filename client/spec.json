@@ -15,6 +15,21 @@
 				"publicKey": "publicKey"
 			}
 		},
-		"returns": 0
+		"returns": {
+			"result": 0
+		}
+	},
+	{
+		"name": "login",
+		"params": {
+			"username": "cat",
+			"password": "password"
+		},
+		"returns": {
+			"result": 0,
+			"secretKey": "secretKey",
+			"nonce": "nonce",
+			"publicKey": "publicKey"
+		}
 	}
 ]
