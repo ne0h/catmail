@@ -49,14 +49,19 @@ cd libjson-rpc-cpp
 mkdir -p build && cd build
 cmake -DCMAKE_BUILD_TYPE=debug -DCOMPILE_TESTS=NO -DCOMPILE_EXAMPLES=NO -DHTTP_SERVER=NO -DUNIX_DOMAIN_SOCKET_SERVER=NO -DCMAKE_INSTALL_PREFIX="$pwdstr/../3rdparty/libjson-rpc-cpp/build" -JSONCPP_INCLUDE_PREFIX="../../jsoncpp/build/" ..
 make
-make install
+if [[ "$unamestr" == 'Darwin' ]]; then
+    make install
+fi
 cd ../../
 
 # build api
 cd ../client
 mkdir -p api
 if [[ "$unamestr" == 'Darwin' ]]; then
-	export DYLD_LIBRARY_PATH="../3rdparty/libjson-rpc-cpp/build/lib"
+    export DYLD_LIBRARY_PATH="../3rdparty/libjson-rpc-cpp/build/lib"
+fi
+if [[ "$unamestr" == 'Linux' ]]; then
+    export LD_LIBRARY_PATH="../3rdparty/libjson-rpc-cpp/build/lib"
 fi
 
 ../3rdparty/libjson-rpc-cpp/build/bin/jsonrpcstub spec.json --cpp-client=ClientHandler
