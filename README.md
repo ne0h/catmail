@@ -20,3 +20,18 @@ Run `git submodule update --init`
 #### Run Tests
 
 Run `DYLD_LIBRARY_PATH="../../3rdparty/libjson-rpc-cpp/build/lib" ./testrunner` to execute unit tests.
+
+
+### Server
+
+## Requirements
+python3
+python-pip
+sqlite3
+
+Install flusk-JSONRPC via pip
+sudo pip install Flask-JSONRPC
+
+## RUN
+python main.py
+## 
