@@ -47,8 +47,7 @@ class XMPP2:
         self.openDatabaseConnection()
         print("SELECT count(*) FROM user_table WHERE USERNAME = '" + username + "';")
         if self.sqlite_connection.execute("SELECT count(*) FROM user_table where USERNAME = '" + username + "';").fetchone()[0] == 0: #check if the username already exists
-            self.sqlite_connection.execute("INSERT INTO user_table (USERNAME, PASSWORD, USERKEY_SECRETKEY, 
-USERKEY_NONCE, USERKEY_PUBLICKYE, EXCHANGEKEY_SECRETKEY, EXCHANGEKEY_NONCE, EXCHANGEKEY_PUBLICKEY) VALUES ('" + username +"','" + password + "','" + userKey["secretKey"] + "','" + userKey["nonce"] + "','" + userKey["publicKey"] + "','" + exchangeKey["secretKey"] + "','" + exchangeKey["nonce"] + "','" + exchangeKey["publicKey"] +  "');")
+            self.sqlite_connection.execute("INSERT INTO user_table (USERNAME, PASSWORD, USERKEY_SECRETKEY, USERKEY_NONCE, USERKEY_PUBLICKEY, EXCHANGEKEY_SECRETKEY, EXCHANGEKEY_NONCE, EXCHANGEKEY_PUBLICKEY) VALUES ('" + username +"','" + password + "','" + userKey["secretKey"] + "','" + userKey["nonce"] + "','" + userKey["publicKey"] + "','" + exchangeKey["secretKey"] + "','" + exchangeKey["nonce"] + "','" + exchangeKey["publicKey"] +  "');")
             self.sqlite_connection.commit()
             self.closeDatabaseConnection()
             return {"result": 0}
