@@ -29,6 +29,7 @@ def logout(sessionCookie=""):
 @jsonrpc.method("getUserPublicKeys(sessionCookie=str, otherUser=str) -> dict", validate=True)
 def getUserPublicKeys(sessionCookie="", otherUser=""):
     return xmpp2.getUserPublicKeys(sessionCookie, otherUser)
+
 @jsonrpc.method("setTrust(sessionCookie=str, otherUser=str, keyFingerprint=str, trust=str) -> dict")
 def setTrust(sessionCookie="", otherUser="", keyFingerprint="", trust=""):
     raise Exception("Not implemented yet")
@@ -66,8 +67,9 @@ def removeContact(sessionCookie=str, otherUser=""):
 def blockContact(sessionCookie="", otherUser="", silent=False):
     raise Exception("Not implemented yet")
 
-@jsonrpc.method("createUser(username=str, password=str, userKey=str, exchangeKey=str) -> dict") 
-def createUser(username="", password="", userKey="", exchangeKey="", ):
+@jsonrpc.method("createUser(username=str, password=str, userKey=dict, exchangeKey=str) -> dict") 
+def createUser(username, password, userKey, exchangeKey):
     return xmpp2.createUser(username, password, userKey, exchangeKey)
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0')

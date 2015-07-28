@@ -41,7 +41,9 @@ class XMPP2:
     def pollChatMessages(self, sessionCookie):
         raise Exception("Not implemented yet")
         pass
+
     def createUser(self, username, password, userKey, exchangeKey):
+        print(userKey["secretKey"])
         self.openDatabaseConnection()
         print("SELECT count(*) FROM user_table WHERE USERNAME = '" + username + "';")
         if self.sqlite_connection.execute("SELECT count(*) FROM user_table where USERNAME = '" + username + "';").fetchone()[0] == 0: #check if the username already exists
