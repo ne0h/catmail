@@ -35,9 +35,11 @@ void NewUserDialog::on_createUserBtn_released() {
 	const KeyPairBox encryptedUserKeyPair     = m_cryptoHelper->encryptAndEncodeBase64(userKeyPair, storageHash);
 	const KeyPairBox encryptedExchangeKeyPair = m_cryptoHelper->encryptAndEncodeBase64(userKeyPair, storageHash);
 
-	m_client->createUser(ui->usernameInpt->text().toStdString(), ui->passwordInpt->text().toStdString(),
+	m_client->createUser(ui->usernameInpt->text().toStdString() + "@catmail.de", ui->passwordInpt->text().toStdString(),
 						 std::make_shared<KeyPairBox>(encryptedUserKeyPair),
 						 std::make_shared<KeyPairBox>(encryptedExchangeKeyPair));
+
+	this->close();
 }
 
 void NewUserDialog::on_cancelBtn_released() {
