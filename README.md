@@ -29,7 +29,7 @@ Run `DYLD_LIBRARY_PATH="../../3rdparty/libjson-rpc-cpp/build/lib" ./testrunner` 
 * python-pip
 * sqlite3
 
-Install flusk-JSONRPC via pip
+Install flusk-JSONRPC via pip:
 
 `sudo pip install Flask-JSONRPC`
 
