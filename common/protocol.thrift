@@ -1,5 +1,6 @@
 
-namespace cpp catmail.api
+namespace java de.catmail.api
+namespace cpp  catmail.api
 
 exception InternalException {
 	

@@ -1,0 +1,26 @@
+apply plugin: "scala"
+
+sourceSets {
+	main {
+		scala {
+			srcDirs = ["src"]
+		}
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	compile "org.scala-lang:scala-library:2.11.7"
+}
+
+task fat(type: Jar) {
+	manifest {
+		attributes "Main-Class": "de.catmail.server.CatMailServer", "Class-Path": "."
+	}
+
+	from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } } with jar
+	from "resources/" exclude "META-INF/*.RSA", "META-INF/*.SF", "META-INF/*.DSA"
+}

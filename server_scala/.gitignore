@@ -1,0 +1,8 @@
+.gradle/
+
+catmailapi/bin/
+catmailapi/build/
+catmailapi/src/
+
+catmailserver/bin/
+catmailserver/build/
