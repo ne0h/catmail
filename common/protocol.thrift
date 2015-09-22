@@ -302,10 +302,14 @@ service CatMailService {
 	 * Marks message with given MessageID and older as read.
 	 */
 	 void markMessagesAsRead(
+		/** The name of the user. */
+		1: string username,
+		/** The user's session token. */
+		2: string sessionToken,
 	 	/**The chat which contains the messages. */
-	 	1: i64 chatID,
+	 	3: i64 chatID,
 	 	/**The newest MessageID. */
-	 	2: i64 MessageID, 
+	 	4: i64 MessageID, 
 	 ) throws (
 	 	/** Something went dramatically wrong. */
 		1: InternalException internalException,
@@ -313,6 +317,8 @@ service CatMailService {
 		2: ChatDoesNotExistException chatDoesNotExistException,
 		/** Message doesn't exist. */
 		3: MessageDoesNotExistException messageDoesNotExistException
+		/** Combination of username and password is wrong. */
+		4: InvalidSessionException invalidSessionException,
 	)
 
 }
