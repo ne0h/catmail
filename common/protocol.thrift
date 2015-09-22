@@ -266,8 +266,10 @@ service CatMailService {
 		1: string username,
 		/** The user's session token. */
 		2: string sessionToken,
+		/** The chat where to send the message to. */
+		3: i64 chatId,
 		/** The message itsself. */
-		3: string message,
+		4: string message,
 	) throws (
 		/** Something went dramatically wrong. */
 		1: InternalException internalException,
