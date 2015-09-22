@@ -293,5 +293,16 @@ service CatMailService {
 		/** Indicates that there is no chat with this id. */
 		3: ChatDoesNotExistException chatDoesNotExistException,
 	)
+	
+	/**
+	 * Marks message with given MessageID and older as read.
+	 */
+	 void markMessagesAsRead{
+	 	/**The newest MessageID. */
+	 	1: i64 MessageIDm 
+	 ) throws (
+	 	/** Something went dramatically wrong. */
+		1: InternalException internalException
+	)
 
 }
