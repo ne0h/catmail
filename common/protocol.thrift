@@ -26,6 +26,10 @@ exception ChatDoesNotExistException {
 	
 }
 
+exception MessageDoesNotExistException {
+
+}
+
 exception InvalidMessageException {
 	
 }
@@ -298,11 +302,17 @@ service CatMailService {
 	 * Marks message with given MessageID and older as read.
 	 */
 	 void markMessagesAsRead{
+	 	/**The chat which contains the messages./*
+	 	1: i64 chatID,
 	 	/**The newest MessageID. */
-	 	1: i64 MessageIDm 
+	 	2: i64 MessageID, 
 	 ) throws (
 	 	/** Something went dramatically wrong. */
-		1: InternalException internalException
+		1: InternalException internalException,
+		/** chat dosen't exist. */
+		2: ChatDoesNotExistException,
+		/** Message doesn't exist. */
+		3: MessageDoesNotExistException
 	)
 
 }
