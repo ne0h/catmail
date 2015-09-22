@@ -1,0 +1,7 @@
+allprojects {
+	apply plugin: "eclipse"
+	
+	repositories {
+		mavenCentral()
+	}
+}

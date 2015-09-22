@@ -6,7 +6,10 @@ package de.catmail.server
 object CatMailServer {
 	
 	def start() {
-		println("Start")
+		println("Starting server...")
+		
+		
+		println("Server started.")
 	}
 	
 	def main(args: Array[String]) {
