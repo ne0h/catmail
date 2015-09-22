@@ -309,7 +309,7 @@ service CatMailService {
 	 	/**The chat which contains the messages. */
 	 	3: i64 chatID,
 	 	/**The newest MessageID. */
-	 	4: i64 MessageID, 
+	 	4: i64 messageID, 
 	 ) throws (
 	 	/** Something went dramatically wrong. */
 		1: InternalException internalException,
