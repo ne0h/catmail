@@ -4,3 +4,6 @@
 [submodule "3rdparty/cppunit"]
 	path = 3rdparty/cppunit
 	url = git://anongit.freedesktop.org/git/libreoffice/cppunit/
+[submodule "3rdparty/thrift"]
+	path = 3rdparty/thrift
+	url = https://github.com/apache/thrift.git

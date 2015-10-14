@@ -105,11 +105,68 @@ struct ChatData {
 }
 
 /**
- * Response of a getNewMessages query.
+ * Response of a getMessages query.
  */
-struct GetNewMessagesResponse {
+struct GetMessagesResponse {
 	/** New messages per chat. */
 	1: list<ChatData> chatData,
+}
+
+/**
+ * Response of a getUserPublicKey query.
+ */
+struct GetUserPublicKeyResponse {
+	/** The public key of the target user. */
+	1: string publicKey
+}
+
+/**
+ * Different attribute types used in contact lists.
+ */
+enum ContactAttributeType {
+	ALIAS
+}
+
+/**
+ * Encapsulates one contact.
+ */
+struct Contact {
+	/** Username of the contact. */
+	1: string username,
+	/** Extandable set of user attributes */
+	2: map<ContactAttributeType, string> attributes,
+}
+
+/**
+ * Response of a getContactListResponse.
+ */
+struct GetContactListResponse {
+	/** List of contacts the user has. */
+	1: list<Contact> contacts
+}
+
+/**
+ * Reponse of a addToContactList query
+ */
+struct AddToContactListResponse {
+	/** The new version after the update */
+	1: i32 version,
+}
+
+/**
+ * Reponse of a removeFromContactList query
+ */
+struct RemoveFromContactListResponse {
+	/** The new version after the update */
+	1: i32 version,
+}
+
+/**
+ * Response of a updateContactList query
+ */
+struct UpdateContactListReponse {
+	/** The new version after the update */
+	1: i32 version,
 }
 
 /**
@@ -284,12 +341,12 @@ service CatMailService {
 	/**
 	 * Fetches all new messages from server.
 	 */
-	GetNewMessagesResponse getNewMessages(
+	GetMessagesResponse getMessages(
 		/** The name of the user. */
 		1: string username,
 		/** The user's session token. */
 		2: string sessionToken,
-		/** Chats where to fetch messages. */
+		/** Chats where to fetch messages. An empty list queries all chats. */
 		3: list<Chat> chats,
 	) throws (
 		/** Something went dramatically wrong. */
@@ -298,7 +355,7 @@ service CatMailService {
 		2: InvalidSessionException invalidSessionException,
 		/** Indicates that there is no chat with this id. */
 		3: ChatDoesNotExistException chatDoesNotExistException,
-	)
+	),
 	
 	/**
 	 * Marks message with given MessageID and older as read.
@@ -321,6 +378,103 @@ service CatMailService {
 		3: MessageDoesNotExistException messageDoesNotExistException
 		/** Combination of username and password is wrong. */
 		4: InvalidSessionException invalidSessionException,
-	)
+	),
+
+	/**
+	 * Downloads the public key of any user
+	 */
+	GetUserPublicKeyResponse getUserPublicKeyResponse(
+		/** The name of the user. */
+		1: string username,
+		/** The user's session token. */
+		2: string sessionToken,
+		/** Get the public key of this user */
+		3: string targetUser,
+	) throws (
+		/** Something went dramatically wrong. */
+		1: InternalException internalException,
+		/** Combination of username and password is wrong. */
+		2: InvalidSessionException invalidSessionException,
+		/** Indicates that the target user does not exist. */
+		3: UserDoesNotExistException userDoesNotExistException,
+	),
+
+	/**
+	 * Downloads own the contact list.
+	 */
+	GetContactListResponse getContactList(
+		/** The name of the user. */
+		1: string username,
+		/** The user's session token. */
+		2: string sessionToken,
+		/** Verion number the client has */
+		3: i32 version,
+	) throws (
+		/** Something went dramatically wrong. */
+		1: InternalException internalException,
+		/** Combination of username and password is wrong. */
+		2: InvalidSessionException invalidSessionException,
+	),
+
+	/**
+	 * Adds an entry to the contact list. Increments the version counter to inform other clients.
+	 */
+	AddToContactListReponse addToContactList(
+		/** The name of the user. */
+		1: string username,
+		/** The user's session token. */
+		2: string sessionToken,
+		/** The name of the user who will be added */
+		3: string userToAdd,
+		/** Additional information to store. */
+		4: map<ContactAttribute, String> attributes,
+	) throws (
+		/** Something went dramatically wrong. */
+		1: InternalException internalException,
+		/** Combination of username and password is wrong. */
+		2: InvalidSessionException invalidSessionException,
+		/** Indicates that the target user does not exist. */
+		3: UserDoesNotExistException userDoesNotExistException,
+	),
+
+	/**
+	 * Updates an entry of the contact list. Increments the version counter to inform other clients.
+	 */
+	UpdateContactListReponse updateContactList(
+		/** The name of the user. */
+		1: string username,
+		/** The user's session token. */
+		2: string sessionToken,
+		/** The name of the user who will be updated */
+		3: string userToUpdate,
+		/** Additional information to update. */
+		4: map<ContactAttributeType, String> attributes,
+	) throws (
+		/** Something went dramatically wrong. */
+		1: InternalException internalException,
+		/** Combination of username and password is wrong. */
+		2: InvalidSessionException invalidSessionException,
+		/** Indicates that the target user does not exist. */
+		3: UserDoesNotExistException userDoesNotExistException,
+	),
+
+	/**
+	 * Adds an entry to the contact list. Increments the version counter to inform other clients.
+	 */
+	RemoveFromContactListResponse removeFromContactList(
+		/** The name of the user. */
+		1: string username,
+		/** The user's session token. */
+		2: string sessionToken,
+		/** The name of the user who will be deleted */
+		3: string userToDelete,
+	) throws (
+		/** Something went dramatically wrong. */
+		1: InternalException internalException,
+		/** Combination of username and password is wrong. */
+		2: InvalidSessionException invalidSessionException,
+		/** Indicates that the target user does not exist. */
+		3: UserDoesNotExistException userDoesNotExistException,
+	),
 
 }
