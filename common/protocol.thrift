@@ -419,7 +419,7 @@ service CatMailService {
 	/**
 	 * Adds an entry to the contact list. Increments the version counter to inform other clients.
 	 */
-	AddToContactListReponse addToContactList(
+	AddToContactListResponse addToContactList(
 		/** The name of the user. */
 		1: string username,
 		/** The user's session token. */
@@ -427,7 +427,7 @@ service CatMailService {
 		/** The name of the user who will be added */
 		3: string userToAdd,
 		/** Additional information to store. */
-		4: map<ContactAttribute, String> attributes,
+		4: map<ContactAttributeType, string> attributes,
 	) throws (
 		/** Something went dramatically wrong. */
 		1: InternalException internalException,
@@ -448,7 +448,7 @@ service CatMailService {
 		/** The name of the user who will be updated */
 		3: string userToUpdate,
 		/** Additional information to update. */
-		4: map<ContactAttributeType, String> attributes,
+		4: map<ContactAttributeType, string> attributes,
 	) throws (
 		/** Something went dramatically wrong. */
 		1: InternalException internalException,
