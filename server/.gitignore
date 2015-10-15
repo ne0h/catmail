@@ -1,1 +1,5 @@
-database.sqlite
+*.log
+
+api/
+node_modules/node-int64/
+node_modules/q/

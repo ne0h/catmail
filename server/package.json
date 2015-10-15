@@ -1,0 +1,9 @@
+{
+	"name": "catmailserver",
+	"description": "Server implementation of CatMail.",
+	"author": "Maximilian Hess <mail@ne0h.de>",
+	"dependencies": {
+		"express": ">= 1.2.0"
+	},
+	"engine": "node 4.2.1"
+}
