@@ -1,2 +1,3 @@
-cppunitm.built
 libsodium.built
+pysodium-build/
+thrift-build/
