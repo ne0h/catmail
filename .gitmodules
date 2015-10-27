@@ -4,3 +4,6 @@
 [submodule "3rdparty/thrift"]
 	path = 3rdparty/thrift
 	url = https://github.com/apache/thrift.git
+[submodule "3rdparty/pysodium"]
+	path = 3rdparty/pysodium
+	url = https://github.com/stef/pysodium.git
