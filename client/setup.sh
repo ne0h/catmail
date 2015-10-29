@@ -50,7 +50,8 @@ fi
 # build pysodium
 if [ ! -d pysodium-build ]; then
 	cd pysodium
-	export PYTHONPATH=$pwdstr/../3rdparty/pysodium-build/lib/python2.7/site-packages/
+	pyversion=`python --version`
+	export PYTHONPATH=$pwdstr/../3rdparty/pysodium-build/lib/python`echo $pyversion | cut -c8-10`/site-packages/
 	mkdir -p $PYTHONPATH
 	python setup.py build
 	python setup.py install --prefix=$pwdstr/../3rdparty/pysodium-build
