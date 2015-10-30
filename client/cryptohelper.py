@@ -4,6 +4,6 @@ import pysodium
 
 from keypair import *
 
-def generateKeyPair():
+def generateSeededKeyPair(seed):
 	publicKey, secretKey = pysodium.crypto_box_keypair()
 	return KeyPair(secretKey, publicKey)
