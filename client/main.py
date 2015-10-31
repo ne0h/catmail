@@ -1,5 +1,5 @@
-from keypair import *
+from catmailtypes import *
 import cryptohelper
 
-keyPair = cryptohelper.generateKeyPair()
+keyPair = cryptohelper.generateSeededKeyPair("test")
 print(keyPair.secretKey)
