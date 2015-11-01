@@ -32,9 +32,9 @@ if [ ! -d thrift-build ]; then
 	./bootstrap.sh
 
 	thriftopts="--prefix=$pwdstr/../3rdparty/thrift-build \
-			--with-python --without-c_glib \
 			--without-csharp --without-java --without-erlang --without-lua --without-perl --without-php \
-			--without-php_extension --without-ruby --without-haskell --without-go --without-haxe --without-d"
+			--without-php_extension --without-ruby --without-haskell --without-go --without-haxe --without-d \
+			--without-c_glib --with-python"
 
 	# OSX needs separate installed openssl (via brew...)
 	if [[ "$unamestr" == 'Darwin' ]]; then
@@ -42,7 +42,7 @@ if [ ! -d thrift-build ]; then
 	fi
 
 	./configure $thriftopts
-	make -j3
+	make -j2
 	make install
 	cd ..
 fi
@@ -50,8 +50,8 @@ fi
 # build pysodium
 if [ ! -d pysodium-build ]; then
 	cd pysodium
-	pyversion=`python --version`
-	export PYTHONPATH=$pwdstr/../3rdparty/pysodium-build/lib/python`echo $pyversion | cut -c8-10`/site-packages/
+	pyversion=`python -c "import sys;t='{v[0]}.{v[1]}'.format(v=list(sys.version_info[:2]));sys.stdout.write(t)";`
+	export PYTHONPATH=$pwdstr/../3rdparty/pysodium-build/lib/python$pyversion/site-packages/
 	mkdir -p $PYTHONPATH
 	python setup.py build
 	python setup.py install --prefix=$pwdstr/../3rdparty/pysodium-build
