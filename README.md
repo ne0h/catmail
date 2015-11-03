@@ -14,7 +14,7 @@ Run `git submodule update --init`
 * PyQt5
 * OpenSSL
 
-**OSX: ** Use homebrew to install python 3.5, pyqt5 and openssl.
+**OSX:** Use homebrew to install python 3.5, pyqt5 and openssl.
 
 #### Build & Run
 
