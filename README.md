@@ -10,9 +10,14 @@ Run `git submodule update --init`
 
 #### Dependencies
 
+##### Client
 * Python 3
 * PyQt5
 * OpenSSL
+
+##### Server
+
+* NodeJS
 
 **OSX:** Use homebrew to install python 3.5, pyqt5 and openssl.
 
@@ -26,3 +31,9 @@ Run `git submodule update --init`
 #### Run Tests
 
 Run `python test_crypto.py`
+
+### Server
+
+1. `./setup.sh`
+2. `./buildapi.sh`
+3. `node catmailserver.js`
