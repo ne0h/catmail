@@ -4,9 +4,18 @@
 unamestr=`uname`
 pwdstr=`pwd`
 cd ../3rdparty
-pyversion=`python -c "import sys;t='{v[0]}.{v[1]}'.format(v=list(sys.version_info[:2]));sys.stdout.write(t)";`
 
+# OSX: use python3.5 from homebrew
+pybin=python
+if [[ "$unamestr" == 'Darwin' ]]; then
+	pybin=/usr/local/bin/python3.5
+fi
+
+pyversion=`$pybin -c "import sys;t='{v[0]}.{v[1]}'.format(v=list(sys.version_info[:2]));sys.stdout.write(t)";`
+
+#
 # build libsodium
+#
 if [ ! -f libsodium.built ]; then
 	cd libsodium/
 	./autogen.sh
@@ -27,7 +36,9 @@ if [ ! -f libsodium.built ]; then
 	touch libsodium.built
 fi
 
+#
 # build thrift
+#
 if [ ! -d thrift-build ]; then
 	cd thrift
 	./bootstrap.sh
@@ -50,8 +61,8 @@ if [ ! -d thrift-build ]; then
 	cd lib/py
 	export PYTHONPATH=$pwdstr/../3rdparty/thrift-build/lib/python$pyversion/site-packages/
 	mkdir -p $PYTHONPATH
-	python setup.py build
-	python setup.py install --prefix=$pwdstr/../3rdparty/thrift-build
+	$pybin setup.py build
+	$pybin setup.py install --prefix=$pwdstr/../3rdparty/thrift-build
 	cd ../../../
 
 	# symlink python lib to more practical name
@@ -60,12 +71,14 @@ if [ ! -d thrift-build ]; then
 	cd ../../../../
 fi
 
+#
 # build pysodium
+#
 if [ ! -d pysodium-build ]; then
 	cd pysodium
 	export PYTHONPATH=$pwdstr/../3rdparty/pysodium-build/lib/python$pyversion/site-packages/
 	mkdir -p $PYTHONPATH
-	python setup.py build
-	python setup.py install --prefix=$pwdstr/../3rdparty/pysodium-build
+	$pybin setup.py build
+	$pybin setup.py install --prefix=$pwdstr/../3rdparty/pysodium-build
 	cd ..
 fi
