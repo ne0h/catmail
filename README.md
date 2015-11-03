@@ -11,27 +11,10 @@ Run `git submodule update --init`
 #### Build & Run
 
 1. `cd client`
-1. `./setup.sh`
-1. `mkdir build && cd build`
-2. `cmake ..`
-3. `make`
-4. `DYLD_LIBRARY_PATH="../../3rdparty/libjson-rpc-cpp/build/lib" ./catmail-client`
+1. Build dependencies: `./setup.sh`
+2. Build api: `./buildapi.sh`
+2. Run `python main.py`
 
 #### Run Tests
 
-Run `DYLD_LIBRARY_PATH="../../3rdparty/libjson-rpc-cpp/build/lib" ./testrunner` to execute unit tests.
-
-
-## Server
-
-### Requirements
-* python3
-* python-pip
-* sqlite3
-
-Install flusk-JSONRPC via pip:
-
-`sudo pip install Flask-JSONRPC`
-
-### RUN
-python main.py
+Run `python test_crypto.py`
