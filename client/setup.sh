@@ -4,6 +4,7 @@
 unamestr=`uname`
 pwdstr=`pwd`
 cd ../3rdparty
+pyversion=`python -c "import sys;t='{v[0]}.{v[1]}'.format(v=list(sys.version_info[:2]));sys.stdout.write(t)";`
 
 # build libsodium
 if [ ! -f libsodium.built ]; then
@@ -34,7 +35,7 @@ if [ ! -d thrift-build ]; then
 	thriftopts="--prefix=$pwdstr/../3rdparty/thrift-build \
 			--without-csharp --without-java --without-erlang --without-lua --without-perl --without-php \
 			--without-php_extension --without-ruby --without-haskell --without-go --without-haxe --without-d \
-			--without-c_glib --with-python"
+			--without-c_glib"
 
 	# OSX needs separate installed openssl (via brew...)
 	if [[ "$unamestr" == 'Darwin' ]]; then
@@ -44,13 +45,24 @@ if [ ! -d thrift-build ]; then
 	./configure $thriftopts
 	make -j2
 	make install
-	cd ..
+
+	# build python lib
+	cd lib/py
+	export PYTHONPATH=$pwdstr/../3rdparty/thrift-build/lib/python$pyversion/site-packages/
+	mkdir -p $PYTHONPATH
+	python setup.py build
+	python setup.py install --prefix=$pwdstr/../3rdparty/thrift-build
+	cd ../../../
+
+	# symlink python lib to more practical name
+	cd thrift-build/lib/python$pyversion/site-packages
+	ln -sv thrift-* thrift.egg
+	cd ../../../../
 fi
 
 # build pysodium
 if [ ! -d pysodium-build ]; then
 	cd pysodium
-	pyversion=`python -c "import sys;t='{v[0]}.{v[1]}'.format(v=list(sys.version_info[:2]));sys.stdout.write(t)";`
 	export PYTHONPATH=$pwdstr/../3rdparty/pysodium-build/lib/python$pyversion/site-packages/
 	mkdir -p $PYTHONPATH
 	python setup.py build
