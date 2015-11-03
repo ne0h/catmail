@@ -5,6 +5,19 @@ from protocol import CatMailService
 from protocol.ttypes import *
 
 from thrift import Thrift
-from thrift.transport import TSocket
+from thrift.transport import THttpClient
 from thrift.transport import TTransport
 from thrift.protocol import TJSONProtocol
+
+try:
+	transport = THttpClient.THttpClient("http://localhost:9000/catmail")
+	transport = TTransport.TBufferedTransport(transport)
+	protocol = TJSONProtocol.TJSONProtocol(transport)
+
+	client = CatMailService.Client(protocol)
+	transport.open()
+
+	client.login("me", "pw")
+
+except Thrift.TException, tx:
+	print '%s' % (tx.message)

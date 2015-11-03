@@ -8,6 +8,7 @@ var Thrift			= require("thrift"),
 var CatMailHandler = {
 
 	login: function(username, password, callback) {
+		console.log("Username: " + username)
 		clientHandler.login(username, password, function(err, data) {
 			(!err) ? callback(null, data) : callback(err)
 		});
