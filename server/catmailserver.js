@@ -8,9 +8,11 @@ var Thrift			= require("thrift"),
 var CatMailHandler = {
 
 	login: function(username, password, callback) {
-		console.log("Username: " + username)
 		clientHandler.login(username, password, function(err, data) {
-			(!err) ? callback(null, data) : callback(err)
+			//(!err) ? callback(null, data) : callback(err)
+			var result = new CatMailTypes.LoginResponse()
+			result.sessionToken = "tokeeeen";
+			callback(null, result);
 		});
 	},
 

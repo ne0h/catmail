@@ -46,7 +46,7 @@ if [ ! -d thrift-build ]; then
 	thriftopts="--prefix=$pwdstr/../3rdparty/thrift-build \
 			--without-csharp --without-java --without-erlang --without-lua --without-perl --without-php \
 			--without-php_extension --without-ruby --without-haskell --without-go --without-haxe --without-d \
-			--without-c_glib"
+			--without-c_glib --without-cpp"
 
 	# OSX needs separate installed openssl (via brew...)
 	if [[ "$unamestr" == 'Darwin' ]]; then
@@ -68,6 +68,7 @@ if [ ! -d thrift-build ]; then
 	# symlink python lib to more practical name
 	cd thrift-build/lib/python$pyversion/site-packages
 	ln -sv thrift-* thrift.egg
+	ln -sv six-* six.egg
 	cd ../../../../
 fi
 
@@ -82,3 +83,7 @@ if [ ! -d pysodium-build ]; then
 	$pybin setup.py install --prefix=$pwdstr/../3rdparty/pysodium-build
 	cd ..
 fi
+
+# return to client directory and build api
+cd $pwdstr
+./buildapi.sh

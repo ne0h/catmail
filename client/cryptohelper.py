@@ -4,7 +4,7 @@ sys.path.append("../3rdparty/pysodium-build/lib/python" + curVersion + "/site-pa
 	+ curVersion + ".egg")
 import pysodium
 
-from catmailtypes import *
+#from catmailtypes import *
 
 def generateKeyPair():
 	publicKey, secretKey = pysodium.crypto_box_keypair()
@@ -22,3 +22,6 @@ def encryptAsym(msg, nonce, secretKey, publicKey):
 
 def decryptAsym(c, nonce, secretKey, publicKey):
 	return pysodium.crypto_box_open_easy(c, nonce, publicKey, secretKey)
+
+def hash(input, salt):
+	return pysodium.crypto_box_SEEDBYTES
