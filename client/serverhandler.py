@@ -1,7 +1,4 @@
 import sys, glob, os, time
-sys.path.append("/Users/ne0h/Projekte/catmail/3rdparty/thrift-build/lib/python3.5/site-packages/thrift.egg")
-sys.path.append("/Users/ne0h/Projekte/catmail/3rdparty/thrift-build/lib/python3.5/site-packages/six.egg")
-sys.path.append("/Users/ne0h/Projekte/catmail/client/api/protocol")
 
 import CatMailService
 from ttypes import *
