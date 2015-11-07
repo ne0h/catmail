@@ -1,3 +1,4 @@
+import pysodium
 from catmailtypes import *
 
 def generateKeyPair():

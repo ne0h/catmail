@@ -7,7 +7,6 @@ sys.path.append("/Users/ne0h/Projekte/catmail/3rdparty/thrift-build/lib/python" 
 sys.path.append("/Users/ne0h/Projekte/catmail/client/api/protocol")
 sys.path.append("../3rdparty/pysodium-build/lib/python" + curVersion + "/site-packages/pysodium-0.6.7-py" 
 	+ curVersion + ".egg")
-import pysodium
 
 from catmailtypes import *
  
