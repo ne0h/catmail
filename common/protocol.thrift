@@ -52,10 +52,6 @@ struct EncryptedKeyPair {
 struct LoginResponse {
 	/** The user's session token. */
 	1: string sessionToken,
-	/** The cryptographic key pair used for login and encryption. */
-	2: EncryptedKeyPair userKeyPair,
-	/** The cryptographic key pair used to exchange keys. */
-	3: EncryptedKeyPair exchangeKeyPair
 }
 
 /**
@@ -162,7 +158,7 @@ struct RemoveFromContactListResponse {
 }
 
 /**
- * Response of a updateContactList query
+ * Response of a updateContactList query.
  */
 struct UpdateContactListReponse {
 	/** The new version after the update */
@@ -170,9 +166,53 @@ struct UpdateContactListReponse {
 }
 
 /**
+ * Response of a getPrivateKeys query.
+ */
+struct GetPrivateKeysResponse {
+	/** The cryptographic key pair used for login and encryption. */
+	1: EncryptedKeyPair userKeyPair,
+	/** The cryptographic key pair used to exchange keys. */
+	2: EncryptedKeyPair exchangeKeyPair
+}
+
+/**
+ * Response of a requestLoginChallenge.
+ */
+struct RequestLoginChallengeResponse {
+	/** The challenge. */
+	1: string challenge
+}
+
+/**
  * Communication interface between catmail server und catmail clients.
  */
 service CatMailService {
+
+	/**
+	 * Requests the encrypted private keys to sign a login challenge.
+	 */
+	GetPrivateKeysResponse getPrivateKeys(
+		/** The name of the user. */
+		1: string username,
+		/** The password of the user. */
+		2: string password
+	) throws (
+		/** Something went dramatically wrong. */
+		1: InternalException internalException,
+		/** Combination of username and password is wrong. */
+		2: InvalidLoginCredentialsException invalidLoginCredentialsException
+	),
+
+	/**
+	 * Returns a login challenge from the server.
+	 */
+	RequestLoginChallengeResponse requestLoginChallenge(
+		/** The name of the user. */
+		1: string username,
+	) throws (
+		/** Something went dramatically wrong. */
+		1: InternalException internalException,
+	),
 	
 	/**
 	 * Logs the user in
@@ -180,8 +220,10 @@ service CatMailService {
 	LoginResponse login(
 		/** The name of the user. */
 		1: string username,
-		/** The password of the user. */
-		2: string password
+		/** Challenge received from the server */
+		2: string challenge,
+		/** Signed string "challenge/hostname" */
+		3: string signature,
 	) throws (
 		/** Something went dramatically wrong. */
 		1: InternalException internalException,
