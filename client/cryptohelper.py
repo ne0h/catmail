@@ -1,4 +1,4 @@
-import binascii, pysodium
+import base64, binascii, pysodium
 from catmailtypes import *
 
 def generateKeyPair():
@@ -44,15 +44,33 @@ def byteHashToString(input):
 
 def newClient(username, password):
 
+	# generate password hashes
 	passwordHash = kdf(username, password)
 	passwordHashForServer = sha256(kdf(username, passwordHash))
-	print("Password hash to store at server: " + byteHashToString(passwordHashForServer))
+	print("Password hash:        " + byteHashToString(passwordHashForServer))
 
+	# generate keypairs and nonce that will be stored encrypted on the server
 	userKeyPair = generateKeyPair()
 	exchangeKeyPair = generateKeyPair()
-	seededCryptoKeyPair = generateSeededKeyPair(passwordHash)
+	userKeyPairNonce = generateNonce()
+	exchangePairNonce = generateNonce()
 
-	#print(pysodium.crypto_pwhash_scryptsalsa208sha256_SALTBYTES)
+	# encrypt secret keys with before hashed password
+	userKeyPair.secretKey = base64.b64encode(encryptAead(userKeyPair.secretKey, "", userKeyPairNonce, passwordHash))
+	userKeyPair.publicKey = base64.b64encode(userKeyPair.publicKey)
+	print("UserKeyPair (sk):     " + exportBase64(userKeyPair.secretKey))
+	print("UserKeyPair (pk):     " + exportBase64(userKeyPair.publicKey))
+	print("UserKeyPairNonce:     " + exportBase64(base64.b64encode(userKeyPairNonce)))
+
+	exchangeKeyPair.secretKey = base64.b64encode(encryptAead(exchangeKeyPair.secretKey, "", exchangePairNonce,
+		passwordHash))
+	exchangeKeyPair.publicKey = base64.b64encode(exchangeKeyPair.publicKey)
+	print("ExchangeKeyPair (sk): " + exportBase64(exchangeKeyPair.secretKey))
+	print("ExchangeKeyPair (pk): " + exportBase64(exchangeKeyPair.publicKey))
+	print("ExchangeKeyPairNonce: " + exportBase64(base64.b64encode(exchangePairNonce)))
+
+def exportBase64(input):
+	return str(base64.b64encode(input))[2:-1]
 
 """
 Encrypts a message symmetrically. Messages that are type(str) are converted to type(bytes) automatically.

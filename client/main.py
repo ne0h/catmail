@@ -9,6 +9,23 @@ sys.path.append("../3rdparty/pysodium-build/lib/python" + curVersion + "/site-pa
 	+ curVersion + ".egg")
 
 from catmailtypes import *
+import cryptohelper
  
 if __name__ == '__main__':
-	CatMailClient()
+
+	if len(sys.argv) == 1:
+		CatMailClient()
+
+	cmd = sys.argv[1]
+
+	if (cmd == "help"):
+		print("Usage:")
+		print("python main.py help                         Prints this information")
+		print("python main.py new username password        Generates all crypto data for a new client")
+
+	# Generates all crypto data for a new client and prints them.
+	# This data is to be transfered to catmail server manually.
+	elif cmd == "new":
+		cryptohelper.newClient(sys.argv[2], sys.argv[3])
+	else:
+		print("Command not known.")

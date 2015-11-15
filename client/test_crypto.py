@@ -1,4 +1,4 @@
-import binascii, unittest, sys
+import base64, binascii, unittest, sys
 curVersion = str(sys.version_info.major) + "." + str(sys.version_info.minor)
 sys.path.append("../3rdparty/thrift-build/lib/python" + curVersion
 	+ "/site-packages/thrift.egg")
@@ -13,6 +13,9 @@ import cryptohelper
 
 class TestCrypto(unittest.TestCase):
 
+	"""
+	Tests if seeded keypairs are always equal (with same seed).
+	"""
 	def test_AsymCryptoWithSeededKeypair(self):
 		seed    = "password"
 		msg     = "cryptotexttoencrypt"
@@ -40,6 +43,9 @@ class TestCrypto(unittest.TestCase):
 		
 		self.assertEqual(msg, m)
 
+	"""
+	Tests AEAD encryption.
+	"""
 	def test_aeadWithSeededKeypairs(self):
 		msg   = "cryptotexttoencrypt"
 		nonce = cryptohelper.generateNonce()
@@ -50,6 +56,21 @@ class TestCrypto(unittest.TestCase):
 		m = cryptohelper.decryptAead(c, ad, nonce, key)
 
 		self.assertEqual(msg, m.decode())
+
+	"""
+	Tests if decryption of server stored secretkeys works.
+	"""
+	def test_encryptKeyPair(self):
+		username = "test@catmail.de"
+		password = "password"
+		passwordHash = cryptohelper.kdf(username, password)
+		nonce = cryptohelper.generateNonce()
+		keypair = cryptohelper.generateKeyPair()
+
+		encrypted = cryptohelper.exportBase64(cryptohelper.encryptAead(keypair.secretKey, "", nonce, passwordHash))
+		decrypted = cryptohelper.decryptAead(base64.b64decode(encrypted), "", nonce, passwordHash)
+		
+		self.assertEqual(keypair.secretKey, decrypted)
 
 if __name__ == '__main__':
 	unittest.main()
