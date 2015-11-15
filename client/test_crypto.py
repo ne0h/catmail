@@ -1,11 +1,19 @@
-import unittest
+import binascii, unittest, sys
+curVersion = str(sys.version_info.major) + "." + str(sys.version_info.minor)
+sys.path.append("../3rdparty/thrift-build/lib/python" + curVersion
+	+ "/site-packages/thrift.egg")
+sys.path.append("../3rdparty/thrift-build/lib/python" + curVersion
+	+ "/site-packages/six.egg")
+sys.path.append("./api/protocol")
+sys.path.append("../3rdparty/pysodium-build/lib/python" + curVersion + "/site-packages/pysodium-0.6.7-py" 
+	+ curVersion + ".egg")
 
 from catmailtypes import *
 import cryptohelper
 
 class TestCrypto(unittest.TestCase):
 
-	def test_Asym_Crypto_With_Seeded_Keypair(self):
+	def test_AsymCryptoWithSeededKeypair(self):
 		seed    = "password"
 		msg     = "cryptotexttoencrypt"
 		nonce   = cryptohelper.generateNonce()
@@ -19,7 +27,7 @@ class TestCrypto(unittest.TestCase):
 	"""
 	Makes sure that two differently generated seeded keypairs are compatible
 	"""
-	def test_Asym_Crypto_With_Two_Seeded_Keypairs(self):
+	def test_AsymCryptoWithTwoSeededKeypairs(self):
 		seed     = "password"
 		msg      = "cryptotexttoencrypt"
 		nonce    = cryptohelper.generateNonce()
@@ -31,6 +39,17 @@ class TestCrypto(unittest.TestCase):
 		m = cryptohelper.decryptAsym(c, nonce, keyPair2.secretKey, keyPair2.publicKey)
 		
 		self.assertEqual(msg, m)
+
+	def test_aeadWithSeededKeypairs(self):
+		msg   = "cryptotexttoencrypt"
+		nonce = cryptohelper.generateNonce()
+		key   = "topsecretpassword"
+		ad = binascii.unhexlify("")
+
+		c = cryptohelper.encryptAead(msg, ad, nonce, key)
+		m = cryptohelper.decryptAead(c, ad, nonce, key)
+
+		self.assertEqual(msg, m.decode())
 
 if __name__ == '__main__':
 	unittest.main()
