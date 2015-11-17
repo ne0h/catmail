@@ -12,6 +12,7 @@ class FirstRunForm(QWidget):
 		passwordLbl = QLabel("Password: ")
 		self.usernameIpt = QLineEdit()
 		self.passwordIpt = QLineEdit()
+		self.passwordIpt.setEchoMode(QLineEdit.Password)
 
 		self.submitBtn = QPushButton("Login")
 		self.submitBtn.clicked.connect(self.login)
@@ -30,5 +31,4 @@ class FirstRunForm(QWidget):
 		username = self.usernameIpt.text()
 		password = self.passwordIpt.text()
 
-		sessionToken = self.catMailClient.login(username, password)
-		print(sessionToken)
+		self.catMailClient.login(username, password)

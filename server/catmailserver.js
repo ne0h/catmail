@@ -7,16 +7,14 @@ var Thrift			= require("thrift"),
 
 var CatMailHandler = {
 
-	login: function(username, password, callback) {
-		clientHandler.login(username, password, function(err, data) {
-			//(!err) ? callback(null, data) : callback(err)
-			var result = new CatMailTypes.LoginResponse()
-			result.sessionToken = "tokeeeen";
-			callback(null, result);
+	getPrivateKeys: function(username, password, callback) {
+		console.log("Incoming query");
+		clientHandler.getPrivateKeys(username, password, function(err, data) {
+			(!err) ? callback(null, data) : callback(err)
 		});
-	},
+	}
 
-	logout: function(username, sessionToken, callback) {
+	/*logout: function(username, sessionToken, callback) {
 		clientHandler.logout(username, sessionToken, function(err, data) {
 			(!err) ? callback(null, data) : callback(err)
 		});
@@ -26,7 +24,7 @@ var CatMailHandler = {
 		clientHandler.createUser(username, password, userKeyPair, exchangeKeyPair, function(err, data) {
 			(!err) ? callback(null, data) : callback(err)
 		});
-	}
+	}*/
 
 }
 

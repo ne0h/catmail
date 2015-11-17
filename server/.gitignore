@@ -1,5 +1,8 @@
 *.log
+catmail.db
 
 api/
 node_modules/node-int64/
 node_modules/q/
+node_modules/sodium/
+node_modules/sqlite3/

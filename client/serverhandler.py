@@ -22,5 +22,10 @@ class ServerHandler():
 		except Thrift.TException:
 			print("text")
 
+	def getPrivateKeys(self, username, password):
+		print("Login data send to server: " + username + ", " + password)
+
+		print(self.client.getPrivateKeys(username, password))
+
 	def login(self, username, password):
 		print("sessionToken: " + self.client.login(username, password).sessionToken)

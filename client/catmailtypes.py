@@ -2,6 +2,7 @@ import sys
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
+import cryptohelper
 from view import *
 from serverhandler import *
 
@@ -16,14 +17,15 @@ class UserContext():
 
 class CatMailClient():
 
-	def __init__(self):
+	def __init__(self, nogui=False):
 
 		# start serverhandler to connect to catmail server
 		self.serverHandler = ServerHandler()
 
 		# check for local user settings, if nothing found launch firstrunwizard
 		
-		self.startFirstRunForm()
+		if not nogui:
+			self.startFirstRunForm()
 
 	def startFirstRunForm(self):
 		app = QApplication(sys.argv)
@@ -35,4 +37,5 @@ class CatMailClient():
 		print("mainform")
 
 	def login(self, username, password):
-		return self.serverHandler.login(username, password)
+		passwordHash = cryptohelper.byteHashToString(cryptohelper.kdf(username, cryptohelper.kdf(username, password)))
+		return self.serverHandler.getPrivateKeys(username, passwordHash)
