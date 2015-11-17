@@ -47,7 +47,7 @@ if [ ! -d thrift-build ]; then
 	cd thrift
 	./bootstrap.sh
 
-	thriftopts="--prefix=$pwdstr/../3rdparty/thrift-build \
+	thriftopts="--prefix=$pwdstr/3rdparty/thrift-build \
 			--without-csharp --without-java --without-erlang --without-lua --without-perl --without-php \
 			--without-php_extension --without-ruby --without-haskell --without-go --without-haxe --without-d \
 			--without-c_glib --without-cpp"
@@ -63,10 +63,10 @@ if [ ! -d thrift-build ]; then
 
 	# build python lib
 	cd lib/py
-	export PYTHONPATH=$pwdstr/../3rdparty/thrift-build/lib/python$pyversion/site-packages/
+	export PYTHONPATH=$pwdstr/3rdparty/thrift-build/lib/python$pyversion/site-packages/
 	mkdir -p $PYTHONPATH
 	$pybin setup.py build
-	$pybin setup.py install --prefix=$pwdstr/../3rdparty/thrift-build
+	$pybin setup.py install --prefix=$pwdstr/3rdparty/thrift-build
 	cd ../../../
 
 	# symlink python lib to more practical name
@@ -81,10 +81,10 @@ fi
 #
 if [ ! -d pysodium-build ]; then
 	cd pysodium
-	export PYTHONPATH=$pwdstr/../3rdparty/pysodium-build/lib/python$pyversion/site-packages/
+	export PYTHONPATH=$pwdstr/3rdparty/pysodium-build/lib/python$pyversion/site-packages/
 	mkdir -p $PYTHONPATH
 	$pybin setup.py build
-	$pybin setup.py install --prefix=$pwdstr/../3rdparty/pysodium-build
+	$pybin setup.py install --prefix=$pwdstr/3rdparty/pysodium-build
 	cd ..
 fi
 
