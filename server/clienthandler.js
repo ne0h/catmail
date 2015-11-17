@@ -1,4 +1,6 @@
-var DatabaseHandler = require("./databasehandler"),
+var CatMailTypes	= require("./api/protocol_types"),
+	
+	DatabaseHandler = require("./databasehandler"),
 	databaseHandler = new DatabaseHandler(),
 
 	CryptoHelper    = require("./cryptohelper"),
@@ -7,10 +9,13 @@ var DatabaseHandler = require("./databasehandler"),
 function ClientHandler() {
 
 	this.getPrivateKeys = function(username, password, callback) {
-		console.log("starting");
-		cryptoHelper.sha256(password, function(result) {
-			databaseHandler.validatePasswordLogin(username, password, function(result) {
-				console.log(validatePasswordLogin);
+		databaseHandler.validatePasswordLogin(username, cryptoHelper.sha256(password), function(err, result) {
+			if (err) {callback(new CatMailTypes.InternalException())}
+			if (result == 0) {callback(new CatMailTypes.InvalidLoginCredentialsException())}
+
+			databaseHandler.getPrivateKeys(username, function(err, result) {
+				if (err) {callback(new CatMailTypes.InternalException())}
+				callback(null, result);
 			});
 		});
 	}

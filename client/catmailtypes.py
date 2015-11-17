@@ -38,4 +38,5 @@ class CatMailClient():
 
 	def login(self, username, password):
 		passwordHash = cryptohelper.byteHashToString(cryptohelper.kdf(username, cryptohelper.kdf(username, password)))
-		return self.serverHandler.getPrivateKeys(username, passwordHash)
+		response = self.serverHandler.getPrivateKeys(username, passwordHash)
+		print(response.userKeyPair.encryptedSecretKey)

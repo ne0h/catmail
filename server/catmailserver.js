@@ -8,7 +8,6 @@ var Thrift			= require("thrift"),
 var CatMailHandler = {
 
 	getPrivateKeys: function(username, password, callback) {
-		console.log("Incoming query");
 		clientHandler.getPrivateKeys(username, password, function(err, data) {
 			(!err) ? callback(null, data) : callback(err)
 		});

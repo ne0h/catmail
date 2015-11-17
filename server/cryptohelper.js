@@ -3,7 +3,6 @@ var sodium = require("sodium").api;
 function CryptoHelper() {
 
 	this.sha256 = function(input) {
-		console.log("input: " + input);
 		var message = new Buffer(input, "utf-8");
 		var hash = sodium.crypto_hash_sha256(message);
 
@@ -14,7 +13,6 @@ function CryptoHelper() {
   			result += c;
   		}
 
-  		console.log("Hash: " + result);
 		return result;
 	}
 
