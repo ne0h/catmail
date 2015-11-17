@@ -4,36 +4,29 @@ Cryptographic draft is available here: https://docs.google.com/document/d/124mqA
 
 ## Build
 
-Run `git submodule update --init`
+1. Run `git submodule update --init`
+1. Build dependencies `./setup.sh`
+
+## Run
 
 ### Client
 
-#### Dependencies
+* Application: Run `python3 main.py`
+* Tests: Run `python3 test_crypto.py`
 
-##### Client
+### Server
+
+`cd server && node catmailserver.js`
+
+## Dependencies
+
+### Client
 * Python 3
 * PyQt5
 * OpenSSL
 
-##### Server
+### Server
 
 * NodeJS
 
 **OSX:** Use homebrew to install python 3.5, pyqt5 and openssl.
-
-#### Build & Run
-
-1. `cd client`
-1. Build dependencies: `./setup.sh`
-2. Build api: `./buildapi.sh`
-2. Run `python main.py`
-
-#### Run Tests
-
-Run `python test_crypto.py`
-
-### Server
-
-1. `./setup.sh`
-2. `./buildapi.sh`
-3. `node catmailserver.js`
