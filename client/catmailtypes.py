@@ -1,4 +1,4 @@
-import sys
+import sys, base64
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
@@ -7,13 +7,19 @@ from view import *
 from serverhandler import *
 
 class KeyPair:
+
 	def __init__(self, secretKey, publicKey):
 		self.secretKey = secretKey
 		self.publicKey = publicKey
 
 class UserContext:
+
 	def __init__(self, username):
 		self.username = username
+
+	def setKeyPairs(self, userKeyPair, exchangeKeyPair):
+		self.userKeyPair = userKeyPair
+		self.exchangeKeyPair = exchangeKeyPair
 
 class CatMailClient:
 
@@ -46,5 +52,11 @@ class CatMailClient:
 			return ex, None
 
 		# decrypt secret keys
-		print(cryptohelper.decryptAeadBase64Encoded(response.userKeyPair.encryptedSecretKey, "",
-			response.userKeyPair.nonce, passwordHash))
+		userKeyPair = KeyPair(cryptohelper.decryptAeadBase64Encoded(response.userKeyPair.encryptedSecretKey, "",
+			response.userKeyPair.nonce, passwordHash), base64.b64decode(response.userKeyPair.publicKey))
+		exchangeKeyPair = KeyPair(cryptohelper.decryptAeadBase64Encoded(response.exchangeKeyPair.encryptedSecretKey, "",
+			response.exchangeKeyPair.nonce, passwordHash), base64.b64decode(response.exchangeKeyPair.publicKey))
+
+		self.userContext = UserContext(username)
+		self.userContext.setKeyPairs(userKeyPair, exchangeKeyPair)
+

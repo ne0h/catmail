@@ -1,5 +1,3 @@
-import sys, glob, os, time
-
 import CatMailService
 from ttypes import *
 
@@ -22,15 +20,15 @@ class ServerHandler():
 		except Thrift.TException:
 			print("text")
 
-	def sendQuery(self, query, args):
+	def __sendQuery(self, query, args):
 		try:
 			return None, eval("self.client." + query)(*args)
 		except Thrift.TException as ex:
 			return ex, None
 
 	def getPrivateKeys(self, username, password):
-		return self.sendQuery("getPrivateKeys", (username, password))
+		return self.__sendQuery("getPrivateKeys", (username, password))
 
 
 	def login(self, username, challenge, signature):
-		return self.query("login", (username, challenge, signature))
+		return self.__query("login", (username, challenge, signature))

@@ -8,7 +8,7 @@ def generateKeyPair():
 
 def generateSeededKeyPair(seed):
 	from catmailtypes import KeyPair
-	
+
 	publicKey, secretKey = pysodium.crypto_box_seed_keypair(seed)
 	return KeyPair(secretKey, publicKey)
 
@@ -53,24 +53,23 @@ def newClient(username, password):
 	print("Password hash:        " + passwordHashForServer)
 
 	# generate keypairs and nonce that will be stored encrypted on the server
-	userKeyPair = generateKeyPair()
-	exchangeKeyPair = generateKeyPair()
-	userKeyPairNonce = generateNonce()
+	userKeyPair       = generateKeyPair()
+	userKeyPairNonce  = generateNonce()
+	exchangeKeyPair   = generateKeyPair()
 	exchangePairNonce = generateNonce()
 
 	# encrypt secret keys with before hashed password
-	userKeyPair.secretKey = base64.b64encode(encryptAead(userKeyPair.secretKey, "", userKeyPairNonce, passwordHash))
-	userKeyPair.publicKey = base64.b64encode(userKeyPair.publicKey)
+	userKeyPair.secretKey = encryptAead(userKeyPair.secretKey, "", userKeyPairNonce, passwordHash)
+	userKeyPair.publicKey = userKeyPair.publicKey
 	print("UserKeyPair (sk):     " + exportBase64(userKeyPair.secretKey))
 	print("UserKeyPair (pk):     " + exportBase64(userKeyPair.publicKey))
-	print("UserKeyPairNonce:     " + exportBase64(base64.b64encode(userKeyPairNonce)))
+	print("UserKeyPairNonce:     " + exportBase64(userKeyPairNonce))
 
-	exchangeKeyPair.secretKey = base64.b64encode(encryptAead(exchangeKeyPair.secretKey, "", exchangePairNonce,
-		passwordHash))
-	exchangeKeyPair.publicKey = base64.b64encode(exchangeKeyPair.publicKey)
+	exchangeKeyPair.secretKey = encryptAead(exchangeKeyPair.secretKey, "", exchangePairNonce, passwordHash)
+	exchangeKeyPair.publicKey = exchangeKeyPair.publicKey
 	print("ExchangeKeyPair (sk): " + exportBase64(exchangeKeyPair.secretKey))
 	print("ExchangeKeyPair (pk): " + exportBase64(exchangeKeyPair.publicKey))
-	print("ExchangeKeyPairNonce: " + exportBase64(base64.b64encode(exchangePairNonce)))
+	print("ExchangeKeyPairNonce: " + exportBase64(exchangePairNonce))
 
 def exportBase64(input):
 	return str(base64.b64encode(input))[2:-1]

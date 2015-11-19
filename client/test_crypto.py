@@ -62,7 +62,7 @@ class TestCrypto(unittest.TestCase):
 	def test_encryptKeyPair(self):
 		username = "test@catmail.de"
 		password = "password"
-		passwordHash = cryptohelper.kdf(username, password)
+		passwordHash = cryptohelper.byteHashToString(cryptohelper.kdf(username, password))
 		nonce = cryptohelper.generateNonce()
 		keypair = cryptohelper.generateKeyPair()
 

@@ -16,7 +16,7 @@ function DatabaseHandler() {
 		var sql = "SELECT `userkeypair_sk`, `userkeypair_pk`, `userkeypair_nonce`, `exchangekeypair_sk`, "
 			+ "`exchangekeypair_pk`, `exchangekeypair_nonce` FROM `users` WHERE `username`=?;"
 		db.each(sql, {1: username}, function(err, result) {
-			if (err) {callback(err, null)}
+			if (err) {callback(err, null); return;}
 
 			var userKeyPair = new CatMailTypes.EncryptedKeyPair();
 			userKeyPair.encryptedSecretKey = result.userkeypair_sk;
