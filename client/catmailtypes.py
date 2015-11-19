@@ -6,16 +6,16 @@ import cryptohelper
 from view import *
 from serverhandler import *
 
-class KeyPair():
+class KeyPair:
 	def __init__(self, secretKey, publicKey):
 		self.secretKey = secretKey
 		self.publicKey = publicKey
 
-class UserContext():
+class UserContext:
 	def __init__(self, username):
 		self.username = username
 
-class CatMailClient():
+class CatMailClient:
 
 	def __init__(self, nogui=False):
 

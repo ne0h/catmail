@@ -1,11 +1,14 @@
 import base64, binascii, pysodium
-from catmailtypes import *
 
 def generateKeyPair():
+	from catmailtypes import KeyPair
+
 	publicKey, secretKey = pysodium.crypto_box_keypair()
 	return KeyPair(secretKey, publicKey)
 
 def generateSeededKeyPair(seed):
+	from catmailtypes import KeyPair
+	
 	publicKey, secretKey = pysodium.crypto_box_seed_keypair(seed)
 	return KeyPair(secretKey, publicKey)
 
@@ -45,9 +48,9 @@ def byteHashToString(input):
 def newClient(username, password):
 
 	# generate password hashes
-	passwordHash = kdf(username, password)
-	passwordHashForServer = sha256(kdf(username, passwordHash))
-	print("Password hash:        " + byteHashToString(passwordHashForServer))
+	passwordHash = byteHashToString(kdf(username, password))
+	passwordHashForServer = byteHashToString(sha256(byteHashToString(kdf(username, passwordHash))))
+	print("Password hash:        " + passwordHashForServer)
 
 	# generate keypairs and nonce that will be stored encrypted on the server
 	userKeyPair = generateKeyPair()

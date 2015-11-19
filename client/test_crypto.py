@@ -8,7 +8,6 @@ sys.path.append("./api/protocol")
 sys.path.append("../3rdparty/pysodium-build/lib/python" + curVersion + "/site-packages/pysodium-0.6.8-py"
 	+ curVersion + ".egg")
 
-from catmailtypes import *
 import cryptohelper
 
 class TestCrypto(unittest.TestCase):
