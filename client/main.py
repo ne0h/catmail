@@ -5,8 +5,9 @@ sys.path.append("../3rdparty/thrift-build/lib/python" + curVersion
 sys.path.append("../3rdparty/thrift-build/lib/python" + curVersion
 	+ "/site-packages/six.egg")
 sys.path.append("./api/protocol")
-sys.path.append("../3rdparty/pysodium-build/lib/python" + curVersion + "/site-packages/pysodium-0.6.7-py" 
+sys.path.append("../3rdparty/pysodium-build/lib/python" + curVersion + "/site-packages/pysodium-0.6.8-py" 
 	+ curVersion + ".egg")
+print(sys.path)
 
 from catmailtypes import *
 import cryptohelper
