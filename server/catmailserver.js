@@ -11,6 +11,18 @@ var CatMailHandler = {
 		clientHandler.getPrivateKeys(username, password, function(err, data) {
 			(!err) ? callback(null, data) : callback(err)
 		});
+	},
+
+	requestLoginChallenge: function(username, callback) {
+		clientHandler.requestLoginChallenge(username, function(err, data) {
+			(!err) ? callback(null, data) : callback(err)
+		});
+	},
+
+	login: function(username, challenge, signature, callback) {
+		clientHandler.login(username, challenge, signature, function(err, data) {
+			(!err) ? callback(null, data) : callback(err)
+		});
 	}
 
 	/*logout: function(username, sessionToken, callback) {

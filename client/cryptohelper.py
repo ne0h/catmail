@@ -86,3 +86,7 @@ Decrypts a message symmetrically. Returns type(bytes).
 """
 def decryptAead(cipherText, ad, nonce, key):
 	return pysodium.crypto_aead_chacha20poly1305_decrypt(cipherText, ad, nonce, key)
+
+def decryptAeadBase64Encoded(cipherText, ad, nonce, key):
+	return decryptAead(base64.b64decode(cipherText), ad, base64.b64decode(nonce), key)
+	

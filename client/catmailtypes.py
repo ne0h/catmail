@@ -37,6 +37,14 @@ class CatMailClient():
 		print("mainform")
 
 	def login(self, username, password):
-		passwordHash = cryptohelper.byteHashToString(cryptohelper.kdf(username, cryptohelper.kdf(username, password)))
-		response = self.serverHandler.getPrivateKeys(username, passwordHash)
-		print(response.userKeyPair.encryptedSecretKey)
+		passwordHash = cryptohelper.byteHashToString(cryptohelper.kdf(username, password))
+		loginHash = cryptohelper.byteHashToString(cryptohelper.kdf(username, passwordHash))
+		
+		ex, response = self.serverHandler.getPrivateKeys(username, loginHash)
+		if ex is not None:
+			print(type(ex).__name__)
+			return ex, None
+
+		# decrypt secret keys
+		print(cryptohelper.decryptAeadBase64Encoded(response.userKeyPair.encryptedSecretKey, "",
+			response.userKeyPair.nonce, passwordHash))

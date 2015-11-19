@@ -10,14 +10,17 @@ function ClientHandler() {
 
 	this.getPrivateKeys = function(username, password, callback) {
 		databaseHandler.validatePasswordLogin(username, cryptoHelper.sha256(password), function(err, result) {
-			if (err) {callback(new CatMailTypes.InternalException())}
-			if (result == 0) {callback(new CatMailTypes.InvalidLoginCredentialsException())}
+			if (err) {callback(new CatMailTypes.InternalException()); return;}
+			if (result == 0) {callback(new CatMailTypes.InvalidLoginCredentialsException()); return;}
 
 			databaseHandler.getPrivateKeys(username, function(err, result) {
-				if (err) {callback(new CatMailTypes.InternalException())}
-				callback(null, result);
+				(err) ? callback(new CatMailTypes.InternalException()) : callback(null, result);
 			});
 		});
+	}
+
+	this.requestLoginChallenge = function(username, callback) {
+		
 	}
 
 	this.login = function(username, password, callback) {

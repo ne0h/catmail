@@ -22,8 +22,15 @@ class ServerHandler():
 		except Thrift.TException:
 			print("text")
 
-	def getPrivateKeys(self, username, password):
-		return self.client.getPrivateKeys(username, password)
+	def sendQuery(self, query, args):
+		try:
+			return None, eval("self.client." + query)(*args)
+		except Thrift.TException as ex:
+			return ex, None
 
-	def login(self, username, password):
-		print("sessionToken: " + self.client.login(username, password).sessionToken)
+	def getPrivateKeys(self, username, password):
+		return self.sendQuery("getPrivateKeys", (username, password))
+
+
+	def login(self, username, challenge, signature):
+		return self.query("login", (username, challenge, signature))
