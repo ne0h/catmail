@@ -35,9 +35,12 @@ class CatMailClient:
 		else:
 			username, password = Config().getLoginCredentials()
 			ex = self.login(username, password, passwordAlreadyHashed=True)
-			self.__startMainForm()
+			if ex is None:
+				self.__startMainForm()
+			elif type(ex) is InvalidLoginCredentialsException:
+				self.__startFirstRunForm(self)
 
-	def __startFirstRunForm(self):
+	def __startFirstRunForm(self, loginerror=False):
 		app = QApplication(sys.argv)
 		screen = FirstRunForm(self)
 		screen.show()
@@ -46,6 +49,14 @@ class CatMailClient:
 		self.__startMainForm()
 
 	def __startMainForm(self):
+
+		# check if there is a session token
+		try:
+			if self.__userContext.sessionToken is None:
+				self.__startFirstRunForm(self)
+		except AttributeError:
+			sys.exit()
+
 		app = QApplication(sys.argv)
 		screen = MainForm(self)
 		screen.show()
