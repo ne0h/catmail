@@ -1,4 +1,4 @@
-import sys, base64
+import base64, configparser, sys
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
@@ -26,30 +26,41 @@ class CatMailClient:
 	def __init__(self, nogui=False):
 
 		# start serverhandler to connect to catmail server
-		self.serverHandler = ServerHandler()
+		self.__serverHandler = ServerHandler()
 
 		# check for local user settings, if nothing found launch firstrunwizard
-		
-		if not nogui:
-			self.startFirstRunForm()
+		if not nogui and not Config().exists():
+			self.__startFirstRunForm()
+		# or login and start main form
+		else:
+			username, password = Config().getLoginCredentials()
+			ex = self.login(username, password, passwordAlreadyHashed=True)
+			self.__startMainForm()
 
-	def startFirstRunForm(self):
+	def __startFirstRunForm(self):
 		app = QApplication(sys.argv)
 		screen = FirstRunForm(self)
 		screen.show()
+		app.exec_()
+		
+		self.__startMainForm()
+
+	def __startMainForm(self):
+		app = QApplication(sys.argv)
+		screen = MainForm(self)
+		screen.show()
 		sys.exit(app.exec_())
 
-	def startMainForm(self):
-		print("mainform")
-
-	def login(self, username, password):
-		passwordHash = cryptohelper.byteHashToString(cryptohelper.kdf(username, password))
+	def login(self, username, password, testlogin=False, passwordAlreadyHashed=False):
+		if not passwordAlreadyHashed:
+			passwordHash = cryptohelper.byteHashToString(cryptohelper.kdf(username, password))
+		else:
+			passwordHash = password
 		loginHash = cryptohelper.byteHashToString(cryptohelper.kdf(username, passwordHash))
 		
-		ex, response = self.serverHandler.getPrivateKeys(username, loginHash)
+		ex, response = self.__serverHandler.getPrivateKeys(username, loginHash)
 		if ex is not None:
-			print(type(ex).__name__)
-			return ex, None
+			return ex
 
 		# decrypt secret keys and store them in usercontext
 		userKeyPair = KeyPair(cryptohelper.decryptAeadBase64Encoded(response.userKeyPair.encryptedSecretKey, "",
@@ -57,22 +68,63 @@ class CatMailClient:
 		exchangeKeyPair = KeyPair(cryptohelper.decryptAeadBase64Encoded(response.exchangeKeyPair.encryptedSecretKey, "",
 			response.exchangeKeyPair.nonce, passwordHash), base64.b64decode(response.exchangeKeyPair.publicKey))
 
-		self.userContext = UserContext(username)
-		self.userContext.setKeyPairs(userKeyPair, exchangeKeyPair)
+		self.__userContext = UserContext(username)
+		self.__userContext.setKeyPairs(userKeyPair, exchangeKeyPair)
 
 		# Start challange-response-login. request a login challenge
-		ex, response = self.serverHandler.requestLoginChallenge(username)
+		ex, response = self.__serverHandler.requestLoginChallenge(username)
 		if ex is not None:
-			print(type(ex).__name__)
-			return ex, None
+			return ex
 
 		# sign this challenge
-		signature = cryptohelper.signChallenge(response.challenge, self.userContext.exchangeKeyPair.secretKey)
+		signature = cryptohelper.signChallenge(response.challenge, self.__userContext.exchangeKeyPair.secretKey)
 
 		# send the signature to server to log in
-		ex, response = self.serverHandler.login(username, response.challenge, signature)
+		ex, response = self.__serverHandler.login(username, response.challenge, signature)
 		if ex is not None:
-			print(type(ex).__name__)
-			return ex, None
+			return ex
 
-		print("Login successful!\nSessionToken is: %s" % (response.sessionToken))
+		print("Login successful!\nSessionToken: %s" % (response.sessionToken))
+
+		# store login data if no testlogin
+		if not testlogin:
+			Config().writeInitialConfig(username, passwordHash)
+			self.__userContext.sessionToken = response.sessionToken
+
+			return None
+
+class Config:
+
+	def __init__(self):
+		from os.path import expanduser
+
+		self.__configDirectory = expanduser("~") + "/.config/CatMail"
+		self.__configFile = self.__configDirectory + "/catmail.ini"
+
+	def exists(self):
+		import os
+
+		return os.path.isfile(self.__configFile)
+
+	def writeInitialConfig(self, username, passwordHash):
+		from os.path import exists
+		import os
+
+		# create containing folder if it does not exist so far
+		if not os.path.exists(self.__configDirectory):
+			os.makedirs(self.__configDirectory)
+
+		config = configparser.ConfigParser()
+		config.add_section("CatMail")
+		config.set("CatMail", "username", username)
+		config.set("CatMail", "password", passwordHash)
+
+		configFile = open(self.__configFile, "w")
+		config.write(configFile)
+		configFile.close()
+
+	def getLoginCredentials(self):
+		config = configparser.ConfigParser()
+		config.read(self.__configFile)
+
+		return config.get("CatMail", "username"), config.get("CatMail", "password")
