@@ -51,7 +51,7 @@ class CatMailClient:
 			print(type(ex).__name__)
 			return ex, None
 
-		# decrypt secret keys
+		# decrypt secret keys and store them in usercontext
 		userKeyPair = KeyPair(cryptohelper.decryptAeadBase64Encoded(response.userKeyPair.encryptedSecretKey, "",
 			response.userKeyPair.nonce, passwordHash), base64.b64decode(response.userKeyPair.publicKey))
 		exchangeKeyPair = KeyPair(cryptohelper.decryptAeadBase64Encoded(response.exchangeKeyPair.encryptedSecretKey, "",
@@ -60,3 +60,10 @@ class CatMailClient:
 		self.userContext = UserContext(username)
 		self.userContext.setKeyPairs(userKeyPair, exchangeKeyPair)
 
+		# Start challange-response-login. request a login challenge
+		ex, response = self.serverHandler.requestLoginChallenge(username)
+		if ex is not None:
+			print(type(ex).__name__)
+			return ex, None
+
+		print("Got challenge: " + response.challenge)

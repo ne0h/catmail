@@ -27,7 +27,10 @@ class ServerHandler():
 			return ex, None
 
 	def getPrivateKeys(self, username, password):
-		return self.__sendQuery("getPrivateKeys", (username, password))
+		return self.__sendQuery("getPrivateKeys", [username, password])
+
+	def requestLoginChallenge(self, username):
+		return self.__sendQuery("requestLoginChallenge", [username])
 
 
 	def login(self, username, challenge, signature):
