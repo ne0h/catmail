@@ -66,4 +66,13 @@ class CatMailClient:
 			print(type(ex).__name__)
 			return ex, None
 
-		print("Got challenge: " + response.challenge)
+		# sign this challenge
+		signature = cryptohelper.signChallenge(response.challenge, self.userContext.exchangeKeyPair.secretKey)
+
+		# send the signature to server to log in
+		ex, response = self.serverHandler.login(username, response.challenge, signature)
+		if ex is not None:
+			print(type(ex).__name__)
+			return ex, None
+
+		print("Login successful!\nSessionToken is: %s" % (response.sessionToken))

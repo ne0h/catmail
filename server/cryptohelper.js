@@ -16,6 +16,11 @@ function CryptoHelper() {
 		return result;
 	}
 
+	this.validateSignature = function(challenge, signature, publicKey) {
+		var result = sodium.crypto_sign_open(new Buffer(signature, "base64"), new Buffer(publicKey, "base64"));
+		return (new Buffer(result, "utf-8").toString() == challenge)
+	}
+
 }
 
 module.exports = CryptoHelper;

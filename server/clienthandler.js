@@ -20,6 +20,7 @@ function ClientHandler() {
 	that = this;
 
 	var challenges = {}
+	var sessions   = {}
 
 	this.getPrivateKeys = function(username, password, callback) {
 		databaseHandler.validatePasswordLogin(username, cryptoHelper.sha256(password), function(err, result) {
@@ -33,16 +34,35 @@ function ClientHandler() {
 	}
 
 	this.requestLoginChallenge = function(username, callback) {
+		// TODO: use randombuf sodium function here
 		var id = randomId();
 		challenges[id] = username;
-		
+
 		var response = new CatMailTypes.RequestLoginChallengeResponse();
 		response.challenge = id;
 		callback(null, response);
 	}
 
-	this.login = function(username, password, callback) {
-		callback(null, null);
+	this.login = function(username, challenge, signature, callback) {
+		databaseHandler.getExchangeKeyPairPublicKey(username, function(err, result) {
+			// TODO: use real hostname
+			if (challenges[challenge] != username || !cryptoHelper.validateSignature(challenge + "/catmail.de",
+					signature, result))
+				callback(new CatMailTypes.InvalidLoginCredentialsException())
+			else {
+				// generate session token
+				var sessionToken = randomId();
+
+				// add session
+				if (!sessions[username])
+					sessions[username] = []
+				sessions[username].push(sessionToken)
+
+				var response = new CatMailTypes.LoginResponse();
+				response.sessionToken = sessionToken;
+				callback(null, response);
+			}
+		});
 	}
 
 	this.logout = function(username, password, callback) {

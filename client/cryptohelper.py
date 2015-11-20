@@ -6,6 +6,12 @@ def generateKeyPair():
 	publicKey, secretKey = pysodium.crypto_box_keypair()
 	return KeyPair(secretKey, publicKey)
 
+def generateSignKeyPair():
+	from catmailtypes import KeyPair
+
+	publicKey, secretKey = pysodium.crypto_sign_keypair()
+	return KeyPair(secretKey, publicKey)
+
 def generateSeededKeyPair(seed):
 	from catmailtypes import KeyPair
 
@@ -55,7 +61,7 @@ def newClient(username, password):
 	# generate keypairs and nonce that will be stored encrypted on the server
 	userKeyPair       = generateKeyPair()
 	userKeyPairNonce  = generateNonce()
-	exchangeKeyPair   = generateKeyPair()
+	exchangeKeyPair   = generateSignKeyPair()
 	exchangePairNonce = generateNonce()
 
 	# encrypt secret keys with before hashed password
@@ -91,4 +97,12 @@ def decryptAead(cipherText, ad, nonce, key):
 
 def decryptAeadBase64Encoded(cipherText, ad, nonce, key):
 	return decryptAead(base64.b64decode(cipherText), ad, base64.b64decode(nonce), key)
-	
+
+def sign(message, secretKey):
+	return pysodium.crypto_sign(message, secretKey)
+
+def signChallenge(message, secretKey):
+	return exportBase64(sign((message + "/catmail.de").encode("ascii"), secretKey))
+
+def validateSignature(signature, publicKey):
+	return pysodium.crypto_sign_open(signature, publicKey) 

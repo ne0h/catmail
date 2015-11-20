@@ -36,6 +36,15 @@ function DatabaseHandler() {
 		})
 	}
 
+	this.getExchangeKeyPairPublicKey = function(username, callback) {
+		var sql = "SELECT `exchangekeypair_pk` FROM users WHERE `username`=?;";
+		db.each(sql, {1: username}, function(err, result) {
+			if (err) {callback(err, null); return;}
+
+			callback(null, result.exchangekeypair_pk);
+		});
+	}
+
 }
 
 module.exports = DatabaseHandler;

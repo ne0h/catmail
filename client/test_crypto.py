@@ -71,5 +71,17 @@ class TestCrypto(unittest.TestCase):
 		
 		self.assertEqual(keypair.secretKey, decrypted)
 
+	"""
+	Tests message signing
+	"""
+	def test_signChallenge(self):
+		keyPair = cryptohelper.generateSignKeyPair()
+		message = "e8292f52011be89f6e9f4251c33da474"
+
+		signature = cryptohelper.signChallenge(message, keyPair.secretKey)
+		result = cryptohelper.validateSignature(base64.b64decode(signature), keyPair.publicKey)
+
+		self.assertEqual(message + "/catmail.de", result.decode("ascii"))
+
 if __name__ == '__main__':
 	unittest.main()

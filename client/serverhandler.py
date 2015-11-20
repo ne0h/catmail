@@ -34,4 +34,4 @@ class ServerHandler():
 
 
 	def login(self, username, challenge, signature):
-		return self.__query("login", (username, challenge, signature))
+		return self.__sendQuery("login", [username, challenge, signature])
