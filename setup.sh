@@ -105,4 +105,4 @@ cd $pwdstr/server/
 
 # install nodejs dependencies
 cd $pwdstr/server
-npm install node-int64 q sodium sqlite3
+npm install log4js mysql node-int64 q sodium 
