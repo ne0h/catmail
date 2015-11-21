@@ -11,16 +11,6 @@ var CatMailTypes	= require("./api/protocol_types"),
 
 function ClientHandler() {
 
-	function randomId() {
-		function block() {
-			return Math.floor((1 + Math.random()) * 0x10000).toString(16)
-				.substring(1);
-		}
-		var result = "";
-		for (i = 0; i < 8; i++) {result += block();}
-		return result;
-	}
-
 	function validateSessionToken(username, sessionToken, callback) {
 
 	}
@@ -44,7 +34,7 @@ function ClientHandler() {
 
 	this.requestLoginChallenge = function(username, callback) {
 		// TODO: use randombuf sodium function here
-		var id = randomId();
+		var id = cryptoHelper.randomId();
 		challenges[id] = username;
 
 		var response = new CatMailTypes.RequestLoginChallengeResponse();
