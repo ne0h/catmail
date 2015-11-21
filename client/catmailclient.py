@@ -23,7 +23,8 @@ class CatMailClient:
 		# or login and start main form
 		else:
 			if not nogui:
-				username, password = Config().getLoginCredentials()
+				username, password \
+						= Config().getLoginCredentials()
 				ex = self.login(username, password, passwordAlreadyHashed=True)
 				if ex is None:
 					self.__init()
@@ -58,22 +59,41 @@ class CatMailClient:
 		# start timer for contactlist updates
 		ContactListTimer().start()
 		
-	def login(self, username, password, testlogin=False, passwordAlreadyHashed=False):
+	def login(self,
+			username,
+			password,
+			testlogin=False,
+			passwordAlreadyHashed=False
+		):
 		if not passwordAlreadyHashed:
-			passwordHash = cryptohelper.byteHashToString(cryptohelper.kdf(username, password))
+			passwordHash = cryptohelper.byteHashToString(
+					cryptohelper.kdf(username, password)
+				)
 		else:
 			passwordHash = password
-		loginHash = cryptohelper.byteHashToString(cryptohelper.kdf(username, passwordHash))
+		loginHash = cryptohelper.byteHashToString(
+				cryptohelper.kdf(username, passwordHash)
+			)
 		
 		ex, res = self.__serverHandler.getPrivateKeys(username, loginHash)
 		if ex is not None:
 			return ex
 
 		# decrypt secret keys and store them in usercontext
-		userKeyPair = KeyPair(cryptohelper.decryptAeadBase64Encoded(res.userKeyPair.encryptedSecretKey, "",
-			res.userKeyPair.nonce, passwordHash), base64.b64decode(res.userKeyPair.publicKey))
-		exchangeKeyPair = KeyPair(cryptohelper.decryptAeadBase64Encoded(res.exchangeKeyPair.encryptedSecretKey, "",
-			res.exchangeKeyPair.nonce, passwordHash), base64.b64decode(res.exchangeKeyPair.publicKey))
+		userKeyPair = KeyPair(
+				cryptohelper.decryptAeadBase64Encoded(
+					res.userKeyPair.encryptedSecretKey, "",
+					res.userKeyPair.nonce, passwordHash
+				),
+				base64.b64decode(res.userKeyPair.publicKey)
+			)
+		exchangeKeyPair = KeyPair(
+				cryptohelper.decryptAeadBase64Encoded(
+					res.exchangeKeyPair.encryptedSecretKey, "",
+					res.exchangeKeyPair.nonce, passwordHash
+				),
+				base64.b64decode(res.exchangeKeyPair.publicKey)
+			)
 
 		self.__userContext = UserContext(username)
 		self.__userContext.setKeyPairs(userKeyPair, exchangeKeyPair)
@@ -84,7 +104,10 @@ class CatMailClient:
 			return ex
 
 		# sign this challenge
-		signature = cryptohelper.signChallenge(res.challenge, self.__userContext.exchangeKeyPair.secretKey)
+		signature = cryptohelper.signChallenge(
+				res.challenge,
+				self.__userContext.exchangeKeyPair.secretKey
+			)
 
 		# send the signature to server to log in
 		ex, res = self.__serverHandler.login(username, res.challenge, signature)
