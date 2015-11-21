@@ -71,6 +71,7 @@ function ClientHandler() {
 
 				var response = new CatMailTypes.LoginResponse();
 				response.sessionToken = sessionToken;
+				Logger.debug(username + " logged in");
 				callback(null, response);
 			}
 		});

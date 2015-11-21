@@ -2,7 +2,7 @@ var CatMailTypes = require("./api/protocol_types"),
 	
 	mysql        = require("mysql"),
 	Log4js       = require("log4js"),
-	Logger       = Log4js.getLogger("catmailserver");
+	Logger       = Log4js.getLogger("databasehandler");
 
 function DatabaseHandler(settings) {
 

@@ -1,0 +1,7 @@
+{ "appenders": [ {
+    "type": "dateFile",
+    "filename": "catmail.log",
+    "pattern": "-yyyy-MM-dd",
+    "alwaysIncludePattern": true
+  } ]
+}
