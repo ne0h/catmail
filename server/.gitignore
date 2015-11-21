@@ -1,7 +1,8 @@
 *.log
-catmail.db
+config.js
 
 api/
+node_modules/mysql/
 node_modules/node-int64/
 node_modules/q/
 node_modules/sodium/

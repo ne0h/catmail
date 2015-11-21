@@ -1,8 +1,8 @@
 var CatMailTypes	= require("./api/protocol_types"),
 	
+	Config          = require("./config"),
 	DatabaseHandler = require("./databasehandler"),
-	databaseHandler = new DatabaseHandler(),
-
+	databaseHandler = new DatabaseHandler(Config.database),
 	CryptoHelper    = require("./cryptohelper"),
 	cryptoHelper    = new CryptoHelper();
 
