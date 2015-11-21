@@ -1,20 +1,15 @@
 import base64, binascii, pysodium
+from keypair import KeyPair
 
 def generateKeyPair():
-	from catmailtypes import KeyPair
-
 	publicKey, secretKey = pysodium.crypto_box_keypair()
 	return KeyPair(secretKey, publicKey)
 
 def generateSignKeyPair():
-	from catmailtypes import KeyPair
-
 	publicKey, secretKey = pysodium.crypto_sign_keypair()
 	return KeyPair(secretKey, publicKey)
 
 def generateSeededKeyPair(seed):
-	from catmailtypes import KeyPair
-
 	publicKey, secretKey = pysodium.crypto_box_seed_keypair(seed)
 	return KeyPair(secretKey, publicKey)
 

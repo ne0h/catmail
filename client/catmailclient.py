@@ -1,25 +1,14 @@
-import base64, configparser, sys
+import base64, sys, threading
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
 import cryptohelper
 from view import *
-from serverhandler import *
-
-class KeyPair:
-
-	def __init__(self, secretKey, publicKey):
-		self.secretKey = secretKey
-		self.publicKey = publicKey
-
-class UserContext:
-
-	def __init__(self, username):
-		self.username = username
-
-	def setKeyPairs(self, userKeyPair, exchangeKeyPair):
-		self.userKeyPair = userKeyPair
-		self.exchangeKeyPair = exchangeKeyPair
+from serverhandler import ServerHandler
+from config import Config
+from keypair import KeyPair
+from usercontext import UserContext
+from contactlisttimer import ContactListTimer
 
 class CatMailClient:
 
@@ -37,7 +26,7 @@ class CatMailClient:
 				username, password = Config().getLoginCredentials()
 				ex = self.login(username, password, passwordAlreadyHashed=True)
 				if ex is None:
-					self.__startClient()
+					self.__init()
 					self.__startMainForm()
 				elif type(ex) is InvalidLoginCredentialsException:
 					self.__startFirstRunForm(self)
@@ -64,11 +53,11 @@ class CatMailClient:
 		screen.show()
 		sys.exit(app.exec_())
 
-	def __startClient(self):
+	def __init(self):
 
 		# start timer for contactlist updates
-		print("timer")
-
+		ContactListTimer().start()
+		
 	def login(self, username, password, testlogin=False, passwordAlreadyHashed=False):
 		if not passwordAlreadyHashed:
 			passwordHash = cryptohelper.byteHashToString(cryptohelper.kdf(username, password))
@@ -113,39 +102,3 @@ class CatMailClient:
 
 	def addToContactList(self, username):
 		print("self.__serverHandler.")
-
-class Config:
-
-	def __init__(self):
-		from os.path import expanduser
-
-		self.__configDirectory = expanduser("~") + "/.config/CatMail"
-		self.__configFile = self.__configDirectory + "/catmail.ini"
-
-	def exists(self):
-		import os
-
-		return os.path.isfile(self.__configFile)
-
-	def writeInitialConfig(self, username, passwordHash):
-		from os.path import exists
-		import os
-
-		# create containing folder if it does not exist so far
-		if not os.path.exists(self.__configDirectory):
-			os.makedirs(self.__configDirectory)
-
-		config = configparser.ConfigParser()
-		config.add_section("CatMail")
-		config.set("CatMail", "username", username)
-		config.set("CatMail", "password", passwordHash)
-
-		configFile = open(self.__configFile, "w")
-		config.write(configFile)
-		configFile.close()
-
-	def getLoginCredentials(self):
-		config = configparser.ConfigParser()
-		config.read(self.__configFile)
-
-		return config.get("CatMail", "username"), config.get("CatMail", "password")
