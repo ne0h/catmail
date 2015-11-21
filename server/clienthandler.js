@@ -65,8 +65,7 @@ function ClientHandler() {
 				var sessionToken = randomId();
 
 				// add session
-				if (!sessions[username])
-					sessions[username] = []
+				if (!sessions[username]) {sessions[username] = []}
 				sessions[username].push(sessionToken)
 
 				var response = new CatMailTypes.LoginResponse();
@@ -102,8 +101,7 @@ function ClientHandler() {
 
 			databaseHandler.addToContactList(username, userToAdd, attributes,
 					function(err, result) {
-				(err) ? callback(new CatMailTypes.InternalException(), null)
-					: callback(null, result)
+				(err) ? callback(new CatMailTypes.InternalException(), null) : callback(null, result)
 			});
 		});
 	}
