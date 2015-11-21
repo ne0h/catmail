@@ -1,6 +1,6 @@
 var CatMailTypes = require("./api/protocol_types"),
 	
-	mysql        = require("mysql");
+	mysql        = require("mysql"),
 	Log4js       = require("log4js"),
 	Logger       = Log4js.getLogger("catmailserver");
 
