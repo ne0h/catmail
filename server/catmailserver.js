@@ -3,25 +3,48 @@ var Thrift			= require("thrift"),
 	CatMailTypes	= require("./api/protocol_types"),
 
 	ClientHandler	= require("./clienthandler"),
-	clientHandler	= new ClientHandler()
+	clientHandler	= new ClientHandler();
+
+	var Log4js = require("log4js");
+	Log4js.loadAppender('file');
+	Log4js.addAppender(Log4js.appenders.file('catmail.log'),'catmailserver');
+	var Logger = Log4js.getLogger('catmailserver');
+	Logger.debug("test");
+
 
 var CatMailHandler = {
 
 	getPrivateKeys: function(username, password, callback) {
 		clientHandler.getPrivateKeys(username, password, function(err, data) {
-			(!err) ? callback(null, data) : callback(err)
+			if(err){
+				Logger.error('getPrivateKeys: ' + err.stack);
+				callback(err);
+			} else {
+				callback(null,data);
+			}
 		});
 	},
 
 	requestLoginChallenge: function(username, callback) {
 		clientHandler.requestLoginChallenge(username, function(err, data) {
-			(!err) ? callback(null, data) : callback(err)
+			if(err){
+				Logger.error('requestLoginChallenge: ' + err.stack);
+				callback(err);
+			} else {
+				callback(null,data);
+			}
 		});
 	},
 
 	login: function(username, challenge, signature, callback) {
 		clientHandler.login(username, challenge, signature, function(err, data) {
-			(!err) ? callback(null, data) : callback(err)
+			if(err){
+				Logger.error('Login failer: ' + err.stack);
+				callback(err)
+			} else {
+				Logger.debug(username + ' logged in');
+				callback(null,data);
+			}
 		});
 	}
 

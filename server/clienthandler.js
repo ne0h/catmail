@@ -6,6 +6,12 @@ var CatMailTypes	= require("./api/protocol_types"),
 	CryptoHelper    = require("./cryptohelper"),
 	cryptoHelper    = new CryptoHelper();
 
+	var Log4js = require("log4js");
+	Log4js.loadAppender('file');
+	Log4js.addAppender(Log4js.appenders.file('catmail.log'),'clienthandler');
+	var Logger = Log4js.getLogger('clienthandler');
+	Logger.debug("test");
+
 function ClientHandler() {
 
 	function randomId() {
