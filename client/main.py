@@ -9,6 +9,7 @@ sys.path.append("../3rdparty/pysodium-build/lib/python" + curVersion + "/site-pa
 	+ curVersion + ".egg")
 
 from catmailclient import CatMailClient
+import cryptohelper
  
 if __name__ == '__main__':
 
