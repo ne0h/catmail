@@ -1,10 +1,8 @@
 var CatMailTypes = require("./api/protocol_types"),
 	
 	mysql        = require("mysql");
-var Log4js = require("log4js");
-	Log4js.loadAppender('file');
-	Log4js.addAppender(Log4js.appenders.file('catmail.log'),'databasehandler');
-var Logger = Log4js.getLogger('databasehandler');
+	Log4js       = require("log4js"),
+	Logger       = Log4js.getLogger("catmailserver");
 
 
 function DatabaseHandler(settings) {
@@ -15,12 +13,13 @@ function DatabaseHandler(settings) {
 		password: settings.password,
 		database: settings.database
 	});
+
 	this.conn.connect(function(err) {
 		if (err) {
-			Logger.error('error connecting:' + err.stack);
-			return;
+			Logger.error("Failed to connect to database server:" + err.stack);
+			process.exit();
 		} else {
-			Logger.debug('successfully connected');
+			Logger.debug("Successfully connected to database server");
 		}
 	});
 
@@ -61,7 +60,7 @@ function DatabaseHandler(settings) {
 			response.exchangeKeyPair = exchangeKeyPair;
 
 			callback(null, response);
-		})
+		});
 	}
 
 	this.getExchangeKeyPairPublicKey = function(username, callback) {

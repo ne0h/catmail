@@ -3,14 +3,13 @@ var Thrift			= require("thrift"),
 	CatMailTypes	= require("./api/protocol_types"),
 
 	ClientHandler	= require("./clienthandler"),
-	clientHandler	= new ClientHandler();
+	clientHandler	= new ClientHandler(),
 
-	var Log4js = require("log4js");
-	Log4js.loadAppender('file');
-	Log4js.addAppender(Log4js.appenders.file('catmail.log'),'catmailserver');
-	var Logger = Log4js.getLogger('catmailserver');
-	Logger.debug("test");
+	Log4js          = require("log4js"),
+	Logger          = Log4js.getLogger("catmailserver");
 
+Log4js.loadAppender("file");
+Log4js.addAppender(Log4js.appenders.file("catmail.log"), "catmailserver");
 
 var CatMailHandler = {
 
@@ -57,8 +56,7 @@ var CatMailHandler = {
 		});
 	},
 
-	addToContactList: function(username, sessionToken, userToAdd, attributes,
-			callback) {
+	addToContactList: function(username, sessionToken, userToAdd, attributes, callback) {
 		clientHandler.addToContactList(username, sessionToken, userToAdd,
 				attributes, function(err, result) {
 			(!err) ? callback(null, data) : callback(err)
