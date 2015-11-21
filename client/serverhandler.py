@@ -32,6 +32,11 @@ class ServerHandler():
 	def requestLoginChallenge(self, username):
 		return self.__sendQuery("requestLoginChallenge", [username])
 
-
 	def login(self, username, challenge, signature):
 		return self.__sendQuery("login", [username, challenge, signature])
+
+	def getContactList(self, username, sessionToken, localVersion):
+		return self.__sendQuery("getContactList", [username, sessionToken, localVersion])
+
+	def addToContactList(self, username, sessionToken, userToAdd, attributes):
+		return self.__sendQuery("addToContactList", [username, sessionToken, userToAdd, attributes])

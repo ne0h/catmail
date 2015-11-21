@@ -33,12 +33,14 @@ class CatMailClient:
 			self.__startFirstRunForm()
 		# or login and start main form
 		else:
-			username, password = Config().getLoginCredentials()
-			ex = self.login(username, password, passwordAlreadyHashed=True)
-			if ex is None:
-				self.__startMainForm()
-			elif type(ex) is InvalidLoginCredentialsException:
-				self.__startFirstRunForm(self)
+			if not nogui:
+				username, password = Config().getLoginCredentials()
+				ex = self.login(username, password, passwordAlreadyHashed=True)
+				if ex is None:
+					self.__startClient()
+					self.__startMainForm()
+				elif type(ex) is InvalidLoginCredentialsException:
+					self.__startFirstRunForm(self)
 
 	def __startFirstRunForm(self, loginerror=False):
 		app = QApplication(sys.argv)
@@ -62,6 +64,11 @@ class CatMailClient:
 		screen.show()
 		sys.exit(app.exec_())
 
+	def __startClient(self):
+
+		# start timer for contactlist updates
+		print("timer")
+
 	def login(self, username, password, testlogin=False, passwordAlreadyHashed=False):
 		if not passwordAlreadyHashed:
 			passwordHash = cryptohelper.byteHashToString(cryptohelper.kdf(username, password))
@@ -69,40 +76,43 @@ class CatMailClient:
 			passwordHash = password
 		loginHash = cryptohelper.byteHashToString(cryptohelper.kdf(username, passwordHash))
 		
-		ex, response = self.__serverHandler.getPrivateKeys(username, loginHash)
+		ex, res = self.__serverHandler.getPrivateKeys(username, loginHash)
 		if ex is not None:
 			return ex
 
 		# decrypt secret keys and store them in usercontext
-		userKeyPair = KeyPair(cryptohelper.decryptAeadBase64Encoded(response.userKeyPair.encryptedSecretKey, "",
-			response.userKeyPair.nonce, passwordHash), base64.b64decode(response.userKeyPair.publicKey))
-		exchangeKeyPair = KeyPair(cryptohelper.decryptAeadBase64Encoded(response.exchangeKeyPair.encryptedSecretKey, "",
-			response.exchangeKeyPair.nonce, passwordHash), base64.b64decode(response.exchangeKeyPair.publicKey))
+		userKeyPair = KeyPair(cryptohelper.decryptAeadBase64Encoded(res.userKeyPair.encryptedSecretKey, "",
+			res.userKeyPair.nonce, passwordHash), base64.b64decode(res.userKeyPair.publicKey))
+		exchangeKeyPair = KeyPair(cryptohelper.decryptAeadBase64Encoded(res.exchangeKeyPair.encryptedSecretKey, "",
+			res.exchangeKeyPair.nonce, passwordHash), base64.b64decode(res.exchangeKeyPair.publicKey))
 
 		self.__userContext = UserContext(username)
 		self.__userContext.setKeyPairs(userKeyPair, exchangeKeyPair)
 
 		# Start challange-response-login. request a login challenge
-		ex, response = self.__serverHandler.requestLoginChallenge(username)
+		ex, res = self.__serverHandler.requestLoginChallenge(username)
 		if ex is not None:
 			return ex
 
 		# sign this challenge
-		signature = cryptohelper.signChallenge(response.challenge, self.__userContext.exchangeKeyPair.secretKey)
+		signature = cryptohelper.signChallenge(res.challenge, self.__userContext.exchangeKeyPair.secretKey)
 
 		# send the signature to server to log in
-		ex, response = self.__serverHandler.login(username, response.challenge, signature)
+		ex, res = self.__serverHandler.login(username, res.challenge, signature)
 		if ex is not None:
 			return ex
 
-		print("Login successful!\nSessionToken: %s" % (response.sessionToken))
+		print("Login successful!\nSessionToken: %s" % (res.sessionToken))
 
 		# store login data if no testlogin
 		if not testlogin:
 			Config().writeInitialConfig(username, passwordHash)
-			self.__userContext.sessionToken = response.sessionToken
+			self.__userContext.sessionToken = res.sessionToken
 
 			return None
+
+	def addToContactList(self, username):
+		print("self.__serverHandler.")
 
 class Config:
 
