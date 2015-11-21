@@ -4,7 +4,6 @@ var CatMailTypes = require("./api/protocol_types"),
 	Log4js       = require("log4js"),
 	Logger       = Log4js.getLogger("catmailserver");
 
-
 function DatabaseHandler(settings) {
 
 	this.conn = mysql.createConnection({
