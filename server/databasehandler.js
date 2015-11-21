@@ -25,7 +25,8 @@ function DatabaseHandler(settings) {
 	});
 
 	this.validatePasswordLogin = function(username, password, callback) {
-		var sql = "SELECT EXISTS (SELECT username, password FROM users WHERE username=? AND password=?) AS result;";
+		var sql = "SELECT EXISTS (SELECT `username`, `password` FROM users"
+			+ " WHERE `username`=? AND `password`=?) AS result;";
 		this.conn.query(sql, [username, password], function(err, result) {
 			if(err) {
 				Logger.error('validatePasswordLogin: '+err.stack);
@@ -36,8 +37,10 @@ function DatabaseHandler(settings) {
 	}
 
 	this.getPrivateKeys = function(username, callback) {
-		var sql = "SELECT `userkeypair_sk`, `userkeypair_pk`, `userkeypair_nonce`, `exchangekeypair_sk`, "
-			+ "`exchangekeypair_pk`, `exchangekeypair_nonce` FROM `users` WHERE `username`=?;"
+		var sql = "SELECT `userkeypair_sk`, `userkeypair_pk`,"
+			+ " `userkeypair_nonce`, `exchangekeypair_sk`,"
+			+ " `exchangekeypair_pk`, `exchangekeypair_nonce` FROM `users`"
+			+ " WHERE `username`=?;";
 		this.conn.query(sql, [username], function(err, result) {
 			if (err) {
 				Logger.error('getPrivateKeys: ' + err.stack);
@@ -62,7 +65,8 @@ function DatabaseHandler(settings) {
 	}
 
 	this.getExchangeKeyPairPublicKey = function(username, callback) {
-		var sql = "SELECT `exchangekeypair_pk` FROM users WHERE `username`=?;";
+		var sql = "SELECT `exchangekeypair_pk` FROM `users` "
+			+ "WHERE `username`=?;";
 		this.conn.query(sql, [username], function(err, result) {
 			if (err) {
 				Logger.error('getExchangeKeyPairPublicKey: ' + err.stack);
@@ -71,6 +75,27 @@ function DatabaseHandler(settings) {
 
 			callback(null, result[0].exchangekeypair_pk);
 		});
+	}
+
+	this.getContactList = function(username, version, callback) {
+		var sql = "SELECT `contactname` FROM `contacts` WHERE `username`=?"
+			+ " AND version>?;";
+		this.conn.query(sql, [username, version], function(err, result) {
+			if (err) {callback(err, null); return;}
+
+			var response = new CatMailTypes.GetContactListResponse();
+			response.contacts = [];
+
+			for (var i in result) {response.contacts.push(
+				new CatMailTypes.Contact(result[i].contactname), {});}
+
+			callback(null, response);
+		});
+	}
+
+	this.addToContactList = function(username, userToAdd, attributes,
+			callback) {
+		
 	}
 
 }
