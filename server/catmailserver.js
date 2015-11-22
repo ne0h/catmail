@@ -119,5 +119,8 @@ function handle_cmd_args(options) {
 handle_cmd_args(getopt.parse(process.argv.slice(2)).options);
 
 var server = Thrift.createWebServer(serverOpt);
+server.on('error', function(err) {
+	Logger.error("Thrift WebServer Error: " + err);
+});
 server.listen(9000);
 Logger.info("CatMail Server up and running...");
