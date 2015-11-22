@@ -5,10 +5,21 @@ var Thrift			= require("thrift"),
 	ClientHandler	= require("./clienthandler"),
 	clientHandler	= new ClientHandler(),
 
-	Log4js          = require("log4js"),
-	Logger          = Log4js.getLogger("catmailserver");
+	Log4js			= require("log4js"),
+	Logger 			= Log4js.getLogger("catmailserver"),
+	Getopt 			= require('node-getopt');
 
 Log4js.configure('log_config.json', {cwd : 'logs'});
+
+// Getopt arguments options
+// '=':   has argument
+// '[=]': has argument but optional
+// '+':   multiple option supported
+getopt = new Getopt([
+	['h', 'help', 'Display this help.'],
+	['v', 'verbose', 'Print logging output on console (additional to log).'],
+	['l', 'level=LEVEL', 'Debug log level']
+]).bindHelp();
 
 //Log4js.addAppender(Log4js.appenders.file("catmail.log"), "catmailserver");
 
@@ -77,5 +88,36 @@ var serverOpt = {
 	}
 };
 
+
+function handle_cmd_args(options) {
+	if (options.verbose) {
+		Log4js.addAppender(Log4js.appenders.console());
+	}
+	if (options.level) {
+		var level;
+		switch (options.level.toUpperCase()) {
+			case 'DEBUG':
+				level = 'DEBUG'; break;
+			case 'INFO':
+				level = 'INFO'; break;
+			case 'WARN':
+				level = 'WARN'; break;
+			case 'ERROR':
+				level = 'ERROR'; break;
+			case 'FATAL':
+				level = 'FATAL'; break;
+			default:
+				console.error('Got invalid log level.'
+					+ 'Valid values are debug, info, warn error or fatal.'
+				);
+			process.exit(1);
+		}
+		Logger.setLevel(level);
+	}
+}
+
+handle_cmd_args(getopt.parse(process.argv.slice(2)).options);
+
 var server = Thrift.createWebServer(serverOpt);
 server.listen(9000);
+Logger.info("CatMail Server up and running...");

@@ -105,4 +105,4 @@ cd $pwdstr/server/
 
 # install nodejs dependencies
 cd $pwdstr/server
-npm install log4js mysql node-int64 q sodium 
+npm install log4js mysql node-int64 q sodium node-getopt
