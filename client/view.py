@@ -1,15 +1,52 @@
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import QPushButton
 
 from ttypes import *
- 
-class FirstRunForm(QWidget):
 
+class DialogBtn(QPushButton):
+	def __click_cb(self):
+		if not self.__callback is None:
+			self.__callback(self.__idx)
+
+	def __init__(self, b, idx, parent, callback=None):
+		super(DialogBtn, self).__init__(b, parent)
+		self.__idx = idx
+		self.__callback = callback
+		self.clicked.connect(self.__click_cb)
+
+class MessageDialog(QDialog):
+	def __btn_click_callback(self, idx):
+		self.__return = idx
+		self.close()
+
+	def show_blocking(self, app, title, message, buttons=[(0, 'Ok'), (1, 'Cancel')]):
+		self.setWindowTitle(title)
+		grid = QGridLayout(self)
+
+		lMessage = QLabel(self)
+		lMessage.setText(message)
+		lMessage.resize(lMessage.sizeHint())
+		grid.addWidget(lMessage, 0, 0, 1, len(buttons))
+
+		btns = []
+		self.__return = None
+		
+		for i, b in enumerate(buttons):
+			btn = DialogBtn(b[1], b[0], self, self.__btn_click_callback)
+			grid.addWidget(btn, 1, i)
+		
+		self.show()
+		app.exec_()
+		return self.__return
+
+	def __init__(self):
+		super(MessageDialog, self).__init__()
+
+class FirstRunForm(QWidget):
 	def __init__(self, catMailClient, parent=None):
 		super(FirstRunForm, self).__init__(parent)
-
 		self.__catMailClient = catMailClient
-
 		self.__errorLbl = QLabel("")
 		usernameLbl = QLabel("Username: ")
 		passwordLbl = QLabel("Password: ")
