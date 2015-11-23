@@ -30,6 +30,9 @@ class Config:
 		config.write(configFile)
 		configFile.close()
 
+	def init(self):
+		pass
+
 	def getLoginCredentials(self):
 		config = configparser.ConfigParser()
 		config.read(self.__configFile)
