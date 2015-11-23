@@ -64,7 +64,7 @@ var CatMailHandler = {
 	getContactList: function(username, sessionToken, version, callback) {
 		clientHandler.getContactList(username, sessionToken, version,
 				function(err, result) {
-			(!err) ? callback(null, data) : callback(err)
+			(!err) ? callback(null, result) : callback(err)
 		});
 	},
 
