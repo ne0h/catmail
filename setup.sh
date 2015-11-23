@@ -7,6 +7,15 @@
 # identify platform
 unamestr=`uname`
 pwdstr=`pwd`
+programs="thrift npm"
+
+for p in $programs; do
+    if ! hash $p 2>/dev/null; then
+        echo "$p is not installed. Please install and re-run.";
+        exit 1
+    fi
+done
+
 cd 3rdparty
 
 # OSX: use python3.5 from homebrew
