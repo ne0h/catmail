@@ -6,6 +6,8 @@ from thrift.transport import THttpClient
 from thrift.transport import TTransport
 from thrift.protocol import TJSONProtocol
 
+from constants import ErrorCodes
+
 class ServerHandler():
 
 	def __init__(self):
@@ -22,9 +24,13 @@ class ServerHandler():
 
 	def __sendQuery(self, query, args):
 		try:
-			return None, eval("self.client." + query)(*args)
+			return (None, eval("self.client." + query)(*args))
 		except Thrift.TException as ex:
-			return ex, None
+			return (ex, None)
+		except InternalException as ex:
+			return (ErrorCodes.InternalServerError, None)
+		except ConnectionRefusedError as ex:
+			return (ErrorCodes.ConnectionRefused, None)
 
 	def getPrivateKeys(self, username, password):
 		return self.__sendQuery("getPrivateKeys", [username, password])
