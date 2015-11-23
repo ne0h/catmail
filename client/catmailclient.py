@@ -1,6 +1,7 @@
 import base64, sys, threading
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
+import logging
 
 import cryptohelper
 from view import *
@@ -9,119 +10,82 @@ from config import Config
 from keypair import KeyPair
 from usercontext import UserContext
 from contactlisttimer import ContactListTimer
+from interfaces import ClientInterface
+from constants import ErrorCodes
 
-class CatMailClient:
+#TODO make sure there is only one window open at a time
 
-	def __init__(self, nogui=False):
+class CatMailClient(ClientInterface):
+	def show_dialog(self, title, message, buttons):
+		dialog = MessageDialog()
+		rv = dialog.show_blocking(
+				self.app,
+				title,
+				message,
+				buttons=buttons
+			)
+		return rv
 
-		# start serverhandler to connect to catmail server
-		self.__serverHandler = ServerHandler()
+	"""Displays a warning dialog asking the user if a previously failed action
+	should be retried or canceled.
 
-		# check for local user settings, if nothing found launch firstrunwizard
-		if not nogui and not Config().exists():
-			self.__startFirstRunForm()
-		# or login and start main form
+	Returns:
+		boolean: true, if the user decides to retry, false otherwise.
+	"""
+	def show_retry_dialog(self, message):
+		btns=[(0, 'Retry'),(1, 'Cancel')]
+		rv = self.show_dialog('Retry?', message, btns)
+		return (rv == 0)
+
+	def show_error(self, message):
+		btns=[(0, 'Ok'), (1, 'Cancel')]
+		return self.show_dialog('Error', message, btns)
+
+	def __show_error(self, message):
+		self.screen.displayError(message)
+
+	def __cb_login(self, username, password):
+		self.logger.debug("Login callback.")
+		err = self.backend.login(username, password)
+		if err == ErrorCodes.NoError:
+			# no error -> login successful.
+			# close firstrunform and start main form
+			self.screen.close()
+			self.cb_success = True
+		elif err == ErrorCodes.LoginCredentialsInvalid:
+			self.__show_error("Error: Wrong login credentials.")
 		else:
-			if not nogui:
-				username, password \
-						= Config().getLoginCredentials()
-				ex = self.login(username, password, passwordAlreadyHashed=True)
-				if ex is None:
-					self.__init()
-					self.__startMainForm()
-				elif type(ex) is InvalidLoginCredentialsException:
-					self.__startFirstRunForm(self)
+			self.__show_error("Error: Unknown error.")
 
-	def __startFirstRunForm(self, loginerror=False):
-		app = QApplication(sys.argv)
-		screen = FirstRunForm(self)
-		screen.show()
-		app.exec_()
+	def first_run(self, loginerror=False):
+		#TODO the cb_success thing is hackish... try something else...
+		self.cb_success = False
+		self.screen = FirstRunForm(self.__cb_login)
+		self.screen.show()
+		self.app.exec_()
+		return self.cb_success
 		
-		self.__startMainForm()
-
-	def __startMainForm(self):
-
+	def show(self):
 		# check if there is a session token
-		try:
-			if self.__userContext.sessionToken is None:
-				self.__startFirstRunForm(self)
-		except AttributeError:
-			sys.exit()
+		#try:
+		#	if self.__userContext.sessionToken is None:
+		#		self.__startFirstRunForm(self)
+		#except AttributeError:
+		#	sys.exit()
 
-		app = QApplication(sys.argv)
-		screen = MainForm(self)
-		screen.show()
-		sys.exit(app.exec_())
-
-	def __init(self):
-
-		# start timer for contactlist updates
-		ContactListTimer().start()
+		#self.app = QApplication(sys.argv)
+		self.screen = MainForm(self)
+		self.screen.show()
+		sys.exit(self.app.exec_())
 		
-	def login(self,
-			username,
-			password,
-			testlogin=False,
-			passwordAlreadyHashed=False
-		):
-		if not passwordAlreadyHashed:
-			passwordHash = cryptohelper.byteHashToString(
-					cryptohelper.kdf(username, password)
-				)
-		else:
-			passwordHash = password
-		loginHash = cryptohelper.byteHashToString(
-				cryptohelper.kdf(username, passwordHash)
-			)
-		
-		ex, res = self.__serverHandler.getPrivateKeys(username, loginHash)
-		if ex is not None:
-			return ex
-
-		# decrypt secret keys and store them in usercontext
-		userKeyPair = KeyPair(
-				cryptohelper.decryptAeadBase64Encoded(
-					res.userKeyPair.encryptedSecretKey, "",
-					res.userKeyPair.nonce, passwordHash
-				),
-				base64.b64decode(res.userKeyPair.publicKey)
-			)
-		exchangeKeyPair = KeyPair(
-				cryptohelper.decryptAeadBase64Encoded(
-					res.exchangeKeyPair.encryptedSecretKey, "",
-					res.exchangeKeyPair.nonce, passwordHash
-				),
-				base64.b64decode(res.exchangeKeyPair.publicKey)
-			)
-
-		self.__userContext = UserContext(username)
-		self.__userContext.setKeyPairs(userKeyPair, exchangeKeyPair)
-
-		# Start challange-response-login. request a login challenge
-		ex, res = self.__serverHandler.requestLoginChallenge(username)
-		if ex is not None:
-			return ex
-
-		# sign this challenge
-		signature = cryptohelper.signChallenge(
-				res.challenge,
-				self.__userContext.exchangeKeyPair.secretKey
-			)
-
-		# send the signature to server to log in
-		ex, res = self.__serverHandler.login(username, res.challenge, signature)
-		if ex is not None:
-			return ex
-
-		print("Login successful!\nSessionToken: %s" % (res.sessionToken))
-
-		# store login data if no testlogin
-		if not testlogin:
-			Config().writeInitialConfig(username, passwordHash)
-			self.__userContext.sessionToken = res.sessionToken
-
-			return None
-
 	def addToContactList(self, username):
 		print("self.__serverHandler.")
+
+	def init(self, backend):
+		self.backend = backend
+
+	def __init__(self, nogui=False):
+		self.app = QApplication([]) # QApplication(sys.argv)
+		self.backend = None
+		self.logger = logging.getLogger("CatMail Client")
+		super(CatMailClient, self).__init__()

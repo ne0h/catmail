@@ -42,11 +42,9 @@ class MessageDialog(QDialog):
 
 	def __init__(self):
 		super(MessageDialog, self).__init__()
-
+ 
 class FirstRunForm(QWidget):
-	def __init__(self, catMailClient, parent=None):
-		super(FirstRunForm, self).__init__(parent)
-		self.__catMailClient = catMailClient
+	def __setup_gui(self):
 		self.__errorLbl = QLabel("")
 		usernameLbl = QLabel("Username: ")
 		passwordLbl = QLabel("Password: ")
@@ -68,20 +66,21 @@ class FirstRunForm(QWidget):
 		self.setLayout(layout)
 		self.setWindowTitle("Welcome to CatMail!")
 
-	def __displayError(self, message):
+	def __init__(self, callback, parent=None):
+		super(FirstRunForm, self).__init__(parent)
+		self.__login_callback = callback
+
+		self.__setup_gui()
+
+	def displayError(self, message):
 		self.__errorLbl.setText("<font color='red'>%s</font>" % message)
 
 	def login(self):
 		username = self.__usernameIpt.text()
 		password = self.__passwordIpt.text()
+		print("login")
 
-		ex = self.__catMailClient.login(username, password)
-		# no exception -> login successful. close firstrunform and start main form
-		if ex is None:
-			self.close()
-
-		if type(ex) is InvalidLoginCredentialsException:
-			self.__displayError("Error: Wrong login credentials.")
+		self.__login_callback(username, password)
 
 class MainForm(QWidget):
 
