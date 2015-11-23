@@ -52,7 +52,7 @@ function ClientHandler() {
 				callback(new CatMailTypes.InvalidLoginCredentialsException())
 			} else {
 				// generate session token
-				var sessionToken = randomId();
+				var sessionToken = cryptoHelper.randomId();
 
 				// add session
 				if (!sessions[username]) {sessions[username] = []}
