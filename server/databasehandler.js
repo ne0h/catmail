@@ -155,7 +155,12 @@ function DatabaseHandler(settings) {
 				var response = new CatMailTypes.GetContactListResponse();
 				response.contacts = [];
 
-				for (var i in result) {response.contacts.push(new CatMailTypes.Contact(result[i].contactname), {});}
+				for (var i in result) {
+					var elem = new CatMailTypes.Contact();
+					elem["username"] = result[i].contactname;
+					elem["attributes"] = {};
+					response.contacts.push(elem);
+				}
 
 				callback(null, response);
 			});
