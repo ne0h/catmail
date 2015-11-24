@@ -78,6 +78,37 @@ function DatabaseHandler(settings) {
 		});
 	}
 
+	this.createUser = function(username, userKeyPair, exchangeKeyPair, callback) {
+		//First check if username already exists
+		var sql = "SELECT EXISTS( SELECT `username` FROM `users` WHERE `username`=? AS user_exists;";
+		//SELECT EXISTS(SELECT username FROM catmail.users WHERE username='benjamin@catmail.de') AS result;
+		this.conn.query(sql, [username], function(err, result) {
+			if (err) {
+				Logger.error("Faild to check if username " + username + "exists: " + err.stack);
+				callback(err, null);
+				return;
+			} else {
+				if (result[0].user_exists) {
+					Logger.inform("A user with username: " + username + " already exists");
+					callback(err, null);
+					return;
+				} else {
+					this.conn.query("INSERT INTO `users`SET ?;",[{"username":username, 
+						"userkeypair_pk":userKeyPair.userkeypair_pk, "userkeypair_nonce":userKeyPair.userkeypair_nonce, 
+						"userkeypair_sk":userKeyPair.userkeypair_sk, "exchangekeypair_pk":exchangeKeyPair.exchangekeypair_pk,
+						"exchangekeypair_nonce":exchangeKeyPair.exchangekeypair_nonce, 
+						"exchangeKeyPair":exchangeKeyPair.exchangekeypair_sk}], function(err, result){
+							if (err) { 
+								Logger.error("Adding user with username: " + username +" failed " + err.stack);
+								callback(err, null);
+								return;
+							}
+						});
+				}
+			}
+		})
+	}
+
 	this.getExchangeKeyPairPublicKey = function(username, callback) {
 
 		var sql = "SELECT `exchangekeypair_pk` FROM `users` WHERE `username`=?;";

@@ -83,6 +83,12 @@ function ClientHandler() {
 		callback(null, response);
 	}
 
+	this.createUser = function(username, userKeyPair, exchangeKeyPair, callback) {
+		databaseHandler.createUser(username, userKeyPair, exchangeKeyPair, 
+			function(err, result){
+				//noting todo here?
+			});
+	}
 	this.login = function(username, challenge, signature, callback) {
 		databaseHandler.getExchangeKeyPairPublicKey(username,
 				function(err, result) {

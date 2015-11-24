@@ -25,6 +25,17 @@ getopt = new Getopt([
 
 var CatMailHandler = {
 
+	createUser: function(username, userKeyPair, exchangeKeyPair, callback){
+		clientHandler.createUser(username, userKeyPair, exchangeKeyPair,function(err, data){
+			if(err){
+				Logger.error('createUser: ' + err.stack);
+				callback(err);
+			} else {
+				callback(null,data);
+			}
+		});
+	},
+
 	getPrivateKeys: function(username, password, callback) {
 		clientHandler.getPrivateKeys(username, password, function(err, data) {
 			if(err){
