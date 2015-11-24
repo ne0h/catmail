@@ -61,16 +61,18 @@ def newClient(username, password):
 
 	# encrypt secret keys with before hashed password
 	userKeyPair.secretKey = encryptAead(userKeyPair.secretKey, "", userKeyPairNonce, passwordHash)
-	userKeyPair.publicKey = userKeyPair.publicKey
+
 	print("UserKeyPair (sk):     " + exportBase64(userKeyPair.secretKey))
 	print("UserKeyPair (pk):     " + exportBase64(userKeyPair.publicKey))
 	print("UserKeyPairNonce:     " + exportBase64(userKeyPairNonce))
 
 	exchangeKeyPair.secretKey = encryptAead(exchangeKeyPair.secretKey, "", exchangePairNonce, passwordHash)
-	exchangeKeyPair.publicKey = exchangeKeyPair.publicKey
+
 	print("ExchangeKeyPair (sk): " + exportBase64(exchangeKeyPair.secretKey))
 	print("ExchangeKeyPair (pk): " + exportBase64(exchangeKeyPair.publicKey))
 	print("ExchangeKeyPairNonce: " + exportBase64(exchangePairNonce))
+
+	//TODO write client createUser
 
 def exportBase64(input):
 	return str(base64.b64encode(input))[2:-1]
