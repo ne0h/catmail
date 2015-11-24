@@ -10,9 +10,9 @@ from constants import ErrorCodes
 
 class ServerHandler():
 
-	def __init__(self):
+	def __init__(self, serveraddress="http://localhost:9000/catmail"):
 		try:
-			transport = THttpClient.THttpClient("http://localhost:9000/catmail")
+			transport = THttpClient.THttpClient(serveraddress)
 			transport = TTransport.TBufferedTransport(transport)
 			protocol = TJSONProtocol.TJSONProtocol(transport)
 
