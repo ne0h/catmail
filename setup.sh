@@ -110,7 +110,7 @@ cd $pwdstr/client/
 
 # generate api
 cd $pwdstr/server/
-mkdir logs
+mkdir -p logs
 ./buildapi.sh
 
 # install nodejs dependencies
