@@ -52,6 +52,6 @@ if __name__ == '__main__':
 	if (args.testlogin):
 		__testlogin(*args.testlogin)
 	elif (args.new):
-		__start_fresh(*args.testlogin)
+		__start_fresh(*args.new)
 	else:
 	        __start()
