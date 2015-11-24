@@ -11,14 +11,55 @@ var CatMailTypes	= require("./api/protocol_types"),
 
 function ClientHandler() {
 
-	function validateSessionToken(username, sessionToken, callback) {
-
-	}
-
 	that = this;
 
-	var challenges = {}
+	/**
+	 * Contains a list of active sessions for each user.
+	 * Map<username, sessionTokens[]>
+	 */
 	var sessions   = {}
+
+	/**
+	 * Adds a new session for a user.
+	 */
+	function addSession(username, sessionToken) {
+		if (!sessions[username]) {sessions[username] = []}
+		sessions[username].push(sessionToken)
+	}
+
+	/**
+	 * Removes an active session for a user.
+	 */
+	function removeSession(username, sessionToken) {
+		sessions[username].splice(sessions[username].indexOf(sessionToken))
+	}
+
+	/**
+	 * Validates if a session is valid.
+	 */
+	function validateSession(username, sessionToken, callback) {
+		(sessions[username].indexOf(sessionToken) != -1) ? callback(true) : callback(false)
+	}
+
+	/**
+	 * Contains a list of challenges for each user.
+	 * Map<username, challenge[]>
+	 */
+	var challenges = {}
+
+	/**
+	 * Adds a new challenge.
+	 */
+	function addChallenge(username, challenge) {
+		challenges[challenge] = username;
+	}
+
+	/**
+	 * Removes an existing challenge
+	 */
+	function removeChallenge(challenge) {
+		delete challenges[challenge]
+	}
 
 	this.getPrivateKeys = function(username, password, callback) {
 		databaseHandler.validatePasswordLogin(username, cryptoHelper.sha256(password), function(err, result) {
@@ -34,11 +75,11 @@ function ClientHandler() {
 
 	this.requestLoginChallenge = function(username, callback) {
 		// TODO: use randombuf sodium function here
-		var id = cryptoHelper.randomId();
-		challenges[id] = username;
+		var challenge = cryptoHelper.randomId();
+		addChallenge(username, challenge);
 
 		var response = new CatMailTypes.RequestLoginChallengeResponse();
-		response.challenge = id;
+		response.challenge = challenge;
 		callback(null, response);
 	}
 
@@ -55,8 +96,10 @@ function ClientHandler() {
 				var sessionToken = cryptoHelper.randomId();
 
 				// add session
-				if (!sessions[username]) {sessions[username] = []}
-				sessions[username].push(sessionToken)
+				addSession(username, sessionToken);
+
+				// remove challenge
+				removeChallenge(challenge);
 
 				var response = new CatMailTypes.LoginResponse();
 				response.sessionToken = sessionToken;
@@ -68,6 +111,7 @@ function ClientHandler() {
 
 	this.logout = function(username, sessionToken, callback) {
 		validateSessionToken(username, sessionToken, function(result) {
+			removeSession(username, sessionToken);
 			(result) ? callback(null, null)	: callback(new CatMailTypes.InvalidSessionException())
 		});
 	}
