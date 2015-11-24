@@ -116,14 +116,14 @@ function ClientHandler() {
 	}
 
 	this.logout = function(username, sessionToken, callback) {
-		validateSessionToken(username, sessionToken, function(result) {
+		validateSession(username, sessionToken, function(result) {
 			removeSession(username, sessionToken);
 			(result) ? callback(null, null)	: callback(new CatMailTypes.InvalidSessionException())
 		});
 	}
 
 	this.getContactList = function(username, sessionToken, version, callback) {
-		validateSessionToken(username, sessionToken, function(result) {
+		validateSession(username, sessionToken, function(result) {
 			if (!result) {callback(new CatMailTypes.InvalidSessionException()); return;}
 
 			databaseHandler.getContactList(username, version, function(err, result) {
@@ -133,7 +133,7 @@ function ClientHandler() {
 	},
 
 	this.addToContactList = function(username, sessionToken, userToAdd, attributes, callback) {
-		validateSessionToken(username, sessionToken, function(result) {
+		validateSession(username, sessionToken, function(result) {
 			if (!result) {
 				callback(new CatMailTypes.InvalidSessionException());
 				return;
