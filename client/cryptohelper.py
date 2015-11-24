@@ -72,7 +72,7 @@ def newClient(username, password):
 	print("ExchangeKeyPair (pk): " + exportBase64(exchangeKeyPair.publicKey))
 	print("ExchangeKeyPairNonce: " + exportBase64(exchangePairNonce))
 
-	//TODO write client createUser
+	# TODO write client createUser
 
 def exportBase64(input):
 	return str(base64.b64encode(input))[2:-1]
