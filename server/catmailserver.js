@@ -59,8 +59,7 @@ var CatMailHandler = {
 	},
 
 	login: function(username, challenge, signature, callback) {
-		clientHandler.login(username, challenge, signature,
-				function(err, data) {
+		clientHandler.login(username, challenge, signature, function(err, data) {
 					
 			(!err) ? callback(null, data) : callback(err)
 		});
@@ -73,15 +72,14 @@ var CatMailHandler = {
 	},
 
 	getContactList: function(username, sessionToken, version, callback) {
-		clientHandler.getContactList(username, sessionToken, version,
-				function(err, result) {
-			(!err) ? callback(null, result) : callback(err)
+		clientHandler.getContactList(username, sessionToken, version, function(err, data) {
+			console.log(data);
+			(!err) ? callback(null, data) : callback(err)
 		});
 	},
 
 	addToContactList: function(username, sessionToken, userToAdd, attributes, callback) {
-		clientHandler.addToContactList(username, sessionToken, userToAdd,
-				attributes, function(err, result) {
+		clientHandler.addToContactList(username, sessionToken, userToAdd, attributes, function(err, data) {
 			(!err) ? callback(null, data) : callback(err)
 		});
 	},

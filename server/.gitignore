@@ -2,8 +2,4 @@
 config.js
 
 api/
-node_modules/mysql/
-node_modules/node-int64/
-node_modules/q/
-node_modules/sodium/
-node_modules/sqlite3/
+node_modules/
