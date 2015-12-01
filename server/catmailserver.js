@@ -27,59 +27,48 @@ var CatMailHandler = {
 
 	createUser: function(username, userKeyPair, exchangeKeyPair, callback){
 		clientHandler.createUser(username, userKeyPair, exchangeKeyPair,function(err, data){
-			if(err){
-				Logger.error('createUser: ' + err.stack);
-				callback(err);
-			} else {
-				callback(null,data);
-			}
+			(!err) ? callback(null, data) : callback(err)
 		});
 	},
 
 	getPrivateKeys: function(username, password, callback) {
+		Logger.debug(username + " wants to download his secret keys")
 		clientHandler.getPrivateKeys(username, password, function(err, data) {
-			if(err){
-				Logger.error('getPrivateKeys: ' + err.stack);
-				callback(err);
-			} else {
-				callback(null,data);
-			}
+			(!err) ? callback(null, data) : callback(err)
 		});
 	},
 
 	requestLoginChallenge: function(username, callback) {
+		Logger.debug(username + " wants a challenge")
 		clientHandler.requestLoginChallenge(username, function(err, data) {
-			if(err){
-				Logger.error('requestLoginChallenge: ' + err.stack);
-				callback(err);
-			} else {
-				callback(null,data);
-			}
+			(!err) ? callback(null, data) : callback(err)
 		});
 	},
 
 	login: function(username, challenge, signature, callback) {
+		Logger.debug(username + " wants to log in")
 		clientHandler.login(username, challenge, signature, function(err, data) {
-					
 			(!err) ? callback(null, data) : callback(err)
 		});
 	},
 
 	logout: function(username, sessionToken, callback) {
+		Logger.debug(username + " tries to log out")
 		clientHandler.logout(username, sessionToken, function(err, data) {
 			(!err) ? callback(null, data) : callback(err)
 		});
 	},
 
 	getContactList: function(username, sessionToken, version, callback) {
-		clientHandler.getContactList(username, sessionToken, version, function(err, data) {
-			console.log(data);
-			(!err) ? callback(null, data) : callback(err)
+		Logger.debug(username + " wants to download his contact list")
+		clientHandler.getContactList(username, sessionToken, version, function(err, result) {
+			(!err) ? callback(null, result) : callback(err)
 		});
 	},
 
 	addToContactList: function(username, sessionToken, userToAdd, attributes, callback) {
-		clientHandler.addToContactList(username, sessionToken, userToAdd, attributes, function(err, data) {
+		Logger.debug(username + " to add " + userToAdd + " to his contact list")
+		clientHandler.addToContactList(username, sessionToken, userToAdd, attributes, function(err, result) {
 			(!err) ? callback(null, data) : callback(err)
 		});
 	},

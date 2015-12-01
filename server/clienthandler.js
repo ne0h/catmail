@@ -125,7 +125,7 @@ function ClientHandler() {
 	this.getContactList = function(username, sessionToken, version, callback) {
 		validateSession(username, sessionToken, function(result) {
 			if (!result) {callback(new CatMailTypes.InvalidSessionException()); return;}
-
+			
 			databaseHandler.getContactList(username, version, function(err, result) {
 				(err) ? callback(new CatMailTypes.InternalException(), null) : callback(null, result)
 			});
