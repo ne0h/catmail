@@ -122,6 +122,7 @@ class CatMailClientBackend(ClientBackend):
 		canceled = self.__login_loop(nogui, (not success))
 
 		if not canceled:
+			self.__serverHandler.getContactList(self.__userContext.username, self.__userContext.sessionToken, 0)
 			self.__frontend.show()
 		else:
 			self.__logger.info("Exiting...")
@@ -148,6 +149,7 @@ class CatMailClientBackend(ClientBackend):
 		
 		ex, res = self.__serverHandler.getPrivateKeys(username, loginHash)
 		if ex is not None:
+			self.__logger.error("Failed to get private keys: " + type(ex).__name__)
 			return ex
 
 		# decrypt secret keys and store them in usercontext
@@ -172,6 +174,7 @@ class CatMailClientBackend(ClientBackend):
 		# Start challange-response-login. request a login challenge
 		ex, res = self.__serverHandler.requestLoginChallenge(username)
 		if ex is not None:
+			self.__logger.error("Failed to request challenge: " + type(ex).__name__)
 			return ex
 
 		# sign this challenge
@@ -183,6 +186,7 @@ class CatMailClientBackend(ClientBackend):
 		# send the signature to server to log in
 		ex, res = self.__serverHandler.login(username, res.challenge, signature)
 		if ex is not None:
+			self.__logger.error("Failed to login: " + type(ex).__name__)
 			return ex
 
 		print("Login successful!\nSessionToken: %s" % (res.sessionToken))
@@ -193,6 +197,10 @@ class CatMailClientBackend(ClientBackend):
 			self.__userContext.sessionToken = res.sessionToken
 
 			return ErrorCodes.NoError
+
+		# if testlogin, return sessionToken
+		else:
+			return res.sessionToken
 
 	def addToContactList(self, username):
 		# TODO
@@ -213,7 +221,7 @@ class CatMailClientBackend(ClientBackend):
 		# add ch to logger
 		self.__logger.addHandler(ch)
 
-		self.__serverHandler 	        = ServerHandler()
+		self.__serverHandler 	= ServerHandler()
 		self.__frontend 		= frontend
 		self.__config 			= None
 
