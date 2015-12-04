@@ -62,19 +62,20 @@ function ClientHandler() {
 	}
 
 	this.getPrivateKeys = function(username, password, callback) {
+		Logger.debug(username + " wants to download his secret keys")
 		databaseHandler.validatePasswordLogin(username, cryptoHelper.sha256(password), function(err, result) {
 			if (err) {callback(new CatMailTypes.InternalException()); return;}
 			if (result == 0) {callback(new CatMailTypes.InvalidLoginCredentialsException()); return;}
 
 			databaseHandler.getPrivateKeys(username, function(err, result) {
-				(err) ? callback(new CatMailTypes.InternalException())
-					: callback(null, result);
+				(err) ? callback(new CatMailTypes.InternalException()) : callback(null, result);
 			});
 		});
 	}
 
 	this.requestLoginChallenge = function(username, callback) {
-		// TODO: use randombuf sodium function here
+		Logger.debug(username + " wants a challenge");
+
 		var challenge = cryptoHelper.randomId();
 		addChallenge(username, challenge);
 
@@ -83,15 +84,9 @@ function ClientHandler() {
 		callback(null, response);
 	}
 
-	this.createUser = function(username, userKeyPair, exchangeKeyPair, callback) {
-		databaseHandler.createUser(username, userKeyPair, exchangeKeyPair, 
-			function(err, result){
-				//noting todo here?
-			});
-	}
 	this.login = function(username, challenge, signature, callback) {
-		databaseHandler.getExchangeKeyPairPublicKey(username,
-				function(err, result) {
+		Logger.debug(username + " wants to log in")
+		databaseHandler.getExchangeKeyPairPublicKey(username, function(err, result) {
 
 			// TODO: use real hostname
 			if (challenges[challenge] != username || !cryptoHelper.validateSignature(challenge + "/catmail.de",
@@ -116,13 +111,21 @@ function ClientHandler() {
 	}
 
 	this.logout = function(username, sessionToken, callback) {
+		Logger.debug(username + " tries to log out")
 		validateSession(username, sessionToken, function(result) {
 			removeSession(username, sessionToken);
 			(result) ? callback(null, null)	: callback(new CatMailTypes.InvalidSessionException())
 		});
 	}
 
+	this.createUser = function(username, userKeyPair, exchangeKeyPair, callback) {
+		databaseHandler.createUser(username, userKeyPair, exchangeKeyPair, function(err, result) {
+			
+		});
+	}
+
 	this.getContactList = function(username, sessionToken, version, callback) {
+		Logger.debug(username + " wants to download his contact list")
 		validateSession(username, sessionToken, function(result) {
 			if (!result) {callback(new CatMailTypes.InvalidSessionException()); return;}
 			
@@ -133,6 +136,7 @@ function ClientHandler() {
 	},
 
 	this.addToContactList = function(username, sessionToken, userToAdd, attributes, callback) {
+		Logger.debug(username + " to add " + userToAdd + " to his contact list")
 		validateSession(username, sessionToken, function(result) {
 			if (!result) {
 				callback(new CatMailTypes.InvalidSessionException());
