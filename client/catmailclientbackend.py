@@ -206,6 +206,10 @@ class CatMailClientBackend(ClientBackend):
 		# TODO
 		pass
 
+	def createUser(self, username, password):
+		self.__serverHandler.createUser(username, password,
+			cryptohelper.newUser(username, password))
+
 	def __init__(self, frontend=None):
 		super(CatMailClientBackend, self).__init__()
 		# start serverhandler to connect to catmail server

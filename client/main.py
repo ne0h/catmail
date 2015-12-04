@@ -44,7 +44,7 @@ def __testlogin(username, password):
 # Generates all crypto data for a new client and prints them.
 # This data is to be transfered to catmail server manually.
 def __start_fresh(username, password):
-	cryptohelper.newClient(sys.argv[2], sys.argv[3])
+	cryptohelper.newUser(sys.argv[2], sys.argv[3], forServer=False)
 
 if __name__ == '__main__':
 	args = setup_argparse().parse_args()

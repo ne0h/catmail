@@ -46,12 +46,11 @@ def byteHashToString(input):
 		result += tmp
 	return result
 
-def newClient(username, password):
+def newUser(username, password, forServer=True):
 
 	# generate password hashes
 	passwordHash = byteHashToString(kdf(username, password))
 	passwordHashForServer = byteHashToString(sha256(byteHashToString(kdf(username, passwordHash))))
-	print("Password hash:        " + passwordHashForServer)
 
 	# generate keypairs and nonce that will be stored encrypted on the server
 	userKeyPair       = generateKeyPair()
@@ -61,18 +60,25 @@ def newClient(username, password):
 
 	# encrypt secret keys with before hashed password
 	userKeyPair.secretKey = encryptAead(userKeyPair.secretKey, "", userKeyPairNonce, passwordHash)
-
-	print("UserKeyPair (sk):     " + exportBase64(userKeyPair.secretKey))
-	print("UserKeyPair (pk):     " + exportBase64(userKeyPair.publicKey))
-	print("UserKeyPairNonce:     " + exportBase64(userKeyPairNonce))
-
 	exchangeKeyPair.secretKey = encryptAead(exchangeKeyPair.secretKey, "", exchangePairNonce, passwordHash)
 
-	print("ExchangeKeyPair (sk): " + exportBase64(exchangeKeyPair.secretKey))
-	print("ExchangeKeyPair (pk): " + exportBase64(exchangeKeyPair.publicKey))
-	print("ExchangeKeyPairNonce: " + exportBase64(exchangePairNonce))
+	if not forServer:
+		print("Password hash:        " + passwordHashForServer)
 
-	# TODO write client createUser
+		print("UserKeyPair (sk):     " + exportBase64(userKeyPair.secretKey))
+		print("UserKeyPair (pk):     " + exportBase64(userKeyPair.publicKey))
+		print("UserKeyPairNonce:     " + exportBase64(userKeyPairNonce))
+
+		print("ExchangeKeyPair (sk): " + exportBase64(exchangeKeyPair.secretKey))
+		print("ExchangeKeyPair (pk): " + exportBase64(exchangeKeyPair.publicKey))
+		print("ExchangeKeyPairNonce: " + exportBase64(exchangePairNonce))
+
+	return (exportBase64(userKeyPair.secretKey),
+		exportBase64(userKeyPair.publicKey),
+		exportBase64(userKeyPairNonce),
+		exportBase64(exchangeKeyPair.secretKey),
+		exportBase64(exchangeKeyPair.publicKey),
+		exportBase64(exchangePairNonce))
 
 def exportBase64(input):
 	return str(base64.b64encode(input))[2:-1]

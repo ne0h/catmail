@@ -48,3 +48,10 @@ class ServerHandler():
 	def addToContactList(self, username, sessionToken, userToAdd, attributes):
 		return self.__sendQuery("addToContactList", [username, sessionToken,
 			userToAdd, attributes])
+
+	def createUser(self, username, password, keyData):
+		userKeyPair     = EncryptedKeyPair(keyData[0], keyData[1], keyData[2])
+		exchangeKeyPair = EncryptedKeyPair(keyData[3], keyData[4], keyData[5])
+
+		return self.__sendQuery("createUser", [username, password, userKeyPair,
+			exchangeKeyPair])

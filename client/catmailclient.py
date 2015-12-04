@@ -13,7 +13,7 @@ from contactlisttimer import ContactListTimer
 from interfaces import ClientInterface
 from constants import ErrorCodes
 
-#TODO make sure there is only one window open at a time
+# TODO make sure there is only one window open at a time
 
 class CatMailClient(ClientInterface):
 	def show_dialog(self, title, message, buttons):

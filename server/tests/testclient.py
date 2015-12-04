@@ -26,8 +26,7 @@ class TestClient:
 		username, password = self._config.getLoginCredentials()
 
 		self._client = CatMailClientBackend()
-		self._sessionToken = self._client.login(username, password,
-			testlogin=True, passwordAlreadyHashed=True)
+		self._sessionToken = self._client.login(username, password,	testlogin=True, passwordAlreadyHashed=True)
 
 if __name__ == '__main__':
 	TestClient()

@@ -15,11 +15,7 @@ function DatabaseHandler(settings) {
 		database: settings.database
 	});
 
-	this.validatePasswordLogin = function(username, password, callback) {
-		
-		var sql = "SELECT EXISTS (SELECT `username`, `password` FROM users WHERE `username`=? AND `password`=?)"
-			+ " AS result;";
-		
+	this.validatePasswordLogin = function(username, password, callback) {	
 		pool.getConnection(function(err, conn) {
 			if (err) {
 				Logger.error("Failed to get mysql connection form pool: " + err.stack);
@@ -27,6 +23,8 @@ function DatabaseHandler(settings) {
 				return;
 			}
 
+			var sql = "SELECT EXISTS (SELECT `username`, `password` FROM users WHERE `username`=? AND `password`=?)"
+				+ " AS result;";
 			conn.query(sql, [username, password], function(err, result) {
 				conn.release();
 				if (err) {
@@ -40,10 +38,6 @@ function DatabaseHandler(settings) {
 	}
 
 	this.getPrivateKeys = function(username, callback) {
-
-		var sql = "SELECT `userkeypair_sk`, `userkeypair_pk`, `userkeypair_nonce`, `exchangekeypair_sk`,"
-			+ " `exchangekeypair_pk`, `exchangekeypair_nonce` FROM `users` WHERE `username`=?;";
-
 		pool.getConnection(function(err, conn) {
 			if (err) {
 				Logger.error("Failed to get mysql connection form pool: " + err.stack);
@@ -51,6 +45,8 @@ function DatabaseHandler(settings) {
 				return;
 			}
 
+			var sql = "SELECT `userkeypair_sk`, `userkeypair_pk`, `userkeypair_nonce`, `exchangekeypair_sk`,"
+				+ " `exchangekeypair_pk`, `exchangekeypair_nonce` FROM `users` WHERE `username`=?;";
 			conn.query(sql, [username], function(err, result) {
 				conn.release();
 				if (err) {
@@ -78,41 +74,7 @@ function DatabaseHandler(settings) {
 		});
 	}
 
-	this.createUser = function(username, userKeyPair, exchangeKeyPair, callback) {
-		//First check if username already exists
-		var sql = "SELECT EXISTS( SELECT `username` FROM `users` WHERE `username`=? AS user_exists;";
-		//SELECT EXISTS(SELECT username FROM catmail.users WHERE username='benjamin@catmail.de') AS result;
-		this.conn.query(sql, [username], function(err, result) {
-			if (err) {
-				Logger.error("Faild to check if username " + username + "exists: " + err.stack);
-				callback(err, null);
-				return;
-			} else {
-				if (result[0].user_exists) {
-					Logger.inform("A user with username: " + username + " already exists");
-					callback(err, null);
-					return;
-				} else {
-					this.conn.query("INSERT INTO `users`SET ?;",[{"username":username, 
-						"userkeypair_pk":userKeyPair.userkeypair_pk, "userkeypair_nonce":userKeyPair.userkeypair_nonce, 
-						"userkeypair_sk":userKeyPair.userkeypair_sk, "exchangekeypair_pk":exchangeKeyPair.exchangekeypair_pk,
-						"exchangekeypair_nonce":exchangeKeyPair.exchangekeypair_nonce, 
-						"exchangeKeyPair":exchangeKeyPair.exchangekeypair_sk}], function(err, result){
-							if (err) { 
-								Logger.error("Adding user with username: " + username +" failed " + err.stack);
-								callback(err, null);
-								return;
-							}
-						});
-				}
-			}
-		})
-	}
-
 	this.getExchangeKeyPairPublicKey = function(username, callback) {
-
-		var sql = "SELECT `exchangekeypair_pk` FROM `users` WHERE `username`=?;";
-
 		pool.getConnection(function(err, conn) {
 			if (err) {
 				Logger.error("Failed to get mysql connection form pool: " + err.stack);
@@ -120,6 +82,7 @@ function DatabaseHandler(settings) {
 				return;
 			}
 
+			var sql = "SELECT `exchangekeypair_pk` FROM `users` WHERE `username`=?;";
 			conn.query(sql, [username], function(err, result) {
 				conn.release();
 				if (err) {
@@ -134,9 +97,6 @@ function DatabaseHandler(settings) {
 	}
 
 	this.getContactList = function(username, version, callback) {
-
-		var sql = "SELECT `contactname` FROM `contacts` WHERE `username`=? AND version>?;";
-
 		pool.getConnection(function(err, conn) {
 			if (err) {
 				Logger.error("Failed to get mysql connection form pool: " + err.stack);
@@ -144,10 +104,11 @@ function DatabaseHandler(settings) {
 				return;
 			}
 
+			var sql = "SELECT `contactname` FROM `contacts` WHERE `username`=? AND version>?;";
 			conn.query(sql, [username, version], function(err, result) {
 				conn.release();
 				if (err) {
-					Logger.error("Failed to get contactlist for " + username + ": " + err.stack);
+					Logger.error("Failed to get contactlist for '" + username + "': " + err.stack);
 					callback(new CatMailTypes.InternalException(), null);
 					return;
 				}
@@ -168,7 +129,6 @@ function DatabaseHandler(settings) {
 	}
 
 	this.addToContactList = function(username, userToAdd, attributes, callback) {
-			
 		pool.getConnection(function(err, conn) {
 			if (err) {
 				Logger.error("Failed to get mysql connection form pool: " + err.stack);
@@ -187,7 +147,8 @@ function DatabaseHandler(settings) {
 				conn.query(sql, [username], function(err, result) {
 					if (err) {
 						return that.conn.rollback(function() {
-							Logger.error("Failed to add " + userToAdd + " to contact list of " + username + " " + err.stack)
+							Logger.error("Failed to add " + userToAdd + " to contact list of " + username + " "
+								+ err.stack)
 							callback(err, null);
 							return;
 						});
@@ -195,23 +156,23 @@ function DatabaseHandler(settings) {
 
 				sql = "SELECT `contacts_version` FROM `users` WHERE `username`=?;";
 				conn.query(sql, [username], function(err, result) {
-						if (err) {
-							return that.conn.rollback(function() {
-								Logger.error("Failed to add " + userToAdd + " to contact list of " + username + " "
-									+ err.stack)
-								callback(err, null);
-								return;
-							});
-						}
+					if (err) {
+						return that.conn.rollback(function() {
+							Logger.error("Failed to add " + userToAdd + " to contact list of " + username + " "
+								+ err.stack)
+							callback(err, null);
+							return;
+						});
+					}
 				
-						var version = result[0].contacts_version;
+					var version = result[0].contacts_version;
 
-						sql = "INSERT INTO `contacts` SET ?;";
-						conn.query(sql, [{"username": username, "contactname": userToAdd,
-								"version": version}], function(err, result) {
+					sql = "INSERT INTO `contacts` SET ?;";
+					conn.query(sql, [{"username": username, "contactname": userToAdd, "version": version}],
+						function(err, result) {
 							if (err) {
 								return that.conn.rollback(function() {
-									Logger.error("Failed to add " + userToAdd + " to contact list of " + username + " "
+									Logger.error("Failed to add " + userToAdd + " to contact list of " + username + ": "
 										+ err.stack)
 									callback(err, null);
 									return;
@@ -222,8 +183,8 @@ function DatabaseHandler(settings) {
 								conn.release();
 								if (err) {
 									return that.conn.rollback(function() {
-										Logger.error("Failed to add " + userToAdd + " to contact list of " + username + " "
-											+ err.stack)
+										Logger.error("Failed to add " + userToAdd + " to contact list of " + username
+											+ ": " + err.stack)
 										callback(err, null);
 										return;
 									});
@@ -238,6 +199,62 @@ function DatabaseHandler(settings) {
 					});
 				});
 			});
+		});
+	}
+
+	this.existsUser = function(username, callback) {
+		pool.getConnection(function(err, conn) {
+			if (err) {
+				Logger.error("Failed to get mysql connection form pool: " + err.stack);
+				callback(new CatMailTypes.InternalException(), null);
+				return;
+			}
+			
+			var sql = "SELECT EXISTS (SELECT `username` FROM `users` WHERE `username`=?) AS result;";
+			conn.query(sql, [username], function(err, result) {
+				if (err) {
+					Logger.error("Failed to check if '" + username + "' already exists");
+					callback(false);
+					return;
+				}
+
+				callback(result[0].result == 1);
+			});
+		});
+	}
+
+	this.createUser = function(username, password, userKeyPair, exchangeKeyPair, callback) {
+		that.existsUser(username, function(result) {
+			if (result) {callback(new CatMailTypes.UserAlreadyExistsException(), null); return;}
+			else {
+				pool.getConnection(function(err, conn) {
+					if (err) {
+						Logger.error("Failed to get mysql connection form pool: " + err.stack);
+						callback(new CatMailTypes.InternalException(), null);
+						return;
+					}
+
+					var userData = {};
+					userData["username"] = username;
+					userData["password"] = password;
+					userData["userkeypair_sk"]    = userKeyPair.encryptedSecretKey;
+					userData["userkeypair_pk"]    = userKeyPair.publicKey;
+					userData["userkeypair_nonce"] = userKeyPair.nonce;
+					userData["exchangekeypair_sk"]    = exchangeKeyPair.encryptedSecretKey;
+					userData["exchangekeypair_pk"]    = exchangeKeyPair.publicKey;
+					userData["exchangekeypair_nonce"] = exchangeKeyPair.nonce;
+					console.log(userData);
+					var sql = "INSERT INTO `users` SET ?;";
+					conn.query(sql, [userData], function(err, result) {
+						if (err) { 
+							Logger.error("Failed to add new user called " + username + " : " + err.stack);
+							callback(new CatMailTypes.InternalException(), null);
+						} else {
+							callback(null, null);
+						}
+					});
+				});
+			}
 		});
 	}
 

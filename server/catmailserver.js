@@ -54,12 +54,6 @@ var CatMailHandler = {
 		});
 	},
 
-	createUser: function(username, userKeyPair, exchangeKeyPair, callback){
-		clientHandler.createUser(username, userKeyPair, exchangeKeyPair,function(err, data){
-			callback(err, data)
-		});
-	},
-
 	getContactList: function(username, sessionToken, version, callback) {
 		clientHandler.getContactList(username, sessionToken, version, function(err, result) {
 			callback(err, data)
@@ -68,6 +62,12 @@ var CatMailHandler = {
 
 	addToContactList: function(username, sessionToken, userToAdd, attributes, callback) {
 		clientHandler.addToContactList(username, sessionToken, userToAdd, attributes, function(err, result) {
+			callback(err, data)
+		});
+	},
+
+	createUser: function(username, password, userKeyPair, exchangeKeyPair, callback) {
+		clientHandler.createUser(username, password, userKeyPair, exchangeKeyPair,function(err, data) {
 			callback(err, data)
 		});
 	},
