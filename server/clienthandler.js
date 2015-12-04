@@ -144,7 +144,6 @@ function ClientHandler() {
 	}
 
 	this.createUser = function(username, password, userKeyPair, exchangeKeyPair, callback) {
-		console.log("2");
 		databaseHandler.createUser(username, cryptoHelper.sha256(password), userKeyPair, exchangeKeyPair, 
 				function(err, result) {
 			callback(err, result);

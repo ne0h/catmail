@@ -243,7 +243,7 @@ function DatabaseHandler(settings) {
 					userData["exchangekeypair_sk"]    = exchangeKeyPair.encryptedSecretKey;
 					userData["exchangekeypair_pk"]    = exchangeKeyPair.publicKey;
 					userData["exchangekeypair_nonce"] = exchangeKeyPair.nonce;
-					console.log(userData);
+					
 					var sql = "INSERT INTO `users` SET ?;";
 					conn.query(sql, [userData], function(err, result) {
 						if (err) { 
