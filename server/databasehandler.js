@@ -28,7 +28,7 @@ function DatabaseHandler(settings) {
 			conn.query(sql, [username, password], function(err, result) {
 				conn.release();
 				if (err) {
-					Logger.error("Failed to validate password for " + username + ": " + err.stack);
+					Logger.error("Failed to validate password for '" + username + "': " + err.stack);
 					callback(new CatMailTypes.InternalException(), null);
 					return;
 				} else {
@@ -50,7 +50,7 @@ function DatabaseHandler(settings) {
 			conn.query(sql, [username], function(err, result) {
 				conn.release();
 				if (err) {
-					Logger.error("Failed to get private keys for " + username + ": " + err.stack);
+					Logger.error("Failed to get private keys for '" + username + "': " + err.stack);
 					callback(new CatMailTypes.InternalException(), null);
 					return;
 				}
@@ -86,7 +86,7 @@ function DatabaseHandler(settings) {
 			conn.query(sql, [username], function(err, result) {
 				conn.release();
 				if (err) {
-					Logger.error("Failed to get exchange keypair for " + username + ": " + err.stack);
+					Logger.error("Failed to get exchange keypair for '" + username + "': " + err.stack);
 					callback(err, null);
 					return;
 				}
@@ -138,7 +138,7 @@ function DatabaseHandler(settings) {
 
 			conn.beginTransaction(function(err) {
 				if (err) {
-					Logger.error("Failed to add " + userToAdd + " to contact list of " + username + " " + err.stack)
+					Logger.error("Failed to add " + userToAdd + " to contact list of '" + username + "': " + err.stack)
 					callback(new CatMailTypes.InternalException(), null);
 					return;
 				}
@@ -147,7 +147,7 @@ function DatabaseHandler(settings) {
 				conn.query(sql, [username], function(err, result) {
 					if (err) {
 						return that.conn.rollback(function() {
-							Logger.error("Failed to add " + userToAdd + " to contact list of " + username + " "
+							Logger.error("Failed to add '" + userToAdd + "' to contact list of '" + username + "' "
 								+ err.stack)
 							callback(err, null);
 							return;
@@ -158,7 +158,7 @@ function DatabaseHandler(settings) {
 				conn.query(sql, [username], function(err, result) {
 					if (err) {
 						return that.conn.rollback(function() {
-							Logger.error("Failed to add " + userToAdd + " to contact list of " + username + " "
+							Logger.error("Failed to add '" + userToAdd + "' to contact list of '" + username + "' "
 								+ err.stack)
 							callback(err, null);
 							return;
@@ -172,8 +172,8 @@ function DatabaseHandler(settings) {
 						function(err, result) {
 							if (err) {
 								return that.conn.rollback(function() {
-									Logger.error("Failed to add " + userToAdd + " to contact list of " + username + ": "
-										+ err.stack)
+									Logger.error("Failed to add '" + userToAdd + "' to contact list of '" + username
+										+ "': " + err.stack)
 									callback(err, null);
 									return;
 								});
@@ -183,8 +183,8 @@ function DatabaseHandler(settings) {
 								conn.release();
 								if (err) {
 									return that.conn.rollback(function() {
-										Logger.error("Failed to add " + userToAdd + " to contact list of " + username
-											+ ": " + err.stack)
+										Logger.error("Failed to add '" + userToAdd + "' to contact list of '"
+											+ username + "': " + err.stack)
 										callback(err, null);
 										return;
 									});
@@ -247,7 +247,7 @@ function DatabaseHandler(settings) {
 					var sql = "INSERT INTO `users` SET ?;";
 					conn.query(sql, [userData], function(err, result) {
 						if (err) { 
-							Logger.error("Failed to add new user called " + username + " : " + err.stack);
+							Logger.error("Failed to add new user called '" + username + "': " + err.stack);
 							callback(new CatMailTypes.InternalException(), null);
 						} else {
 							callback(null, null);
