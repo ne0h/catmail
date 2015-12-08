@@ -109,6 +109,12 @@ class CatMailClientBackend(ClientBackend):
 				retry = False
 		return canceled
 
+	def __show_main_window(self):
+		self.__frontend.show()
+
+		#TODO remove when threaded, debug only!
+		#NOTE: The following call is blocking!
+		self.__frontend.wait()
 
 	def start(self, nogui=False):
 		success = self.__init_config()
@@ -123,7 +129,7 @@ class CatMailClientBackend(ClientBackend):
 
 		if not canceled:
 			self.__serverHandler.getContactList(self.__userContext.username, self.__userContext.sessionToken, 0)
-			self.__frontend.show()
+			self.__show_main_window()
 		else:
 			self.__logger.info("Exiting...")
 
