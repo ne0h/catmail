@@ -3,9 +3,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 import logging
 
-import cryptohelper
 from view import *
-from serverhandler import ServerHandler
 from config import Config
 from keypair import KeyPair
 from usercontext import UserContext
@@ -42,7 +40,8 @@ class CatMailClient(ClientInterface):
 		return self.show_dialog('Error', message, btns)
 
 	def __show_error(self, message):
-		self.screen.displayError(message)
+		#TODO make this method useable for main_window, too
+		self.login_dialog.displayError(message)
 
 	def __cb_login(self, username, password):
 		self.logger.debug("Login callback.")
@@ -50,7 +49,7 @@ class CatMailClient(ClientInterface):
 		if err == ErrorCodes.NoError:
 			# no error -> login successful.
 			# close firstrunform and start main form
-			self.screen.close()
+			self.login_dialog.close()
 			self.cb_success = True
 		elif err == ErrorCodes.LoginCredentialsInvalid:
 			self.__show_error("Error: Wrong login credentials.")
@@ -60,12 +59,13 @@ class CatMailClient(ClientInterface):
 	def first_run(self, loginerror=False):
 		#TODO the cb_success thing is hackish... try something else...
 		self.cb_success = False
-		self.screen = FirstRunForm(self.__cb_login)
-		self.screen.show()
+		self.login_dialog = FirstRunForm(self.__cb_login)
+		self.login_dialog.show()
 		self.app.exec_()
 		return self.cb_success
 		
 	def show(self):
+		#TODO...
 		# check if there is a session token
 		#try:
 		#	if self.__userContext.sessionToken is None:
@@ -74,8 +74,9 @@ class CatMailClient(ClientInterface):
 		#	sys.exit()
 
 		#self.app = QApplication(sys.argv)
-		self.screen = MainForm(self)
-		self.screen.show()
+
+	#TODO remove when threaded, debug only!
+	def wait(self):
 		sys.exit(self.app.exec_())
 		
 	def addToContactList(self, username):
