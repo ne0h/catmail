@@ -4,12 +4,14 @@ from PyQt5.QtWidgets import *
 import logging
 
 from view import *
+from views.mainwindow import MainWindow
 from config import Config
 from keypair import KeyPair
 from usercontext import UserContext
 from contactlisttimer import ContactListTimer
 from interfaces import ClientInterface
 from constants import ErrorCodes
+from contact import CatMailContact
 
 # TODO make sure there is only one window open at a time
 
@@ -63,6 +65,13 @@ class CatMailClient(ClientInterface):
 		self.login_dialog.show()
 		self.app.exec_()
 		return self.cb_success
+
+	def update_contacts(self, contacts):
+		self.main_window.update_contacts(contacts)
+
+	def __on_send_message(self, message, conversationID):
+	    print("conversation: %s, message: '%s'" %
+				(conversationID, message))
 		
 	def show(self):
 		#TODO...
@@ -74,6 +83,16 @@ class CatMailClient(ClientInterface):
 		#	sys.exit()
 
 		#self.app = QApplication(sys.argv)
+		self.main_window = MainWindow(self, self.app)
+		self.main_window.send_message.connect(self.__on_send_message)
+		self.main_window.show()
+
+	def add_conversation(self, conversationId, title=None):
+		self.main_window.add_conversation(conversationId, title)
+
+	def add_message(self, conversationId, sender, time, message, its_me=False):
+		self.main_window.add_message(conversationId, sender, time,
+                        message, its_me)
 
 	#TODO remove when threaded, debug only!
 	def wait(self):

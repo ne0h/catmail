@@ -2,8 +2,6 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtWidgets import QPushButton
 
-from ttypes import *
-
 class DialogBtn(QPushButton):
 	def __click_cb(self):
 		if not self.__callback is None:
@@ -81,13 +79,3 @@ class FirstRunForm(QWidget):
 		print("login")
 
 		self.__login_callback(username, password)
-
-class MainForm(QWidget):
-
-	def __init__(self, catMailClient, parent=None):
-		super(MainForm, self).__init__(parent)
-
-		self.__catMailClient = catMailClient
-
-		self.setFixedSize(200, 500)
-		self.setWindowTitle("CatMail")
