@@ -15,5 +15,12 @@ class TestUserCreationAndDeletion(TestClient):
 		self._client.createUser(username, password)
 		print("Created " + username)
 
+		try:
+			self._client.createUser(username, password)
+			print("Created " + username)
+		except:
+			print("shit")
+		
+
 if __name__ == '__main__':
 	TestUserCreationAndDeletion()

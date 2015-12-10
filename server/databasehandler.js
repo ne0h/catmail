@@ -224,37 +224,32 @@ function DatabaseHandler(settings) {
 	}
 
 	this.createUser = function(username, password, userKeyPair, exchangeKeyPair, callback) {
-		that.existsUser(username, function(result) {
-			if (result) {callback(new CatMailTypes.UserAlreadyExistsException(), null); return;}
-			else {
-				pool.getConnection(function(err, conn) {
-					if (err) {
-						Logger.error("Failed to get mysql connection form pool: " + err.stack);
-						callback(new CatMailTypes.InternalException(), null);
-						return;
-					}
-
-					var userData = {};
-					userData["username"] = username;
-					userData["password"] = password;
-					userData["userkeypair_sk"]    = userKeyPair.encryptedSecretKey;
-					userData["userkeypair_pk"]    = userKeyPair.publicKey;
-					userData["userkeypair_nonce"] = userKeyPair.nonce;
-					userData["exchangekeypair_sk"]    = exchangeKeyPair.encryptedSecretKey;
-					userData["exchangekeypair_pk"]    = exchangeKeyPair.publicKey;
-					userData["exchangekeypair_nonce"] = exchangeKeyPair.nonce;
-					
-					var sql = "INSERT INTO `users` SET ?;";
-					conn.query(sql, [userData], function(err, result) {
-						if (err) { 
-							Logger.error("Failed to add new user called '" + username + "': " + err.stack);
-							callback(new CatMailTypes.InternalException(), null);
-						} else {
-							callback(null, null);
-						}
-					});
-				});
+		pool.getConnection(function(err, conn) {
+			if (err) {
+				Logger.error("Failed to get mysql connection form pool: " + err.stack);
+				callback(new CatMailTypes.InternalException(), null);
+				return;
 			}
+
+			var userData = {};
+			userData["username"] = username;
+			userData["password"] = password;
+			userData["userkeypair_sk"]    = userKeyPair.encryptedSecretKey;
+			userData["userkeypair_pk"]    = userKeyPair.publicKey;
+			userData["userkeypair_nonce"] = userKeyPair.nonce;
+			userData["exchangekeypair_sk"]    = exchangeKeyPair.encryptedSecretKey;
+			userData["exchangekeypair_pk"]    = exchangeKeyPair.publicKey;
+			userData["exchangekeypair_nonce"] = exchangeKeyPair.nonce;
+					
+			var sql = "INSERT INTO `users` SET ?;";
+			conn.query(sql, [userData], function(err, result) {
+				if (err) { 
+					Logger.error("Failed to add new user called '" + username + "': " + err.stack);
+					callback(new CatMailTypes.InternalException(), null);
+				} else {
+					callback(null, null);
+				}
+			});
 		});
 	}
 

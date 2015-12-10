@@ -144,9 +144,18 @@ function ClientHandler() {
 	}
 
 	this.createUser = function(username, password, userKeyPair, exchangeKeyPair, callback) {
-		databaseHandler.createUser(username, cryptoHelper.sha256(password), userKeyPair, exchangeKeyPair, 
-				function(err, result) {
-			callback(err, result);
+		databaseHandler.existsUser(username, function(data) {
+			if (data) {
+				console.log("Resuuuuult1: " + data);
+				callback(new CatMailTypes.UserAlreadyExistsException(), null);
+				return;
+			} else {
+				console.log("Resuuuuult2: " + data);
+				databaseHandler.createUser(username, cryptoHelper.sha256(password), userKeyPair, exchangeKeyPair, 
+						function(err, result) {
+					callback(err, result);
+				});
+			}
 		});
 	}
 
