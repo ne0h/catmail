@@ -55,13 +55,13 @@ var CatMailHandler = {
 	},
 
 	getContactList: function(username, sessionToken, version, callback) {
-		clientHandler.getContactList(username, sessionToken, version, function(err, result) {
+		clientHandler.getContactList(username, sessionToken, version, function(err, data) {
 			callback(err, data)
 		});
 	},
 
 	addToContactList: function(username, sessionToken, userToAdd, attributes, callback) {
-		clientHandler.addToContactList(username, sessionToken, userToAdd, attributes, function(err, result) {
+		clientHandler.addToContactList(username, sessionToken, userToAdd, attributes, function(err, data) {
 			callback(err, data)
 		});
 	},
