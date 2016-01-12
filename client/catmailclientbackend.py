@@ -213,7 +213,7 @@ class CatMailClientBackend(ClientBackend):
 		pass
 
 	def createUser(self, username, password):
-		self.__serverHandler.createUser(username, password,
+		return self.__serverHandler.createUser(username, password,
 			cryptohelper.newUser(username, password))
 
 	def __init__(self, frontend=None):

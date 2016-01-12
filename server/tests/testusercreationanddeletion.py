@@ -12,15 +12,18 @@ class TestUserCreationAndDeletion(TestClient):
 		password = "".join(random.SystemRandom().choice(string.ascii_lowercase) for _ in range(16))
 		
 		# create user
-		self._client.createUser(username, password)
-		print("Created " + username)
-
-		try:
-			self._client.createUser(username, password)
+		(err, result) = self._client.createUser(username, password)
+		if err is None:
 			print("Created " + username)
-		except:
-			print("shit")
+		else:
+			print("Creation failed.")
 		
+		(err, result) = self._client.createUser(username, password)
+		if err is None:
+			print("Created " + username)
+		else:
+			print("Creation failed.")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
 	TestUserCreationAndDeletion()
