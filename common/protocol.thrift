@@ -134,13 +134,32 @@ struct Contact {
 }
 
 /**
+ * The different types of updates.
+ */
+enum ContactUpdateType {
+	CREATED,
+	UPDATED,
+	DELETED,
+}
+
+/**
+ * Encapsulates an update.
+ */
+struct ContactUpdate {
+	/** The contact itself */
+	1: Contact contact,
+	/** Type of what has been done. */
+	2: ContactUpdateType updateType,
+}
+
+/**
  * Response of a getContactListResponse.
  */
 struct GetContactListResponse {
 	/** version counter */
 	1: i32 version,
 	/** List of contacts the user has. */
-	2: list<Contact> contacts
+	2: list<ContactUpdate> contacts
 }
 
 /**
