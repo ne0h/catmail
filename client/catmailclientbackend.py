@@ -12,6 +12,7 @@ from usercontext import UserContext
 from contactlisttimer import ContactListTimer
 from interfaces import ClientBackend, ClientInterface
 from constants import ErrorCodes
+from atomic_lists import ContactList
 
 class CatMailClientBackend(ClientBackend):
 	def __init_config(self):
@@ -109,6 +110,18 @@ class CatMailClientBackend(ClientBackend):
 				retry = False
 		return canceled
 
+	def get_contact_list(self):
+		return self.__contact_list
+
+	def update_contacts(self):
+		error, response = self.__serverHandler.getContactList(
+				self.__userContext.username,
+				self.__userContext.sessionToken, 
+				self.__contact_list_revision
+			)
+		if (error is None):
+			self.__contact_list.update_contacts(response)
+
 	def __show_main_window(self):
 		self.__frontend.show()
 
@@ -128,7 +141,6 @@ class CatMailClientBackend(ClientBackend):
 		canceled = self.__login_loop(nogui, (not success))
 
 		if not canceled:
-			self.__serverHandler.getContactList(self.__userContext.username, self.__userContext.sessionToken, 0)
 			self.__show_main_window()
 		else:
 			self.__logger.info("Exiting...")
@@ -231,6 +243,8 @@ class CatMailClientBackend(ClientBackend):
 		# add ch to logger
 		self.__logger.addHandler(ch)
 
+		self.__contact_list 	= ContactList()
+		self.__contact_list_revision = 0
 		self.__serverHandler 	= ServerHandler()
 		self.__frontend 		= frontend
 		self.__config 			= None
