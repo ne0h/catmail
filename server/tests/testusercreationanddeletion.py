@@ -24,6 +24,5 @@ class TestUserCreationAndDeletion(TestClient):
 		else:
 			print("Creation failed.")
 
-
 if __name__ == "__main__":
 	TestUserCreationAndDeletion()
