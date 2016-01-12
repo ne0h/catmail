@@ -14,9 +14,9 @@ Log4js.configure('log_config.json', {cwd : 'logs'});
 
 /*
  * Getopt arguments options:
- *  '=':   has argument
- * '[=]': has argument but optional
- *  '+':   multiple option supported
+ * " = ":   has argument
+ * "[=]":   has argument but optional
+ * " + ":   multiple option supported
  */
 getopt = new Getopt([
 	["h", "help",        "Display this help."],
@@ -67,7 +67,7 @@ var CatMailHandler = {
 	},
 
 	createUser: function(username, password, userKeyPair, exchangeKeyPair, callback) {
-		clientHandler.createUser(username, password, userKeyPair, exchangeKeyPair,function(err, data) {
+		clientHandler.createUser(username, password, userKeyPair, exchangeKeyPair, function(err, data) {
 			callback(err, data)
 		});
 	},
