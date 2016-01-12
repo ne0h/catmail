@@ -125,6 +125,11 @@ class CatMailClientBackend(ClientBackend):
 	def __show_main_window(self):
 		self.__frontend.show()
 
+		#self.update_contact_list()
+		#self.__frontend.update_contacts(self.get_contact_list)
+		contacts = self.get_contact_list()
+		print(contacts)
+
 		#TODO remove when threaded, debug only!
 		#NOTE: The following call is blocking!
 		self.__frontend.wait()

@@ -58,6 +58,17 @@ class CatMailClient(ClientInterface):
 		else:
 			self.__show_error("Error: Unknown error.")
 
+	def __on_start_conversation_intent(self, cid):
+		new = None
+		if not self.conversations_list is None:
+			for conversation in self.conversations_list:
+				if conversation.is_private() \
+						and conversation.is_participant(cid) \
+				:
+					# TODO careful, locking!!
+					new = conversation
+					break
+
 	def first_run(self, loginerror=False):
 		#TODO the cb_success thing is hackish... try something else...
 		self.cb_success = False
@@ -67,7 +78,12 @@ class CatMailClient(ClientInterface):
 		return self.cb_success
 
 	def update_contacts(self, contacts):
-		self.main_window.update_contacts(contacts)
+		self.contact_list = contacts
+		self.main_window.set_contact_list(contacts)
+		self.main_window.update_contacts()
+
+	def update_conversations(self, conversations):
+		self.conversations_list = conversations
 
 	def __on_send_message(self, message, conversationID):
 	    print("conversation: %s, message: '%s'" %
@@ -85,6 +101,8 @@ class CatMailClient(ClientInterface):
 		#self.app = QApplication(sys.argv)
 		self.main_window = MainWindow(self, self.app)
 		self.main_window.send_message.connect(self.__on_send_message)
+		self.backend.update_contacts()
+		self.update_contacts(self.backend.get_contact_list())
 		self.main_window.show()
 
 	def add_conversation(self, conversationId, title=None):
@@ -108,4 +126,6 @@ class CatMailClient(ClientInterface):
 		self.app = QApplication([]) # QApplication(sys.argv)
 		self.backend = None
 		self.logger = logging.getLogger("CatMail Client")
+		self.contact_list 		= None
+		self.conversations_list = None
 		super(CatMailClient, self).__init__()
