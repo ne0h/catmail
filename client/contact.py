@@ -7,7 +7,7 @@ class CatMailContact:
         return self.cid
 
     def getAlias(self):
-        return self.alias if not self.alias is None else self.cid
+        return self.alias if not self.alias is None and self.alias != "" else self.cid
 
     def equals(self, contact):
         return (
