@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QGridLayout, QListWidget, \
         QListWidgetItem, QLabel, QTabWidget
-from PyQt5.QtCore import pyqtSignal, pyqtSlot, QObject
+from PyQt5.QtCore import pyqtSignal, pyqtSlot, QObject, Qt
 from contact import CatMailContact
 from random import randint
 from .helpers import create_avatar
@@ -40,18 +40,34 @@ class ContactListEntry(QWidget):
 
         self.update(contact)
 
+    def get_cid(self):
+        return self.cid
+
     def __init__(self, parent, contact, callback=None):
         super(ContactListEntry, self).__init__(parent)
         print('init contact')
         self.callback = callback
         self.avatar = QLabel()
+        self.cid = contact.getContactID()
         #self.widget = QWidget()
         self.__init_ui(contact)
 
 class ContactListManager(QObject):
+    contact_db_clicked = pyqtSignal(str, name="contact_db_clicked")
+
+    def __get_contact_id_by_widget_id(self, list_item):
+        contactWidget = self.__contactlist.item(list_item)
+        return contactWidget.get_cid() if not contactWidget is None else None
+
     @pyqtSlot(QListWidgetItem)
-    def __on_contact_db_clicked(list_item):
+    def __on_contact_db_clicked(self, list_widget_item):
         print("__on_contact_db_clicked")
+        if not list_widget_item is None \
+                and not list_widget_item.data(Qt.UserRole) is None \
+            :
+                self.contact_db_clicked.emit(
+                        list_widget_item.data(Qt.UserRole).get_cid()
+                    )
 
     @pyqtSlot(QListWidgetItem)
     def __on_conversation_db_clicked(list_item):
@@ -61,6 +77,7 @@ class ContactListManager(QObject):
         item = QListWidgetItem(self.__contactlist)
         c = ContactListEntry(self.__contactlist, contact)
         item.setSizeHint(c.sizeHint())
+        item.setData(Qt.UserRole, c)
         self.__contactlist.addItem(item)
         self.__contactlist.setItemWidget(item, c)
 
@@ -70,11 +87,18 @@ class ContactListManager(QObject):
     def get_widget(self):
         return self.tab_widget
 
-    def update_contacts(self, contacts):
-        cts = contacts if isinstance(contacts, list) else [contacts]
+    def update_contacts(self):
+        if not self.__catmail_contact_list is None:
+            for c in self.__catmail_contact_list.get_contacts_iterator():
+                print("contact test: %s" % str(c))
+                self.__add_contact(c)
+        #cts = contacts if isinstance(contacts, list) else [contacts]
 
-        for c in cts:
-            self.__add_contact(c)
+        #for c in cts:
+        #    self.__add_contact(c)
+
+    def set_contact_list(self, contact_list):
+        self.__catmail_contact_list = contact_list
 
     def __init_ui(self):
         self.tab_widget.setTabsClosable(False)
@@ -87,6 +111,7 @@ class ContactListManager(QObject):
 
     def __connect_signals(self):
         self.__contactlist.itemDoubleClicked.connect(
+     #           self.contact_db_clicked
                 self.__on_contact_db_clicked
             )
         self.__conversationlist.itemDoubleClicked.connect(
@@ -99,6 +124,7 @@ class ContactListManager(QObject):
 
         self.__contactlist = QListWidget(self.tab_widget)
         self.__conversationlist = QListWidget(self.tab_widget)
+        self.__catmail_contact_list = None
 
         self.__init_ui()
         self.__connect_signals()
