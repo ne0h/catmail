@@ -25,6 +25,8 @@ class ServerHandler():
 	def __sendQuery(self, query, args):
 		try:
 			return (None, eval("self.client." + query)(*args))
+		except UserAlreadyExistsException as ex:
+			return (ErrorCodes.UserAlreadyExists, None)
 		except Thrift.TException as ex:
 			return (ex, None)
 		except InternalException as ex:
