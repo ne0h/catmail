@@ -24,6 +24,7 @@ class ServerHandler():
 
 	def __sendQuery(self, query, args):
 		try:
+			#TODO Change this to return ErrorCodes.NoError
 			return (None, eval("self.client." + query)(*args))
 		except UserAlreadyExistsException as ex:
 			return (ErrorCodes.UserAlreadyExists, None)
