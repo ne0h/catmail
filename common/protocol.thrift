@@ -137,8 +137,10 @@ struct Contact {
  * Response of a getContactListResponse.
  */
 struct GetContactListResponse {
+	/** version counter */
+	1: i32 version,
 	/** List of contacts the user has. */
-	1: list<Contact> contacts
+	2: list<Contact> contacts
 }
 
 /**
