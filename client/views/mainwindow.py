@@ -6,8 +6,11 @@ from .contactlist import ContactListManager
 class MainWindow(QWidget):
 	send_message = pyqtSignal(str, str, name='sendMessage')
 
-	def update_contacts(self, contacts):
-		self.__contact_list.update_contacts(contacts)
+	def set_contact_list(self, contact_list):
+		self.__contact_list.set_contact_list(contact_list)
+
+	def update_contacts(self):
+		self.__contact_list.update_contacts()
 
 	def add_conversation(self, conversationId, title=None):
 		self.__conversationManager.add_conversation(conversationId, title)
@@ -46,9 +49,20 @@ class MainWindow(QWidget):
 	def __send_message(self, message, conversationID):
 		self.send_message.emit(message, conversationID)
 
+	def __on_contact_db_cliked(self, cid):
+		print("mainwindow: contact %s double clicked." % cid)
+		# search conversation
+		sefl.__search_private_conversation_with_cid(cid)
+		# not found:
+		# 	create
+		# open
+
 	def __connect_signals(self):
 		self.__conversationManager.send_message.connect(
 			self.__send_message
+		)
+		self.__contact_list.contact_db_clicked.connect(
+			self.__on_contact_db_cliked
 		)
 
 	def __init__(self, catMailClient, app, parent=None):
