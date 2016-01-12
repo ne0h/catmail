@@ -19,7 +19,8 @@ def create_avatar(contact, existing_avatar=None, parent=None):
                 "font-weight: bold; " \
                 "font-size: 20px;" % __random_color()
             );
-        avatar.setText(contact.getAlias()[0])
+        text = contact.getAlias()
+        avatar.setText(text[0] if text != "" else contact.getContactID()[0])
     avatar.setAlignment(Qt.AlignCenter)
     avatar.setFixedSize(20, 20)
     return avatar
