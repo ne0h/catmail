@@ -463,7 +463,12 @@ service CatMailService {
 	),
 
 	/**
-	 * Downloads own the contact list.
+	 * Queries an incremental update a user's contact list.
+	 *
+	 * The specified version indicates the latest version that has been queried
+	 * previously. If version is 0, the full contact list will be returned with
+	 * all incremental changes applied.
+	 * If the given version is larger than 0, the update will be incremental.
 	 */
 	GetContactListResponse getContactList(
 		/** The name of the user. */
