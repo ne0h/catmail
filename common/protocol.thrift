@@ -156,7 +156,7 @@ struct ContactUpdate {
  * Response of a getContactListResponse.
  */
 struct GetContactListResponse {
-	/** version counter */
+	/** Version counter at this time. */
 	1: i32 version,
 	/** List of contacts the user has. */
 	2: list<ContactUpdate> contacts

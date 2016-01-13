@@ -15,6 +15,11 @@ function DatabaseHandler(settings) {
 		database: settings.database
 	});
 
+	var contactUpdateTypes = [];
+	contactUpdateTypes.push(CatMailTypes.ContactUpdateType.CREATED);
+	contactUpdateTypes.push(CatMailTypes.ContactUpdateType.DELETED);
+	contactUpdateTypes.push(CatMailTypes.ContactUpdateType.UPDATED);
+
 	this.validatePasswordLogin = function(username, password, callback) {	
 		pool.getConnection(function(err, conn) {
 			if (err) {
@@ -104,7 +109,7 @@ function DatabaseHandler(settings) {
 				return;
 			}
 
-			var sql = "SELECT `contactname` FROM `contacts` WHERE `username`=? AND version>?;";
+			var sql = "SELECT `contactname`, `type` FROM `contacts` WHERE `username`=? AND `version`>?;";
 			conn.query(sql, [username, version], function(err, result) {
 				conn.release();
 				if (err) {
@@ -117,10 +122,14 @@ function DatabaseHandler(settings) {
 				response.contacts = [];
 
 				for (var i in result) {
-					var elem = new CatMailTypes.Contact();
-					elem["username"] = result[i].contactname;
-					elem["attributes"] = {};
-					response.contacts.push(elem);
+					var contactUpdate = new CatMailTypes.ContactUpdate();
+					contactUpdate["contact"] = new CatMailTypes.Contact();
+
+					contactUpdate["contact"]["username"] = result[i].contactname;
+					contactUpdate["contact"]["attributes"] = {};
+					contactUpdate["updateType"] = contactUpdateTypes[result[i].type];
+
+					response.contacts.push(contactUpdate);
 				}
 
 				callback(null, response);

@@ -12,8 +12,7 @@ sys.path.append("../../3rdparty/pysodium-build/lib/python" + curVersion + "/site
 from serverhandler import ServerHandler
 
 #
-# Parent class for all test cases. Does the login and prepares for further
-# tests.
+# Parent class for all test cases. Does the login and prepares for further tests.
 #
 class TestClient:
 
@@ -23,10 +22,10 @@ class TestClient:
 
 		# load test settings
 		self._config = Config(configDirectory=".")
-		username, password = self._config.getLoginCredentials()
+		self._username, password = self._config.getLoginCredentials()
 
 		self._client = CatMailClientBackend()
-		self._sessionToken = self._client.login(username, password,	testlogin=True, passwordAlreadyHashed=True)
+		self._sessionToken = self._client.login(self._username, password, testlogin=True, passwordAlreadyHashed=True)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 	TestClient()

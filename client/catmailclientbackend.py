@@ -15,6 +15,10 @@ from constants import ErrorCodes
 from atomic_lists import ContactList
 
 class CatMailClientBackend(ClientBackend):
+
+	def get_server_handler(self):
+		return self.__serverHandler
+
 	def __init_config(self):
 		success = False
 		self.__config = Config()
@@ -50,7 +54,7 @@ class CatMailClientBackend(ClientBackend):
 			message = "Connection refused by server."
 		return message
 
-	#TODO join all these __show_foo methods into one + convenience methods
+	# TODO join all these __show_foo methods into one + convenience methods
 	def __show_error(self, error, nogui):
 		rv = None
 		message = self.__get_message(error)
@@ -125,13 +129,13 @@ class CatMailClientBackend(ClientBackend):
 	def __show_main_window(self):
 		self.__frontend.show()
 
-		#self.update_contact_list()
-		#self.__frontend.update_contacts(self.get_contact_list)
+		# self.update_contact_list()
+		# self.__frontend.update_contacts(self.get_contact_list)
 		contacts = self.get_contact_list()
 		print(contacts)
 
-		#TODO remove when threaded, debug only!
-		#NOTE: The following call is blocking!
+		# TODO remove when threaded, debug only!
+		# NOTE: The following call is blocking!
 		self.__frontend.wait()
 
 	def start(self, nogui=False):
