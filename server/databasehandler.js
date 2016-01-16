@@ -109,7 +109,8 @@ function DatabaseHandler(settings) {
 				return;
 			}
 
-			var sql = "SELECT `contactname`, `type` FROM `contacts` WHERE `username`=? AND `version`>?;";
+			var sql = "SELECT `contactname`, `type`, `version` FROM `contacts` WHERE `username`=? AND `version`>?"
+						+ " ORDER BY `version` DESC;";
 			conn.query(sql, [username, version], function(err, result) {
 				conn.release();
 				if (err) {
@@ -119,6 +120,7 @@ function DatabaseHandler(settings) {
 				}
 
 				var response = new CatMailTypes.GetContactListResponse();
+				response.version  = (result.length > 0) ? result[0].version : version;
 				response.contacts = [];
 
 				for (var i in result) {
