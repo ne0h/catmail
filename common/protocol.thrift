@@ -34,6 +34,10 @@ exception InvalidMessageException {
 	
 }
 
+exception ContactAlreadyExistsException {
+	
+}
+
 /**
  * Holds a keypair.
  */
@@ -503,6 +507,8 @@ service CatMailService {
 		2: InvalidSessionException invalidSessionException,
 		/** Indicates that the target user does not exist. */
 		3: UserDoesNotExistException userDoesNotExistException,
+		/** Indicates that this contact already exists. */
+		4: ContactAlreadyExistsException contactAlreadyExistsException,
 	),
 
 	/**
