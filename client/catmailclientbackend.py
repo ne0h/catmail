@@ -117,14 +117,16 @@ class CatMailClientBackend(ClientBackend):
 	def get_contact_list(self):
 		return self.__contact_list
 
-	def update_contacts(self):
+	def update_contacts(self, callback):
 		error, response = self.__serverHandler.getContactList(
 				self.__userContext.username,
 				self.__userContext.sessionToken, 
 				self.__contact_list_revision
 			)
-		if (error is None):
+		if (error is None and not callback is None):
 			self.__contact_list.update_contacts(response)
+			print("ContactList update callback")
+			callback(self.__contact_list)
 
 	def __show_main_window(self):
 		self.__frontend.show()

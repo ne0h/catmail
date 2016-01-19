@@ -77,7 +77,7 @@ class CatMailClient(ClientInterface):
 		self.app.exec_()
 		return self.cb_success
 
-	def update_contacts(self, contacts):
+	def __on_contacts_updated(self, contacts):
 		self.contact_list = contacts
 		self.main_window.set_contact_list(contacts)
 		self.main_window.update_contacts()
@@ -100,9 +100,8 @@ class CatMailClient(ClientInterface):
 
 		#self.app = QApplication(sys.argv)
 		self.main_window = MainWindow(self, self.app)
-		self.main_window.send_message.connect(self.__on_send_message)
-		self.backend.update_contacts()
-		self.update_contacts(self.backend.get_contact_list())
+		self.backend.update_contacts(self.__on_contacts_updated)
+		# self.__connect_mani_window_signals()
 		self.main_window.show()
 
 	def add_conversation(self, conversationId, title=None):

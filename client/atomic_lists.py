@@ -1,5 +1,6 @@
 from contact import CatMailContact
 from lib.rwlock import RWLock
+from enum import Enum
 
 class AtomicList:
 	def _acquire_write_lock(self):
@@ -33,6 +34,11 @@ class AtomicList:
 		self._atomic_list = []
 
 class ContactList(AtomicList):
+	class UPDATE_TYPES(Enum):
+		CREATED = 0
+		UPDATED = 1
+		DELETED = 2
+
 	def get_contacts_iterator(self):
 		return self._get_iterator()
 
@@ -46,14 +52,41 @@ class ContactList(AtomicList):
 	def update_contacts(self, contactListResponse):
 		self._acquire_write_lock()
 		self._atomic_list = []
-		if not contactListResponse is None and not contactListResponse.contacts is None:
-			for c in contactListResponse.contacts:
-				self._atomic_list.append(
-						CatMailContact(
-								c.username,
-								"" #TODO alias, other attributes...
-							)
+		def delete(contact):
+			print("Deleting contact: %s" % contact.username)
+			i = 0
+			for i, c in self._atomic_list:
+				if c.getContactID() == contact.username:
+					break
+			self._atomic_list.pop(i)
+		def add(contact):
+			print("Adding contact: %s" % contact.username)
+			self._atomic_list.append(
+				CatMailContact(
+						contact.username,
+						"" #TODO alias, other attributes...
 					)
+				)
+
+		if not contactListResponse is None \
+				and not contactListResponse.contactUpdates is None \
+		:
+			print("updating contacts")	
+			for update in contactListResponse.contactUpdates:
+				updateType = self.UPDATE_TYPES(update.updateType)
+				if updateType == self.UPDATE_TYPES.CREATED:
+					add(update.contact)
+				elif updateType == self.UPDATE_TYPES.UPDATED:
+					# since order does not matter:
+					# simply delete old instance, add new update
+					delete(update.contact)
+					add(update.contact)
+				elif updateType == self.UPDATE_TYPES.DELETED:
+					delete(update.contact)
+				else:
+					raise RuntimeError("Received invalid update type: %s" % \
+							str(update.updateType))
+			self.__revision = contactListResponse.version
 		self._release_write_lock()
 
 	def __init__(self):

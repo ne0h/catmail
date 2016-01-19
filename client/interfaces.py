@@ -1,5 +1,5 @@
 class ClientBackend:
-    def update_contacts(self):
+    def update_contacts(self, callback=None):
         raise NotImplementedError()
 
     def __init__(self):
