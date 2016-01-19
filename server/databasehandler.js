@@ -121,7 +121,7 @@ function DatabaseHandler(settings) {
 
 				var response = new CatMailTypes.GetContactListResponse();
 				response.version  = (result.length > 0) ? result[0].version : version;
-				response.contacts = [];
+				response.contactUpdates = [];
 
 				for (var i in result) {
 					var contactUpdate = new CatMailTypes.ContactUpdate();
@@ -131,7 +131,7 @@ function DatabaseHandler(settings) {
 					contactUpdate["contact"]["attributes"] = {};
 					contactUpdate["updateType"] = contactUpdateTypes[result[i].type];
 
-					response.contacts.push(contactUpdate);
+					response.contactUpdates.push(contactUpdate);
 				}
 
 				callback(null, response);
