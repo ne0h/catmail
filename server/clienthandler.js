@@ -113,6 +113,11 @@ function ClientHandler() {
 	this.logout = function(username, sessionToken, callback) {
 		Logger.debug(username + " tries to log out")
 		validateSession(username, sessionToken, function(result) {
+			if (!result) {
+				callback(new CatMailTypes.InvalidSessionException(), null);
+				return;
+			}
+
 			removeSession(username, sessionToken);
 			(result) ? callback(null, null)	: callback(new CatMailTypes.InvalidSessionException(), null)
 		});
@@ -137,8 +142,22 @@ function ClientHandler() {
 				return;
 			}
 
-			databaseHandler.addToContactList(username, userToAdd, attributes, function(err, result) {
-				(err) ? callback(new CatMailTypes.InternalException(), null) : callback(null, result)
+			databaseHandler.existsUser(userToAdd, function(err, result) {
+				if (!result) {
+					callback(new CatMailTypes.UserDoesNotExistException(), null);
+					return;
+				}
+
+				databaseHandler.hasContact(username, userToAdd, function(err, result) {
+					if (!result) {
+						callback(new CatMailTypes.ContactAlreadyExistsException(), null);
+						return;
+					}
+
+					databaseHandler.addToContactList(username, userToAdd, attributes, function(err, result) {
+						(err) ? callback(new CatMailTypes.InternalException(), null) : callback(null, result)
+					});
+				});
 			});
 		});
 	}

@@ -139,6 +139,28 @@ function DatabaseHandler(settings) {
 		});
 	}
 
+	this.hasContact = function(username, contactname, callback) {
+		pool.getConnection(function(err, conn) {
+			if (err) {
+				Logger.error("Failed to get mysql connection form pool: " + err.stack);
+				callback(new CatMailTypes.InternalException(), null);
+				return;
+			}
+
+			var sql = "SELECT EXISTS (SELECT `username`, `contactname` FROM `contacts` WHERE `username`=? AND"
+				+ " `contactname`=?) AS result";
+			conn.query(sql, [username, contactname], function(err, result) {
+				conn.release();
+				if (err) {
+					Logger.error("Failed to validate password for '" + username + "': " + err.stack);
+					callback(new CatMailTypes.InternalException(), null);
+					return;
+				} else {
+					callback(null, result[0].result)}
+			});
+		});
+	}
+
 	this.addToContactList = function(username, userToAdd, attributes, callback) {
 		pool.getConnection(function(err, conn) {
 			if (err) {
@@ -149,64 +171,47 @@ function DatabaseHandler(settings) {
 
 			conn.beginTransaction(function(err) {
 				if (err) {
-					Logger.error("Failed to add " + userToAdd + " to contact list of '" + username + "': " + err.stack)
+					Logger.error("Failed to start transaction: " + err.stack);
 					callback(new CatMailTypes.InternalException(), null);
 					return;
 				}
-				
-				var sql = "UPDATE `users` SET `contacts_version`=`contacts_version`+1 WHERE `username`=?;";
+
+				// get current contactlist version
+				var sql = "SELECT `version` FROM `contacts` WHERE `username`=? ORDER BY `version` DESC LIMIT 1;";
 				conn.query(sql, [username], function(err, result) {
 					if (err) {
-						return that.conn.rollback(function() {
-							Logger.error("Failed to add '" + userToAdd + "' to contact list of '" + username + "' "
-								+ err.stack)
-							callback(err, null);
-							return;
-						});
+						Logger.error("Failed to get current contactlist version count for user " + username + ": "
+							+ err.stack);
+						callback(new CatMailTypes.InternalException(), null);
+						return;
 					}
 
-				sql = "SELECT `contacts_version` FROM `users` WHERE `username`=?;";
-				conn.query(sql, [username], function(err, result) {
-					if (err) {
-						return that.conn.rollback(function() {
-							Logger.error("Failed to add '" + userToAdd + "' to contact list of '" + username + "' "
-								+ err.stack)
-							callback(err, null);
-							return;
-						});
-					}
-				
-					var version = result[0].contacts_version;
+					newVersion = result[0].version + 1;
 
 					sql = "INSERT INTO `contacts` SET ?;";
-					conn.query(sql, [{"username": username, "contactname": userToAdd, "version": version}],
-						function(err, result) {
+					conn.query(sql, [{"username": username, "contactname": userToAdd, "version": newVersion,
+							"type": 0}], function(err, result) {
+
+						if (err) {
+							Logger.error("Failed to add contact " + userToAdd + " to " + username + "'s contactlist"
+								+ ": " + err.stack);
+							callback(new CatMailTypes.InternalException(), null);
+							return;
+						}
+
+						conn.commit(function(err) {
+							conn.release();
 							if (err) {
-								return that.conn.rollback(function() {
-									Logger.error("Failed to add '" + userToAdd + "' to contact list of '" + username
-										+ "': " + err.stack)
-									callback(err, null);
-									return;
-								});
+								Logger.error("Failed to commit transaction: " + err.stack);
+								callback(new CatMailTypes.InternalException(), null);
+								return;
 							}
 
-							conn.commit(function(err) {
-								conn.release();
-								if (err) {
-									return that.conn.rollback(function() {
-										Logger.error("Failed to add '" + userToAdd + "' to contact list of '"
-											+ username + "': " + err.stack)
-										callback(err, null);
-										return;
-									});
-								}
+							var response = new CatMailTypes.AddToContactListResponse();
+							response.version = newVersion;
 
-								var response = new CatMailTypes.AddToContactListResponse();
-								response.version = version;
-
-								callback(null, response);
-							});
-						})
+							callback(null, response);
+						});
 					});
 				});
 			});
@@ -229,7 +234,7 @@ function DatabaseHandler(settings) {
 					return;
 				}
 
-				callback(result[0].result == 1);
+				callback(result[0].result);
 			});
 		});
 	}
