@@ -66,6 +66,12 @@ var CatMailHandler = {
 		});
 	},
 
+	removeFromContactList: function(username, sessionToken, userToDelete, callback) {
+		clientHandler.removeFromContactList(username, sessionToken, userToDelete, function(err, data) {
+			callback(err, data)
+		});
+	}
+
 	createUser: function(username, password, userKeyPair, exchangeKeyPair, callback) {
 		clientHandler.createUser(username, password, userKeyPair, exchangeKeyPair, function(err, data) {
 			callback(err, data)
