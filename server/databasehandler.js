@@ -171,6 +171,7 @@ function DatabaseHandler(settings) {
 
 			conn.beginTransaction(function(err) {
 				if (err) {
+					conn.release();
 					Logger.error("Failed to start transaction: " + err.stack);
 					callback(new CatMailTypes.InternalException(), null);
 					return;
@@ -180,6 +181,7 @@ function DatabaseHandler(settings) {
 				var sql = "SELECT `version` FROM `contacts` WHERE `username`=? ORDER BY `version` DESC LIMIT 1;";
 				conn.query(sql, [username], function(err, result) {
 					if (err) {
+						conn.release();
 						Logger.error("Failed to get current contactlist version count for user " + username + ": "
 							+ err.stack);
 						callback(new CatMailTypes.InternalException(), null);
@@ -193,6 +195,7 @@ function DatabaseHandler(settings) {
 							"type": 0}], function(err, result) {
 
 						if (err) {
+							conn.release();
 							Logger.error("Failed to add contact " + userToAdd + " to " + username + "'s contactlist"
 								+ ": " + err.stack);
 							callback(new CatMailTypes.InternalException(), null);
@@ -228,6 +231,7 @@ function DatabaseHandler(settings) {
 
 			conn.beginTransaction(function(err) {
 				if (err) {
+					conn.release();
 					Logger.error("Failed to start transaction: " + err.stack);
 					callback(new CatMailTypes.InternalException(), null);
 					return;
@@ -237,6 +241,7 @@ function DatabaseHandler(settings) {
 				var sql = "SELECT `version` FROM `contacts` WHERE `username`=? ORDER BY `version` DESC LIMIT 1;";
 				conn.query(sql, [username], function(err, result) {
 					if (err) {
+						conn.release();
 						Logger.error("Failed to get current contactlist version count for user " + username + ": "
 							+ err.stack);
 						callback(new CatMailTypes.InternalException(), null);
@@ -248,6 +253,7 @@ function DatabaseHandler(settings) {
 					sql = "UPDATE `contacts` SET `version`=?, `type`=? WHERE `username`=? AND `contactname`?;";
 					conn.query(sql, [newVersion, 2, username, userToDelete], function(err, result) {
 						if (err) {
+							conn.release();
 							Logger.error("Failed to remove " + userToDelete + " from " + username + "'s contactlist: "
 								+ err.stack);
 							callback(new CatMailTypes.InternalException(), null);
