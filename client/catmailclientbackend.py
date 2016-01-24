@@ -123,7 +123,7 @@ class CatMailClientBackend(ClientBackend):
 				self.__userContext.sessionToken, 
 				self.__contact_list_revision
 			)
-		if (error is None and not callback is None):
+		if (error == ErrorCodes.NoError and not callback is None):
 			self.__contact_list.update_contacts(response)
 			print("ContactList update callback")
 			callback(self.__contact_list)
@@ -176,10 +176,10 @@ class CatMailClientBackend(ClientBackend):
 				cryptohelper.kdf(username, passwordHash)
 			)
 		
-		ex, res = self.__serverHandler.getPrivateKeys(username, loginHash)
-		if ex is not None:
-			self.__logger.error("Failed to get private keys: " + type(ex).__name__)
-			return ex
+		err, res = self.__serverHandler.getPrivateKeys(username, loginHash)
+		if err != ErrorCodes.NoError:
+			self.__logger.error("Failed to get private keys: %s" % err)
+			return err
 
 		# decrypt secret keys and store them in usercontext
 		userKeyPair = KeyPair(
@@ -201,10 +201,10 @@ class CatMailClientBackend(ClientBackend):
 		self.__userContext.setKeyPairs(userKeyPair, exchangeKeyPair)
 
 		# Start challange-response-login. request a login challenge
-		ex, res = self.__serverHandler.requestLoginChallenge(username)
-		if ex is not None:
-			self.__logger.error("Failed to request challenge: " + type(ex).__name__)
-			return ex
+		err, res = self.__serverHandler.requestLoginChallenge(username)
+		if err != ErrorCodes.NoError:
+			self.__logger.error("Failed to request challenge: %s" % err)
+			return err
 
 		# sign this challenge
 		signature = cryptohelper.signChallenge(
@@ -213,10 +213,10 @@ class CatMailClientBackend(ClientBackend):
 			)
 
 		# send the signature to server to log in
-		ex, res = self.__serverHandler.login(username, res.challenge, signature)
-		if ex is not None:
-			self.__logger.error("Failed to login: " + type(ex).__name__)
-			return ex
+		err, res = self.__serverHandler.login(username, res.challenge, signature)
+		if err != ErrorCodes.NoError:
+			self.__logger.error("Failed to login: %s" % err)
+			return err
 
 		print("Login successful!\nSessionToken: %s" % (res.sessionToken))
 
