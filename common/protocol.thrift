@@ -19,7 +19,7 @@ exception UserAlreadyExistsException {
 }
 
 exception UserDoesNotExistException {
-	1: string username
+	1: list<string> username
 }
 
 exception ChatDoesNotExistException {
