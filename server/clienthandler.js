@@ -197,6 +197,10 @@ function ClientHandler() {
 		});
 	}
 
+	this.createChat = function(username, sessionToken, usersToAdd, callback) {
+		
+	}
+
 }
 
 module.exports = ClientHandler;

@@ -70,10 +70,16 @@ var CatMailHandler = {
 		clientHandler.removeFromContactList(username, sessionToken, userToDelete, function(err, data) {
 			callback(err, data)
 		});
-	}
+	},
 
 	createUser: function(username, password, userKeyPair, exchangeKeyPair, callback) {
 		clientHandler.createUser(username, password, userKeyPair, exchangeKeyPair, function(err, data) {
+			callback(err, data)
+		});
+	},
+
+	createChat: function(username, sessionToken, usersToAdd, callback) {
+		clientHandler.createChat(username, sessionToken, usersToAdd, function(err, data) {
 			callback(err, data)
 		});
 	},
