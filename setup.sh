@@ -115,6 +115,4 @@ mkdir -p logs
 
 # install nodejs dependencies
 cd $pwdstr/server
-npm install log4js mysql node-int64 q sodium node-getopt
-cd node_modules
-cp -r ../../3rdparty/thrift/lib/nodejs/lib/thrift .
+npm install log4js mysql node-int64 q sodium node-getopt thrift
