@@ -198,7 +198,16 @@ function ClientHandler() {
 	}
 
 	this.createChat = function(username, sessionToken, usersToAdd, callback) {
-		
+		validateSession(username, sessionToken, function(result) {
+			if (!result) {
+				callback(new CatMailTypes.InvalidSessionException(), null);
+				return;
+			}
+
+			databaseHandler.createChat(function(err, result) {
+
+			});
+		}
 	}
 
 }

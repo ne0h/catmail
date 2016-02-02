@@ -330,6 +330,27 @@ function DatabaseHandler(settings) {
 		});
 	}
 
+	this.createChat = function(callback) {
+		pool.getConnection(function(err, conn) {
+			if (err) {
+				Logger.error("Failed to get mysql connection form pool: " + err.stack);
+				callback(new CatMailTypes.InternalException(), null);
+				return;
+			}
+
+			var sql = "INSERT INTO `chats` SET ?;";
+			conn.query(sql, [{}], function(err, result) {
+				if (err) {
+					Logger.error("Failed to create chat.");
+					callback(new CatMailTypes.InternalException(), null)
+				} else {
+					Logger.debug("New chat with id " + result.insertId);
+					callback(null, result.insertId);
+				}
+			});
+		});
+	}
+
 }
 
 module.exports = DatabaseHandler;
