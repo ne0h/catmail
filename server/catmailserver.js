@@ -78,8 +78,8 @@ var CatMailHandler = {
 		});
 	},
 
-	createChat: function(username, sessionToken, usersToAdd, callback) {
-		clientHandler.createChat(username, sessionToken, usersToAdd, function(err, data) {
+	createChat: function(username, sessionToken, key, usersToAdd, callback) {
+		clientHandler.createChat(username, sessionToken, key, usersToAdd, function(err, data) {
 			callback(err, data)
 		});
 	},

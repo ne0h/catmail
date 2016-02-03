@@ -7,8 +7,7 @@ var CatMailTypes	= require("./api/protocol_types"),
 	cryptoHelper    = new CryptoHelper(),
 
 	Log4js = require("log4js"),
-	Logger = Log4js.getLogger("catmailserver"),
-	callSequentially = require("./callsequentially");
+	Logger = Log4js.getLogger("catmailserver");
 
 function ClientHandler() {
 
@@ -198,7 +197,7 @@ function ClientHandler() {
 		});
 	}
 
-	this.createChat = function(username, sessionToken, usersToAdd, callback) {
+	this.createChat = function(username, sessionToken, key, usersToAdd, callback) {
 		validateSession(username, sessionToken, function(result) {
 			if (!result) {
 				callback(new CatMailTypes.InvalidSessionException(), null);
@@ -211,25 +210,14 @@ function ClientHandler() {
 					return;
 				}
 
-				usersToAdd.push(username);
-				var brokenUsers = [];
-				var funcs = [];
-				for (var i = 0; i < usersToAdd.length; i++) {
-					var j = i;
-					funcs.push(function() {
-						databaseHandler.addUserToChat(result, usersToAdd[j], function(err, result) {
-							if (!result) {
-								brokenUsers.push(usersToAdd[j])
-							}
-						});
-					});
-				}
+				user = new CatMailTypes.AddChatUser();
+				user.username = username;
+				user.key      = key;
+				usersToAdd.push(user);
 
-				callSequentially(funcs,
-					function() {
-						Logger.info("Result: " + brokenUsers);
-					}
-				);
+				databaseHandler.addUsersToChat(result, usersToAdd, function(err, result) {
+					callback(err, result);
+				});
 			});
 		});
 	}

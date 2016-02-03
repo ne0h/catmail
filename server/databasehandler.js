@@ -357,35 +357,65 @@ function DatabaseHandler(settings) {
 
 	}
 
-	this.addUserToChat = function(chatId, username, callback) {
-		
-		// validate that the user exists
-		this.existsUser(username, function(err, result) {
+	this.addUsersToChat = function(chatId, users, callback) {
+
+		pool.getConnection(function(err, conn) {
 			if (err) {
-				callback(err, null);
+				Logger.error("Failed to get mysql connection form pool: " + err.stack);
+				callback(new CatMailTypes.InternalException(), null);
 				return;
 			}
 
-			if (!result) {
-				Logger.error("Failed to add '" + username + "' to chat #" + chatId + ": The user does not exist");
-				callback(null, false);
-			}
-
-			pool.getConnection(function(err, conn) {
+			conn.beginTransaction(function(err) {
 				if (err) {
-					Logger.error("Failed to get mysql connection form pool: " + err.stack);
+					conn.release();
+					Logger.error("Failed to start transaction: " + err.stack);
 					callback(new CatMailTypes.InternalException(), null);
 					return;
 				}
 
-				var sql = "INSERT INTO `chatmembers` SET ?;";
-				conn.query(sql, [{"username": username, "chatid": chatId}], function(err, result) {
+				// check if all the users exist
+				var sql = "SELECT `username` FROM `users` where `username` IN (";
+				for (var i = 0; i < users.length; i++) {
+					sql += "'" + users[i].username + "',"
+				}
+				sql = sql.substring(0, sql.length - 1);
+				sql += ");";
+				conn.query(sql, [], function(err, result) {
 					if (err) {
-						Logger.error("Failed to add '" + username + "' to chat #" + chatId	+ ": " + err.stack);
-						callback(new CatMailTypes.InternalException(), null)
-					} else {
-						callback(null, true);
+						Logging.error("Failed to check if the users exist: " + err.stack);
+						callback(new CatMailTypes.InternalException(), null);
+						return;
 					}
+
+					// iterate the result to check if the users exist
+					brokenUsers = [];
+					var values = "";
+					for (var i = 0; i < users.length; i++) {
+						if (result.indexOf(users[i].username) == -1) {
+							brokenUsers.push(users[i].username);
+						} else {
+							values += "('" + users[i].username + "','" + chatId + "','" + users[i].key + "'),"
+						}
+					}
+					values = values.substring(0, values.length - 1);
+
+					// insert all the users
+					sql = "INSERT INTO `users` (`username`,`chatid`,`userkey`) VALUES " + values + ";";
+					conn.query(sql, [], function(err, result) {
+						if (err) {
+							Logging.error("Failed to add users to chat #: " + chatId + " | " + err.stack);
+							callback(new CatMailTypes.InternalException(), null);
+							return;
+						}
+
+						if (brokenUsers.length > 0) {
+							callback(new CatMailTypes.UserDoesNotExistException(brokenUsers),
+								new CatMailTypes.CreateChatResponse(chatId));
+						} else {
+							callback(null, new CatMailTypes.CreateChatResponse(chatId));
+						}
+					});
 				});
 			});
 		});
