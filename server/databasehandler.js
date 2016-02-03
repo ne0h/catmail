@@ -291,11 +291,12 @@ function DatabaseHandler(settings) {
 			conn.query(sql, [username], function(err, result) {
 				if (err) {
 					Logger.error("Failed to check if '" + username + "' already exists");
-					callback(false);
+					callback(new CatMailTypes.InternalException(), null);
 					return;
 				}
 
-				callback(result[0].result);
+				Logger.info("!!!! " + result[0].result);
+				callback(null, (result[0].result == 1));
 			});
 		});
 	}
@@ -338,15 +339,54 @@ function DatabaseHandler(settings) {
 				return;
 			}
 
-			var sql = "INSERT INTO `chats` SET ?;";
-			conn.query(sql, [{}], function(err, result) {
+			// use 'SET' when there is actually more data then just a chatId
+			var sql = "INSERT INTO `chats` () VALUES ()";
+			conn.query(sql, [], function(err, result) {
 				if (err) {
-					Logger.error("Failed to create chat.");
+					Logger.error("Failed to create chat: " + err.stack);
 					callback(new CatMailTypes.InternalException(), null)
 				} else {
 					Logger.debug("New chat with id " + result.insertId);
 					callback(null, result.insertId);
 				}
+			});
+		});
+	}
+
+	this.existsChat = function(chatId, callback) {
+
+	}
+
+	this.addUserToChat = function(chatId, username, callback) {
+		
+		// validate that the user exists
+		this.existsUser(username, function(err, result) {
+			if (err) {
+				callback(err, null);
+				return;
+			}
+
+			if (!result) {
+				Logger.error("Failed to add '" + username + "' to chat #" + chatId + ": The user does not exist");
+				callback(null, false);
+			}
+
+			pool.getConnection(function(err, conn) {
+				if (err) {
+					Logger.error("Failed to get mysql connection form pool: " + err.stack);
+					callback(new CatMailTypes.InternalException(), null);
+					return;
+				}
+
+				var sql = "INSERT INTO `chatmembers` SET ?;";
+				conn.query(sql, [{"username": username, "chatid": chatId}], function(err, result) {
+					if (err) {
+						Logger.error("Failed to add '" + username + "' to chat #" + chatId	+ ": " + err.stack);
+						callback(new CatMailTypes.InternalException(), null)
+					} else {
+						callback(null, true);
+					}
+				});
 			});
 		});
 	}

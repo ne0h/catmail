@@ -7,9 +7,9 @@ var Thrift			= require("thrift"),
 
 	Log4js			= require("log4js"),
 	Logger 			= Log4js.getLogger("catmailserver"),
-	Getopt 			= require('node-getopt');
+	Getopt 			= require("node-getopt");
 
-Log4js.configure('log_config.json', {cwd : 'logs'});
+Log4js.configure("log_config.json", {cwd : "logs"});
 //Log4js.addAppender(Log4js.appenders.file("catmail.log"), "catmailserver");
 
 /*

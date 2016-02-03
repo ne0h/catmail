@@ -7,7 +7,8 @@ var CatMailTypes	= require("./api/protocol_types"),
 	cryptoHelper    = new CryptoHelper(),
 
 	Log4js = require("log4js"),
-	Logger = Log4js.getLogger("catmailserver");
+	Logger = Log4js.getLogger("catmailserver"),
+	callSequentially = require("./callsequentially");
 
 function ClientHandler() {
 
@@ -17,7 +18,7 @@ function ClientHandler() {
 	 * Contains a list of active sessions for each user.
 	 * Map<username, sessionTokens[]>
 	 */
-	var sessions   = {}
+	var sessions = {}
 
 	/**
 	 * Adds a new session for a user.
@@ -205,9 +206,32 @@ function ClientHandler() {
 			}
 
 			databaseHandler.createChat(function(err, result) {
+				if (err) {
+					callback(err, result);
+					return;
+				}
 
+				usersToAdd.push(username);
+				var brokenUsers = [];
+				var funcs = [];
+				for (var i = 0; i < usersToAdd.length; i++) {
+					var j = i;
+					funcs.push(function() {
+						databaseHandler.addUserToChat(result, usersToAdd[j], function(err, result) {
+							if (!result) {
+								brokenUsers.push(usersToAdd[j])
+							}
+						});
+					});
+				}
+
+				callSequentially(funcs,
+					function() {
+						Logger.info("Result: " + brokenUsers);
+					}
+				);
 			});
-		})
+		});
 	}
 
 }
