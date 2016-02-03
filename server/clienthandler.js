@@ -207,7 +207,7 @@ function ClientHandler() {
 			databaseHandler.createChat(function(err, result) {
 
 			});
-		}
+		})
 	}
 
 }
