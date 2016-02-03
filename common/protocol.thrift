@@ -313,8 +313,10 @@ service CatMailService {
 		1: string username,
 		/** The user's session token. */
 		2: string sessionToken,
+		/** The encrypted key (user individual) to read the messages in the chat. */
+		3: string key,
 		/** Add these users to the new chat. */
-		3: list<AddChatUser> usersToAdd,
+		4: list<AddChatUser> usersToAdd,
 	) throws (
 		/** Something went dramatically wrong. */
 		1: InternalException internalException,
