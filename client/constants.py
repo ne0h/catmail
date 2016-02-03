@@ -9,6 +9,7 @@ ErrorCodes = Enum("ErrorCodes",
         ConnectionRefused
         UserAlreadyExists
         UserDoesNotExist
+        InvalidSession
         """,
         module=__name__
     )
