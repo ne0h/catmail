@@ -91,6 +91,17 @@ class ServerHandler():
 			err, resp = self.__sendQuery("createUser",
 					[username, password, userKeyPair,
 					exchangeKeyPair])
-		except UserAlreadyExistsException as ex:
+		except UserAlreadyExistsException:
 			err = ErrorCodes.UserAlreadyExists
+		return (err, resp)
+
+	def createChat(self, username, sessionToken, usersToAdd):
+		err, resp = (ErrorCodes.NoError, None)
+		try:
+			err, resp = self.__sendQuery("createChat",
+					[username, sessionToken, usersToAdd])
+		except InvalidSessionException:
+			err = ErrorCodes.InvalidSession
+		except UserDoesNotExistException:
+			err = ErrorCodes.UserDoesNotExist
 		return (err, resp)
