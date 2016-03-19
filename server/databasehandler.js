@@ -23,7 +23,7 @@ function DatabaseHandler(settings) {
 	this.validatePasswordLogin = function(username, password, callback) {	
 		pool.getConnection(function(err, conn) {
 			if (err) {
-				Logger.error("Failed to get mysql connection form pool: " + err.stack);
+				Logger.error("Failed to get mysql connection from pool: " + err.stack);
 				callback(new CatMailTypes.InternalException(), null);
 				return;
 			}
@@ -45,7 +45,7 @@ function DatabaseHandler(settings) {
 	this.getPrivateKeys = function(username, callback) {
 		pool.getConnection(function(err, conn) {
 			if (err) {
-				Logger.error("Failed to get mysql connection form pool: " + err.stack);
+				Logger.error("Failed to get mysql connection from pool: " + err.stack);
 				callback(new CatMailTypes.InternalException(), null);
 				return;
 			}
@@ -82,7 +82,7 @@ function DatabaseHandler(settings) {
 	this.getExchangeKeyPairPublicKey = function(username, callback) {
 		pool.getConnection(function(err, conn) {
 			if (err) {
-				Logger.error("Failed to get mysql connection form pool: " + err.stack);
+				Logger.error("Failed to get mysql connection from pool: " + err.stack);
 				callback(new CatMailTypes.InternalException(), null);
 				return;
 			}
@@ -104,7 +104,7 @@ function DatabaseHandler(settings) {
 	this.getContactList = function(username, version, callback) {
 		pool.getConnection(function(err, conn) {
 			if (err) {
-				Logger.error("Failed to get mysql connection form pool: " + err.stack);
+				Logger.error("Failed to get mysql connection from pool: " + err.stack);
 				callback(new CatMailTypes.InternalException(), null);
 				return;
 			}
@@ -142,7 +142,7 @@ function DatabaseHandler(settings) {
 	this.hasContact = function(username, contactname, callback) {
 		pool.getConnection(function(err, conn) {
 			if (err) {
-				Logger.error("Failed to get mysql connection form pool: " + err.stack);
+				Logger.error("Failed to get mysql connection from pool: " + err.stack);
 				callback(new CatMailTypes.InternalException(), null);
 				return;
 			}
@@ -164,7 +164,7 @@ function DatabaseHandler(settings) {
 	this.addToContactList = function(username, userToAdd, attributes, callback) {
 		pool.getConnection(function(err, conn) {
 			if (err) {
-				Logger.error("Failed to get mysql connection form pool: " + err.stack);
+				Logger.error("Failed to get mysql connection from pool: " + err.stack);
 				callback(new CatMailTypes.InternalException(), null);
 				return;
 			}
@@ -224,7 +224,7 @@ function DatabaseHandler(settings) {
 	this.removeFromContactList = function(username, userToDelete, callback) {
 		pool.getConnection(function(err, conn) {
 			if (err) {
-				Logger.error("Failed to get mysql connection form pool: " + err.stack);
+				Logger.error("Failed to get mysql connection from pool: " + err.stack);
 				callback(new CatMailTypes.InternalException(), null);
 				return;
 			}
@@ -282,7 +282,7 @@ function DatabaseHandler(settings) {
 	this.existsUser = function(username, callback) {
 		pool.getConnection(function(err, conn) {
 			if (err) {
-				Logger.error("Failed to get mysql connection form pool: " + err.stack);
+				Logger.error("Failed to get mysql connection from pool: " + err.stack);
 				callback(new CatMailTypes.InternalException(), null);
 				return;
 			}
@@ -295,7 +295,6 @@ function DatabaseHandler(settings) {
 					return;
 				}
 
-				Logger.info("!!!! " + result[0].result);
 				callback(null, (result[0].result == 1));
 			});
 		});
@@ -304,7 +303,7 @@ function DatabaseHandler(settings) {
 	this.createUser = function(username, password, userKeyPair, exchangeKeyPair, callback) {
 		pool.getConnection(function(err, conn) {
 			if (err) {
-				Logger.error("Failed to get mysql connection form pool: " + err.stack);
+				Logger.error("Failed to get mysql connection from pool: " + err.stack);
 				callback(new CatMailTypes.InternalException(), null);
 				return;
 			}
@@ -334,7 +333,7 @@ function DatabaseHandler(settings) {
 	this.createChat = function(callback) {
 		pool.getConnection(function(err, conn) {
 			if (err) {
-				Logger.error("Failed to get mysql connection form pool: " + err.stack);
+				Logger.error("Failed to get mysql connection from pool: " + err.stack);
 				callback(new CatMailTypes.InternalException(), null);
 				return;
 			}
@@ -361,7 +360,7 @@ function DatabaseHandler(settings) {
 
 		pool.getConnection(function(err, conn) {
 			if (err) {
-				Logger.error("Failed to get mysql connection form pool: " + err.stack);
+				Logger.error("Failed to get mysql connection from pool: " + err.stack);
 				callback(new CatMailTypes.InternalException(), null);
 				return;
 			}

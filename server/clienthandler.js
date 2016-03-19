@@ -183,13 +183,17 @@ function ClientHandler() {
 	}
 
 	this.createUser = function(username, password, userKeyPair, exchangeKeyPair, callback) {
-		databaseHandler.existsUser(username, function(data) {
+		databaseHandler.existsUser(username, function(err, data) {
 			if (data) {
+				Logger.info("Failed to create new user called '" + username + "': Username already taken");
 				callback(new CatMailTypes.UserAlreadyExistsException(), null);
 				return;
 			} else {
 				databaseHandler.createUser(username, cryptoHelper.sha256(password), userKeyPair, exchangeKeyPair, 
 						function(err, result) {
+					if (!err) {
+						Logger.info("Create new user called '" + username + "'");
+					}
 					callback(err, result);
 					return;
 				});
