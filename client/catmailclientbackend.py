@@ -239,6 +239,9 @@ class CatMailClientBackend(ClientBackend):
 		return self.__serverHandler.createUser(username, password,
 			cryptohelper.newUser(username, password))
 
+	def deleteUser(self, username, sessionToken):
+		return self.__serverHandler.deleteUser(username, sessionToken)
+
 	def __init__(self, frontend=None):
 		super(CatMailClientBackend, self).__init__()
 		# start serverhandler to connect to catmail server

@@ -330,6 +330,43 @@ function DatabaseHandler(settings) {
 		});
 	}
 
+	/**
+	 * Returns the list of chats of a given user.
+	 * @param username the name of the user
+	 * @param conn the mysql connection object
+	 * @param callback is called when the method finishes
+     */
+	function getChats(username, conn, callback) {
+		var sql = "SELECT `chatid` FROM chatmembers WHERE `username` LIKE ?;";
+		conn.query(sql, [username], function(err, result) {
+			if (err) {
+				Logger.error("Failed to get chat list of '" + username + "'");
+				return;
+			}
+
+			callback(null, result);
+		});
+	}
+
+	this.deleteUser = function(username, callback) {
+		pool.getConnection(function(err, conn) {
+			if (err) {
+				Logger.error("Failed to get mysql connection from pool: " + err.stack);
+				callback(new CatMailTypes.InternalException(), null);
+				return;
+			}
+
+			// delete from chats
+			getChats(username, conn, function(err, result) {
+				Logger.debug(result);
+			});
+
+			// delete from contact lists
+
+			// delete user data
+		});
+	}
+
 	this.createChat = function(callback) {
 		pool.getConnection(function(err, conn) {
 			if (err) {
@@ -357,7 +394,6 @@ function DatabaseHandler(settings) {
 	}
 
 	this.addUsersToChat = function(chatId, users, callback) {
-
 		pool.getConnection(function(err, conn) {
 			if (err) {
 				Logger.error("Failed to get mysql connection from pool: " + err.stack);

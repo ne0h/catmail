@@ -95,6 +95,17 @@ class ServerHandler():
 			err = ErrorCodes.UserAlreadyExists
 		return (err, resp)
 
+	def deleteUser(self, username, sessionToken):
+		err, resp = (ErrorCodes.NoError, None)
+		try:
+			err, resp = self.__sendQuery("deleteUser",
+					[username, sessionToken])
+		except InternalException:
+			err = ErrorCodes.InternalServerError
+		except InvalidSessionException:
+			err = ErrorCodes.InvalidSession
+		return (err, resp)
+
 	def createChat(self, username, sessionToken, usersToAdd):
 		err, resp = (ErrorCodes.NoError, None)
 		try:

@@ -38,7 +38,7 @@ function ClientHandler() {
 	 * Validates if a session is valid.
 	 */
 	function validateSession(username, sessionToken, callback) {
-		(sessions[username].indexOf(sessionToken) != -1) ? callback(true) : callback(false)
+		(sessions[username] && sessions[username].indexOf(sessionToken) != -1) ? callback(true) : callback(false);
 	}
 
 	/**
@@ -198,6 +198,27 @@ function ClientHandler() {
 					return;
 				});
 			}
+		});
+	}
+
+	this.deleteUser = function(username, sessionToken, callback) {
+		Logger.debug("Trying to delete user '" + username + "'")
+		validateSession(username, sessionToken, function(result) {
+			if (!result) {
+				Logger.info("Invalid session");
+				callback(new CatMailTypes.InvalidSessionException(), null);
+				return;
+			}
+
+			databaseHandler.deleteUser(username, function(err, result) {
+				if (err) {
+					callback(err, result);
+					return;
+				}
+
+				Logger.info("Deleted '" + username + "'");
+				callback(null, null);
+			});
 		});
 	}
 

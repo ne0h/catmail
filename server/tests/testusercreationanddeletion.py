@@ -16,16 +16,22 @@ class TestUserCreationAndDeletion(TestClient):
 		print("Trying to create new user called %s" % username)
 		(err, result) = self._client.createUser(username, password)
 		if err is ErrorCodes.NoError:
-			print("Created " + username)
+			print("Created %s" % username)
 		else:
 			print("Creation failed: %s" % err)
 		
 		print("Trying to create user with same username")
 		(err, result) = self._client.createUser(username, password)
 		if err is ErrorCodes.NoError:
-			print("Created " + username)
+			print("Created %s" % username)
 		else:
 			print("Creation failed: %s" % err)
+
+		(err, result) = self._client.deleteUser(username, self._sessionToken)
+		if err is ErrorCodes.NoError:
+			print("Deleted %s" % username)
+		else:
+			print("Deletion failed: %s" % err)
 
 if __name__ == "__main__":
 	TestUserCreationAndDeletion()

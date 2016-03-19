@@ -78,6 +78,12 @@ var CatMailHandler = {
 		});
 	},
 
+	deleteUser: function(username, sessionToken, callback) {
+		clientHandler.deleteUser(username, sessionToken, function(err, data) {
+			callback(err, data)
+		})
+	},
+
 	createChat: function(username, sessionToken, key, usersToAdd, callback) {
 		clientHandler.createChat(username, sessionToken, key, usersToAdd, function(err, data) {
 			callback(err, data)
