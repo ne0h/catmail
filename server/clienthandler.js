@@ -142,22 +142,8 @@ function ClientHandler() {
 				return;
 			}
 
-			databaseHandler.existsUser(userToAdd, function(err, result) {
-				if (!result) {
-					callback(new CatMailTypes.UserDoesNotExistException(), null);
-					return;
-				}
-
-				databaseHandler.hasContact(username, userToAdd, function(err, result) {
-					if (!result) {
-						callback(new CatMailTypes.ContactAlreadyExistsException(), null);
-						return;
-					}
-
-					databaseHandler.addToContactList(username, userToAdd, attributes, function(err, result) {
-						(err) ? callback(new CatMailTypes.InternalException(), null) : callback(null, result)
-					});
-				});
+			databaseHandler.addToContactList(username, userToAdd, attributes, function(err, result) {
+				(err) ? callback(new CatMailTypes.InternalException(), null) : callback(null, result)
 			});
 		});
 	}
@@ -183,21 +169,15 @@ function ClientHandler() {
 	}
 
 	this.createUser = function(username, password, userKeyPair, exchangeKeyPair, callback) {
-		databaseHandler.existsUser(username, function(err, data) {
-			if (data) {
-				Logger.info("Failed to create new user called '" + username + "': Username already taken");
-				callback(new CatMailTypes.UserAlreadyExistsException(), null);
-				return;
-			} else {
-				databaseHandler.createUser(username, cryptoHelper.sha256(password), userKeyPair, exchangeKeyPair, 
-						function(err, result) {
-					if (!err) {
-						Logger.info("Create new user called '" + username + "'");
-					}
-					callback(err, result);
-					return;
-				});
+		databaseHandler.createUser(username, cryptoHelper.sha256(password), userKeyPair, exchangeKeyPair,
+				function(err, result) {
+
+			if (!err) {
+				Logger.info("Create new user called '" + username + "'");
 			}
+
+			callback(err, result);
+			return;
 		});
 	}
 

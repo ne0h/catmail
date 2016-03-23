@@ -20,6 +20,46 @@ function DatabaseHandler(settings) {
 	contactUpdateTypes.push(CatMailTypes.ContactUpdateType.DELETED);
 	contactUpdateTypes.push(CatMailTypes.ContactUpdateType.UPDATED);
 
+	/**
+	 * Checks if a user exists or not.
+	 * @param username the name of the user
+	 * @param conn connection from mysql pool
+	 * @param callback callback
+     */
+	function existsUser(username, conn, callback) {
+		var sql = "SELECT EXISTS (SELECT `username` FROM `users` WHERE `username`=?) AS result;";
+		conn.query(sql, [username], function(err, result) {
+			if (err) {
+				Logger.error("Failed to check if a user called '" + username + "' already exists");
+				callback(new CatMailTypes.InternalException(), null);
+				return;
+			}
+
+			callback(null, (result[0].result == 1));
+		});
+	}
+
+	/**
+	 * Checks if a contact has already been added to a contact list.
+	 * @param username the name of the user who owns the contact list
+	 * @param contactname the name of the user to check
+	 * @param conn connection from mysql pool
+	 * @param callback callback
+     */
+	function hasContact(username, contactname, conn, callback) {
+		var sql = "SELECT EXISTS (SELECT `username`, `contactname` FROM `contacts` WHERE `username`=? AND"
+				+ " `contactname`=?) AS result";
+		conn.query(sql, [username, contactname], function(err, result) {
+			if (err) {
+				Logger.error("Failed to validate password for '" + username + "': " + err.stack);
+				callback(new CatMailTypes.InternalException(), null);
+				return;
+			}
+
+			callback(null, result[0].result == 1);
+		});
+	}
+
 	this.validatePasswordLogin = function(username, password, callback) {	
 		pool.getConnection(function(err, conn) {
 			if (err) {
@@ -147,30 +187,6 @@ function DatabaseHandler(settings) {
 		});
 	}
 
-	this.hasContact = function(username, contactname, callback) {
-		pool.getConnection(function(err, conn) {
-			if (err) {
-				conn.release();
-				Logger.error("Failed to get mysql connection from pool: " + err.stack);
-				callback(new CatMailTypes.InternalException(), null);
-				return;
-			}
-
-			var sql = "SELECT EXISTS (SELECT `username`, `contactname` FROM `contacts` WHERE `username`=? AND"
-				+ " `contactname`=?) AS result";
-			conn.query(sql, [username, contactname], function(err, result) {
-				conn.release();
-
-				if (err) {
-					Logger.error("Failed to validate password for '" + username + "': " + err.stack);
-					callback(new CatMailTypes.InternalException(), null);
-					return;
-				} else {
-					callback(null, result[0].result)}
-			});
-		});
-	}
-
 	this.addToContactList = function(username, userToAdd, attributes, callback) {
 		pool.getConnection(function(err, conn) {
 			if (err) {
@@ -188,43 +204,76 @@ function DatabaseHandler(settings) {
 					return;
 				}
 
-				// get current contactlist version
-				var sql = "SELECT `version` FROM `contacts` WHERE `username`=? ORDER BY `version` DESC LIMIT 1;";
-				conn.query(sql, [username], function(err, result) {
+				// make sure that the user to add exists
+				existsUser(username, conn, function(err, result) {
 					if (err) {
-						conn.release();
-						Logger.error("Failed to get current contactlist version count for user " + username + ": "
-							+ err.stack);
-						callback(new CatMailTypes.InternalException(), null);
+						conn.relase();
+						callback(err, null);
 						return;
 					}
 
-					newVersion = result[0].version + 1;
+					if (result) {
+						conn.release();
+						Logger.info("Failed to create new user called '" + username + "': Username already taken");
+						callback(new CatMailTypes.UserAlreadyExistsException(), null);
+						return;
+					}
 
-					sql = "INSERT INTO `contacts` SET ?;";
-					conn.query(sql, [{"username": username, "contactname": userToAdd, "version": newVersion,
-							"type": 0}], function(err, result) {
-
+					// Check if this contact has already been added
+					hasContact(username, userToAdd, conn, function(err, result) {
 						if (err) {
-							conn.release();
-							Logger.error("Failed to add contact " + userToAdd + " to " + username + "'s contactlist"
-								+ ": " + err.stack);
-							callback(new CatMailTypes.InternalException(), null);
+							conn.relase();
+							callback(err, null);
 							return;
 						}
 
-						conn.commit(function(err) {
+						if (result) {
 							conn.release();
+							callback(new CatMailTypes.ContactAlreadyExistsException(), null);
+							return;
+						}
+
+						// get current contactlist version
+						var sql = "SELECT `version` FROM `contacts` WHERE `username`=? ORDER BY `version` DESC LIMIT 1;";
+						conn.query(sql, [username], function (err, result) {
 							if (err) {
-								Logger.error("Failed to commit transaction: " + err.stack);
+								conn.release();
+								Logger.error("Failed to get current contactlist version count for user "
+									+ username + ": " + err.stack);
 								callback(new CatMailTypes.InternalException(), null);
 								return;
 							}
 
-							var response = new CatMailTypes.AddToContactListResponse();
-							response.version = newVersion;
+							newVersion = result[0].version + 1;
 
-							callback(null, response);
+							sql = "INSERT INTO `contacts` SET ?;";
+							conn.query(sql, [{
+								"username": username, "contactname": userToAdd, "version": newVersion,
+								"type": 0
+							}], function (err, result) {
+
+								if (err) {
+									conn.release();
+									Logger.error("Failed to add contact " + userToAdd + " to " + username
+										+ "'s contactlist" + ": " + err.stack);
+									callback(new CatMailTypes.InternalException(), null);
+									return;
+								}
+
+								conn.commit(function (err) {
+									conn.release();
+									if (err) {
+										Logger.error("Failed to commit transaction: " + err.stack);
+										callback(new CatMailTypes.InternalException(), null);
+										return;
+									}
+
+									var response = new CatMailTypes.AddToContactListResponse();
+									response.version = newVersion;
+
+									callback(null, response);
+								});
+							});
 						});
 					});
 				});
@@ -291,30 +340,6 @@ function DatabaseHandler(settings) {
 		});	
 	}
 
-	this.existsUser = function(username, callback) {
-		pool.getConnection(function(err, conn) {
-			if (err) {
-				conn.release();
-				Logger.error("Failed to get mysql connection from pool: " + err.stack);
-				callback(new CatMailTypes.InternalException(), null);
-				return;
-			}
-			
-			var sql = "SELECT EXISTS (SELECT `username` FROM `users` WHERE `username`=?) AS result;";
-			conn.query(sql, [username], function(err, result) {
-				conn.release();
-
-				if (err) {
-					Logger.error("Failed to check if '" + username + "' already exists");
-					callback(new CatMailTypes.InternalException(), null);
-					return;
-				}
-
-				callback(null, (result[0].result == 1));
-			});
-		});
-	}
-
 	this.createUser = function(username, password, userKeyPair, exchangeKeyPair, callback) {
 		pool.getConnection(function(err, conn) {
 			if (err) {
@@ -324,26 +349,53 @@ function DatabaseHandler(settings) {
 				return;
 			}
 
-			var userData = {};
-			userData["username"] = username;
-			userData["password"] = password;
-			userData["userkeypair_sk"]    = userKeyPair.encryptedSecretKey;
-			userData["userkeypair_pk"]    = userKeyPair.publicKey;
-			userData["userkeypair_nonce"] = userKeyPair.nonce;
-			userData["exchangekeypair_sk"]    = exchangeKeyPair.encryptedSecretKey;
-			userData["exchangekeypair_pk"]    = exchangeKeyPair.publicKey;
-			userData["exchangekeypair_nonce"] = exchangeKeyPair.nonce;
-					
-			var sql = "INSERT INTO `users` SET ?;";
-			conn.query(sql, [userData], function(err, result) {
-				conn.release();
-
-				if (err) { 
-					Logger.error("Failed to add new user called '" + username + "': " + err.stack);
+			conn.beginTransaction(function(err) {
+				if (err) {
+					conn.release();
+					Logger.error("Failed to start transaction: " + err.stack);
 					callback(new CatMailTypes.InternalException(), null);
-				} else {
-					callback(null, null);
+					return;
 				}
+
+				// make sure that the user does not exist
+				existsUser(username, conn, function(err, result) {
+					if (err) {
+						conn.relase();
+						callback(err, null);
+						return;
+					}
+
+					if (result) {
+						conn.release();
+						Logger.info("Failed to create new user called '" + username + "': Username already taken");
+						callback(new CatMailTypes.UserAlreadyExistsException(), null);
+						return;
+					}
+
+					var userData = {};
+					userData["username"] = username;
+					userData["password"] = password;
+					userData["userkeypair_sk"] = userKeyPair.encryptedSecretKey;
+					userData["userkeypair_pk"] = userKeyPair.publicKey;
+					userData["userkeypair_nonce"] = userKeyPair.nonce;
+					userData["exchangekeypair_sk"] = exchangeKeyPair.encryptedSecretKey;
+					userData["exchangekeypair_pk"] = exchangeKeyPair.publicKey;
+					userData["exchangekeypair_nonce"] = exchangeKeyPair.nonce;
+
+					var sql = "INSERT INTO `users` SET ?;";
+					conn.query(sql, [userData], function (err, result) {
+						conn.release();
+
+						if (err) {
+							Logger.error("Failed to add new user called '" + username + "': " + err.stack);
+							callback(new CatMailTypes.InternalException(), null);
+							return;
+						} else {
+							callback(null, null);
+							return;
+						}
+					});
+				});
 			});
 		});
 	}
