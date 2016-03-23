@@ -23,6 +23,7 @@ function DatabaseHandler(settings) {
 	this.validatePasswordLogin = function(username, password, callback) {	
 		pool.getConnection(function(err, conn) {
 			if (err) {
+				conn.release();
 				Logger.error("Failed to get mysql connection from pool: " + err.stack);
 				callback(new CatMailTypes.InternalException(), null);
 				return;
@@ -32,6 +33,7 @@ function DatabaseHandler(settings) {
 				+ " AS result;";
 			conn.query(sql, [username, password], function(err, result) {
 				conn.release();
+
 				if (err) {
 					Logger.error("Failed to validate password for '" + username + "': " + err.stack);
 					callback(new CatMailTypes.InternalException(), null);
@@ -45,6 +47,7 @@ function DatabaseHandler(settings) {
 	this.getPrivateKeys = function(username, callback) {
 		pool.getConnection(function(err, conn) {
 			if (err) {
+				conn.release();
 				Logger.error("Failed to get mysql connection from pool: " + err.stack);
 				callback(new CatMailTypes.InternalException(), null);
 				return;
@@ -54,6 +57,7 @@ function DatabaseHandler(settings) {
 				+ " `exchangekeypair_pk`, `exchangekeypair_nonce` FROM `users` WHERE `username`=?;";
 			conn.query(sql, [username], function(err, result) {
 				conn.release();
+
 				if (err) {
 					Logger.error("Failed to get private keys for '" + username + "': " + err.stack);
 					callback(new CatMailTypes.InternalException(), null);
@@ -82,6 +86,7 @@ function DatabaseHandler(settings) {
 	this.getExchangeKeyPairPublicKey = function(username, callback) {
 		pool.getConnection(function(err, conn) {
 			if (err) {
+				conn.release();
 				Logger.error("Failed to get mysql connection from pool: " + err.stack);
 				callback(new CatMailTypes.InternalException(), null);
 				return;
@@ -90,6 +95,7 @@ function DatabaseHandler(settings) {
 			var sql = "SELECT `exchangekeypair_pk` FROM `users` WHERE `username`=?;";
 			conn.query(sql, [username], function(err, result) {
 				conn.release();
+
 				if (err) {
 					Logger.error("Failed to get exchange keypair for '" + username + "': " + err.stack);
 					callback(err, null);
@@ -104,6 +110,7 @@ function DatabaseHandler(settings) {
 	this.getContactList = function(username, version, callback) {
 		pool.getConnection(function(err, conn) {
 			if (err) {
+				conn.release();
 				Logger.error("Failed to get mysql connection from pool: " + err.stack);
 				callback(new CatMailTypes.InternalException(), null);
 				return;
@@ -113,6 +120,7 @@ function DatabaseHandler(settings) {
 						+ " ORDER BY `version` DESC;";
 			conn.query(sql, [username, version], function(err, result) {
 				conn.release();
+
 				if (err) {
 					Logger.error("Failed to get contactlist for '" + username + "': " + err.stack);
 					callback(new CatMailTypes.InternalException(), null);
@@ -142,6 +150,7 @@ function DatabaseHandler(settings) {
 	this.hasContact = function(username, contactname, callback) {
 		pool.getConnection(function(err, conn) {
 			if (err) {
+				conn.release();
 				Logger.error("Failed to get mysql connection from pool: " + err.stack);
 				callback(new CatMailTypes.InternalException(), null);
 				return;
@@ -151,6 +160,7 @@ function DatabaseHandler(settings) {
 				+ " `contactname`=?) AS result";
 			conn.query(sql, [username, contactname], function(err, result) {
 				conn.release();
+
 				if (err) {
 					Logger.error("Failed to validate password for '" + username + "': " + err.stack);
 					callback(new CatMailTypes.InternalException(), null);
@@ -164,6 +174,7 @@ function DatabaseHandler(settings) {
 	this.addToContactList = function(username, userToAdd, attributes, callback) {
 		pool.getConnection(function(err, conn) {
 			if (err) {
+				conn.release();
 				Logger.error("Failed to get mysql connection from pool: " + err.stack);
 				callback(new CatMailTypes.InternalException(), null);
 				return;
@@ -224,6 +235,7 @@ function DatabaseHandler(settings) {
 	this.removeFromContactList = function(username, userToDelete, callback) {
 		pool.getConnection(function(err, conn) {
 			if (err) {
+				conn.release();
 				Logger.error("Failed to get mysql connection from pool: " + err.stack);
 				callback(new CatMailTypes.InternalException(), null);
 				return;
@@ -282,6 +294,7 @@ function DatabaseHandler(settings) {
 	this.existsUser = function(username, callback) {
 		pool.getConnection(function(err, conn) {
 			if (err) {
+				conn.release();
 				Logger.error("Failed to get mysql connection from pool: " + err.stack);
 				callback(new CatMailTypes.InternalException(), null);
 				return;
@@ -289,6 +302,8 @@ function DatabaseHandler(settings) {
 			
 			var sql = "SELECT EXISTS (SELECT `username` FROM `users` WHERE `username`=?) AS result;";
 			conn.query(sql, [username], function(err, result) {
+				conn.release();
+
 				if (err) {
 					Logger.error("Failed to check if '" + username + "' already exists");
 					callback(new CatMailTypes.InternalException(), null);
@@ -303,6 +318,7 @@ function DatabaseHandler(settings) {
 	this.createUser = function(username, password, userKeyPair, exchangeKeyPair, callback) {
 		pool.getConnection(function(err, conn) {
 			if (err) {
+				conn.release();
 				Logger.error("Failed to get mysql connection from pool: " + err.stack);
 				callback(new CatMailTypes.InternalException(), null);
 				return;
@@ -320,6 +336,8 @@ function DatabaseHandler(settings) {
 					
 			var sql = "INSERT INTO `users` SET ?;";
 			conn.query(sql, [userData], function(err, result) {
+				conn.release();
+
 				if (err) { 
 					Logger.error("Failed to add new user called '" + username + "': " + err.stack);
 					callback(new CatMailTypes.InternalException(), null);
@@ -340,6 +358,7 @@ function DatabaseHandler(settings) {
 		var sql = "SELECT `chatid` FROM chatmembers WHERE `username` LIKE ?;";
 		conn.query(sql, [username], function(err, result) {
 			if (err) {
+				conn.release();
 				Logger.error("Failed to get chat list of '" + username + "'");
 				return;
 			}
@@ -351,6 +370,7 @@ function DatabaseHandler(settings) {
 	this.deleteUser = function(username, callback) {
 		pool.getConnection(function(err, conn) {
 			if (err) {
+				conn.release();
 				Logger.error("Failed to get mysql connection from pool: " + err.stack);
 				callback(new CatMailTypes.InternalException(), null);
 				return;
@@ -364,12 +384,14 @@ function DatabaseHandler(settings) {
 			// delete from contact lists
 
 			// delete user data
+			conn.release();
 		});
 	}
 
 	this.createChat = function(callback) {
 		pool.getConnection(function(err, conn) {
 			if (err) {
+				conn.release();
 				Logger.error("Failed to get mysql connection from pool: " + err.stack);
 				callback(new CatMailTypes.InternalException(), null);
 				return;
@@ -378,6 +400,8 @@ function DatabaseHandler(settings) {
 			// use 'SET' when there is actually more data then just a chatId
 			var sql = "INSERT INTO `chats` () VALUES ()";
 			conn.query(sql, [], function(err, result) {
+				conn.release();
+
 				if (err) {
 					Logger.error("Failed to create chat: " + err.stack);
 					callback(new CatMailTypes.InternalException(), null)
@@ -396,6 +420,7 @@ function DatabaseHandler(settings) {
 	this.addUsersToChat = function(chatId, users, callback) {
 		pool.getConnection(function(err, conn) {
 			if (err) {
+				conn.release();
 				Logger.error("Failed to get mysql connection from pool: " + err.stack);
 				callback(new CatMailTypes.InternalException(), null);
 				return;
@@ -418,6 +443,7 @@ function DatabaseHandler(settings) {
 				sql += ");";
 				conn.query(sql, [], function(err, result) {
 					if (err) {
+						conn.release();
 						Logging.error("Failed to check if the users exist: " + err.stack);
 						callback(new CatMailTypes.InternalException(), null);
 						return;
@@ -438,6 +464,8 @@ function DatabaseHandler(settings) {
 					// insert all the users
 					sql = "INSERT INTO `users` (`username`,`chatid`,`userkey`) VALUES " + values + ";";
 					conn.query(sql, [], function(err, result) {
+						conn.release();
+
 						if (err) {
 							Logging.error("Failed to add users to chat #: " + chatId + " | " + err.stack);
 							callback(new CatMailTypes.InternalException(), null);
