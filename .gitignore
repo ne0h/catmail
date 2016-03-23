@@ -2,7 +2,10 @@
 docs/protocol/
 node_modules/
 config.js
-
+3rdparty/
+server/3rdparty
+server/.idea/
+server/catmail.db
 
 # Created by https://www.gitignore.io/api/node,vim,python
 
@@ -105,4 +108,3 @@ docs/_build/
 
 # PyBuilder
 target/
-
