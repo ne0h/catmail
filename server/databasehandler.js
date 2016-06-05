@@ -1,5 +1,6 @@
 var CatMailTypes = require("./api/protocol_types"),
-	
+
+	async        = require("async"),
 	mysql        = require("mysql"),
 	Log4js       = require("log4js"),
 	Logger       = Log4js.getLogger("databasehandler");
@@ -594,6 +595,47 @@ function DatabaseHandler(settings) {
 		});
 	}
 
+	function addSingleUserToChat(username, chatId, key, conn, callback) {
+		existsUser(username, conn, function(err, result) {
+			if (err) {
+				callback(err);
+				return;
+			}
+
+			if (!result) {
+				Logger.error("'" + username + "' does not exist");
+				callback(new CatMailTypes.UserDoesNotExistException([username]));
+				return;
+			}
+
+			isChatMember(username, chatId, conn, function(err, result) {
+				if (err) {
+					callback(err);
+					return;
+				}
+
+				if (!result) {
+					Logger.error("'" + username + "' is already chat member");
+					callback(new CatMailTypes.UserDoesNotExistException([username]));
+					return;
+				}
+
+				var sql = "INSERT INTO `chatmembers` SET ?;";
+				conn.query(sql, [{
+					"username": username, "chatid": chatId, "userkey": key
+				}], function(err, result) {
+					if (err) {
+						Logger.error("Failed to add userdata to chatmember table");
+						callback(new CatMailTypes.InternalException());
+						return;
+					}
+
+					callback();
+				});
+			})
+		});
+	}
+
 	this.addToChat = function(username, chatId, usersToAdd, callback) {
 		pool.getConnection(function(err, conn) {
 			if (err) {
@@ -626,7 +668,7 @@ function DatabaseHandler(settings) {
 						return;
 					}
 
-					// check if the user is in this chat
+					// check if the current user is in this chat
 					isChatMember(username, chatId, conn, function(err, result) {
 						if (err) {
 							conn.relase();
@@ -641,7 +683,22 @@ function DatabaseHandler(settings) {
 							return;
 						}
 
+						// add every user to chat...
+						async.each(usersToAdd, function(user, callback) {
+							Logger.debug("Adding '" + user.username + "' to chat #" + chatId + "...");
+							addSingleUserToChat(user.username, chatId, user.key, conn, function(err) {
+								(err) ? callback(err) : callback()
+							});
+						}, function(err) {
+							if (err) {
+								Logger.error("Failed to add all users to chat #" + chatId);
+								conn.release();
+								callback(err, null);
+								return;
+							}
 
+							callback(null, null);
+						});
 					});
 				});
 			});

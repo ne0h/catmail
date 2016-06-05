@@ -333,6 +333,8 @@ service CatMailService {
 	/**
 	 * Adds users to a chat the current user is already in. The query fails completely if one of the users could not be
 	 * added to the chat. In that case noone is added to the chat.
+	 *
+	 * TODO: Behavior if user is already chat member?
 	 */
 	void addToChat(
 		/* The name of the user. */
