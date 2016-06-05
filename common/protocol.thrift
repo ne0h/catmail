@@ -38,6 +38,10 @@ exception ContactAlreadyExistsException {
 	
 }
 
+exception UserIsNotInChatException {
+	
+}
+
 /**
  * Holds a keypair.
  */
@@ -326,25 +330,30 @@ service CatMailService {
 		3: UserDoesNotExistException userDoesNotExistException,
 	),
 
-	/* TODO: UserIsNotInChatException */
+	/**
+	 * Adds users to a chat the current user is already in. The query fails completely if one of the users could not be
+	 * added to the chat. In that case noone is added to the chat.
+	 */
 	void addToChat(
-		/** The name of the user. */
+		/* The name of the user. */
 		1: string username,
-		/** The user's session token. */
+		/* The user's session token. */
 		2: string sessionToken,
-		/** The id of the chat. */
+		/* The id of the chat. */
 		3: i64 chatId,
-		/** Add these users to the new chat. */
+		/* Add these users to the new chat. */
 		4: list<AddChatUser> usersToAdd,
 	) throws (
-		/** Something went dramatically wrong. */
+		/* Something went dramatically wrong. */
 		1: InternalException internalException,
-		/** Combination of username and password is wrong. */
+		/* Combination of username and password is wrong. */
 		2: InvalidSessionException invalidSessionException,
-		/** Indicates that there is no chat with this id. */
+		/* Indicates that there is no chat with this id. */
 		3: ChatDoesNotExistException chatDoesNotExistException,
-		/** Indicates that one or more users does not exist */
+		/* Indicates that one or more users does not exist */
 		4: UserDoesNotExistException userDoesNotExistException,
+		/* Indicates that the current user is not in the chat he wants to add the other users to */
+		5: UserIsNotInChatException userIsNotInChatException
 	)
 
 	/**
