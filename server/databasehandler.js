@@ -60,6 +60,25 @@ function DatabaseHandler(settings) {
 		});
 	}
 
+	/**
+	 * Removes a user from all contact lists.
+	 * @param username the name of the user to remove
+	 * @param connection from the mysql pool
+	 * @param callback callback
+     */
+	function removeFromAllContactLists(username, conn, callback) {
+		var sql = "DELETE FROM `contacts` WHERE `contactname` LIKE ?";
+		conn.query(sql, [username], function(err, result) {
+			if (err) {
+				Logger.error("Failed to remove '" + username + "' from all contact lists: " + err.stack);
+				callback(new CatMailTypes.InternalException(), null);
+				return;
+			}
+
+			callback(null, null);
+		});
+	}
+
 	this.validatePasswordLogin = function(username, password, callback) {	
 		pool.getConnection(function(err, conn) {
 			if (err) {
@@ -297,42 +316,58 @@ function DatabaseHandler(settings) {
 					callback(new CatMailTypes.InternalException(), null);
 					return;
 				}
-				
-				// get current contactlist version
-				var sql = "SELECT `version` FROM `contacts` WHERE `username`=? ORDER BY `version` DESC LIMIT 1;";
-				conn.query(sql, [username], function(err, result) {
+
+				// make sure that the user exists
+				existsUser(username, conn, function(err, data) {
 					if (err) {
-						conn.release();
-						Logger.error("Failed to get current contactlist version count for user " + username + ": "
-							+ err.stack);
-						callback(new CatMailTypes.InternalException(), null);
+						conn.relase();
+						callback(err, null);
 						return;
 					}
 
-					newVersion = result[0].version + 1;
+					if (result) {
+						conn.release();
+						Logger.info("Failed to create new user called '" + username + "': Username already taken");
+						callback(new CatMailTypes.UserAlreadyExistsException(), null);
+						return;
+					}
 
-					sql = "UPDATE `contacts` SET `version`=?, `type`=? WHERE `username`=? AND `contactname`?;";
-					conn.query(sql, [newVersion, 2, username, userToDelete], function(err, result) {
+					// get current contactlist version
+					var sql = "SELECT `version` FROM `contacts` WHERE `username`=? ORDER BY `version` DESC LIMIT 1;";
+					conn.query(sql, [username], function(err, result) {
 						if (err) {
 							conn.release();
-							Logger.error("Failed to remove " + userToDelete + " from " + username + "'s contactlist: "
+							Logger.error("Failed to get current contactlist version count for user " + username + ": "
 								+ err.stack);
 							callback(new CatMailTypes.InternalException(), null);
 							return;
 						}
 
-						conn.commit(function(err) {
-							conn.release();
+						newVersion = result[0].version + 1;
+
+						sql = "UPDATE `contacts` SET `version`=?, `type`=? WHERE `username`=? AND `contactname`?;";
+						conn.query(sql, [newVersion, 2, username, userToDelete], function(err, result) {
 							if (err) {
-								Logger.error("Failed to commit transaction: " + err.stack);
+								conn.release();
+								Logger.error("Failed to remove " + userToDelete + " from " + username + "'s contactlist: "
+									+ err.stack);
 								callback(new CatMailTypes.InternalException(), null);
 								return;
 							}
 
-							var response = new CatMailTypes.RemoveFromContactListResponse();
-							response.version = newVersion;
+							conn.commit(function(err) {
+								conn.release();
+								if (err) {
+									Logger.error("Failed to commit transaction: " + err.stack);
+									callback(new CatMailTypes.InternalException(), null);
+									return;
+								}
 
-							callback(null, response);
+								var response = new CatMailTypes.RemoveFromContactListResponse();
+								response.version = newVersion;
+
+								callback(null, response);
+							});
 						});
 					});
 				});

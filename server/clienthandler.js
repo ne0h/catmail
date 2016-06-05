@@ -154,16 +154,9 @@ function ClientHandler() {
 				callback(new CatMailTypes.InvalidSessionException(), null);
 				return;
 			}
-
-			databaseHandler.existsUser(userToDelete, function(err, result) {
-				if (!result) {
-					callback(new CatMailTypes.UserDoesNotExistException(), null);
-					return;
-				}
-
-				databaseHandler.removeFromContactList(username, userToDelete, function(err, result) {
-					callback(err, result)
-				});
+			
+			databaseHandler.removeFromContactList(username, userToDelete, function(err, result) {
+				callback(err, result)
 			});
 		});
 	}
