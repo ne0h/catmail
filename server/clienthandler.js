@@ -220,6 +220,19 @@ function ClientHandler() {
 		});
 	}
 
+	this.addToChat = function(username, sessionToken, chatId, usersToAdd, callback) {
+		validateSession(username, sessionToken, function(result) {
+			if (!result) {
+				callback(new CatMailTypes.InvalidSessionException(), null);
+				return;
+			}
+
+			databaseHandler.addToChat(username, chatId, usersToAdd, function(err, result) {
+				callback(err, result)
+			});
+		});
+	}
+
 }
 
 module.exports = ClientHandler;

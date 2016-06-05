@@ -326,6 +326,7 @@ service CatMailService {
 		3: UserDoesNotExistException userDoesNotExistException,
 	),
 
+	/* TODO: UserIsNotInChatException */
 	void addToChat(
 		/** The name of the user. */
 		1: string username,

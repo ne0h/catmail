@@ -90,6 +90,12 @@ var CatMailHandler = {
 		});
 	},
 
+	addToChat: function(username, sessionToken, chatId, usersToAdd, callback) {
+		clientHander.addToChat(username, sessionToken, chatId, usersToAdd, function(err, data) {
+			callback(err, data)
+		})
+	}
+
 }
 
 var serverOpt = {

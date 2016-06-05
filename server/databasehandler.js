@@ -79,6 +79,33 @@ function DatabaseHandler(settings) {
 		});
 	}
 
+	function existsChat(chatId, conn, callback) {
+		var sql = "SELECT EXISTS (SELECT `id` FROM `chats` WHERE `id`=?) AS result";
+		conn.query(sql, [chatId], function(err, result) {
+			if (err) {
+				Logger.error("Failed to validate that chat #" + chatId + " exists: " + err.stack);
+				callback(new CatMailTypes.InternalException(), null);
+				return;
+			}
+
+			callback(null, result[0].result == 1);
+		});
+	}
+
+	function isChatMember(username, chatId, conn, callback) {
+		var sql = "SELECT EXISTS (SELECT `username`,`id` FROM `chatmembers` WHERE `username`=? AND `id`=?) AS result";
+		conn.query(sql, [username, chatId], function(err, result) {
+			if (err) {
+				Logger.error("Failed to validate the user named '" + username + "' is in chat #" + chatId + ": "
+					+ err.stack);
+				callback(new CatMailTypes.InternalException(), null);
+				return;
+			}
+
+			callback(null, result[0].result == 1);
+		});
+	}
+
 	this.validatePasswordLogin = function(username, password, callback) {	
 		pool.getConnection(function(err, conn) {
 			if (err) {
@@ -500,10 +527,6 @@ function DatabaseHandler(settings) {
 		});
 	}
 
-	this.existsChat = function(chatId, callback) {
-
-	}
-
 	this.addUsersToChat = function(chatId, users, callback) {
 		pool.getConnection(function(err, conn) {
 			if (err) {
@@ -565,6 +588,60 @@ function DatabaseHandler(settings) {
 						} else {
 							callback(null, new CatMailTypes.CreateChatResponse(chatId));
 						}
+					});
+				});
+			});
+		});
+	}
+
+	this.addToChat = function(username, chatId, usersToAdd, callback) {
+		pool.getConnection(function(err, conn) {
+			if (err) {
+				conn.release();
+				Logger.error("Failed to get mysql connection from pool: " + err.stack);
+				callback(new CatMailTypes.InternalException(), null);
+				return;
+			}
+
+			conn.beginTransaction(function (err) {
+				if (err) {
+					conn.release();
+					Logger.error("Failed to start transaction: " + err.stack);
+					callback(new CatMailTypes.InternalException(), null);
+					return;
+				}
+
+				// look if the chat exists
+				existsChat(chatId, conn, function(err, result) {
+					if (err) {
+						conn.relase();
+						callback(err, null);
+						return;
+					}
+
+					if (!result) {
+						conn.release();
+						Logger.info("Failed to add users to chat: Chat with id #" + chatId + " does not exist.");
+						callback(new CatMailTypes.ChatDoesNotExistException(), null);
+						return;
+					}
+
+					// check if the user is in this chat
+					isChatMember(username, chatId, conn, function(err, result) {
+						if (err) {
+							conn.relase();
+							callback(err, null);
+							return;
+						}
+
+						if (!result) {
+							conn.release();
+							Logger.info("Failed to add users to chat: User named '" + username + "' is not member.");
+							callback(new CatMailTypes.InternalException(), null);
+							return;
+						}
+
+
 					});
 				});
 			});
