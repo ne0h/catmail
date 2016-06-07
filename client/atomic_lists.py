@@ -16,7 +16,7 @@ class AtomicList:
 		self.__rwlock.release()
 
 	"""This returns a python iterator to loop over the contacts.
-	
+
 	.. note:: The iterator can not be recycled!
 	"""
 	def _get_iterator(self):
@@ -25,10 +25,10 @@ class AtomicList:
 		for c in self._atomic_list:
 			yield c
 		self.release_read_lock()
-	
+
 	def _clear_list(self):
 		self.__atomic_list = []
-	
+
 	def __init__(self):
 		self.__rwlock = RWLock()
 		self._atomic_list = []
@@ -97,9 +97,18 @@ class ConversationsList(AtomicList):
 	def get_conversations_iterator(self):
 		return self._get_iterator()
 
-	def update_conversations():
+	def update_conversations(self):
 		self._acquire_write_lock()
 		self._release_write_lock()
+
+	def get_conversations_with_contact_id(self, cid, private_only=False):
+		conversationIDs = []
+		for conversation in self.get_conversations_iterator():
+			if conversation.getConversationID() == cid \
+					and (private_only and conversation.is_private()) \
+					or not private_only:
+				conversationIDs.append(cid)
+		return conversationIDs
 
 	def __init__(self):
 		super(ConversationsList, self).__init__()
