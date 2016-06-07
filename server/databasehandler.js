@@ -473,8 +473,8 @@ function DatabaseHandler(settings) {
 		var sql = "SELECT `chatid` FROM chatmembers WHERE `username` LIKE ?;";
 		conn.query(sql, [username], function(err, result) {
 			if (err) {
-				conn.release();
 				Logger.error("Failed to get chat list of '" + username + "'");
+				callback(new CatMailTypes.InternalException(), null);
 				return;
 			}
 
@@ -492,11 +492,38 @@ function DatabaseHandler(settings) {
 			}
 
 			// delete from chats
-			getChats(username, conn, function(err, result) {
-				Logger.debug(result);
-			});
+			var sql = "DELETE FROM `chatmembers` WHERE `username` LIKE ?;";
+			conn.query(sql, [username], function(err, result) {
+				if (err) {
+					conn.release();
+					Logger.error("Failed to delete chatmembers stuff for '" + username + "': " + err.stack);
+					callback(new CatMailTypes.InternalException(), null);
+					return;
+				}
 
-			// delete from contact lists
+				// delete from contact lists
+				sql = "DELETE FROM `contacts` WHERE `contactname` LIKE ?;";
+				conn.query(sql, [username], function(err, result) {
+					if (err) {
+						conn.release();
+						Logger.error("Failed to delete '" + username + "' from all other contactlists: " + err.stack);
+						callback(new CatMailTypes.InternalException(), null);
+						return;
+					}
+
+					sql = "DELETE FROM `users` WHERE `username` LIKE ?;";
+					conn.query(sql, [username], function(err, result) {
+						if (err) {
+							conn.release();
+							Logger.error("Failed to delete '" + username + "': " + err.stack);
+							callback(new CatMailTypes.InternalException(), null);
+							return;
+						}
+
+						callback(null, null);
+					});
+				});
+			});
 
 			// delete user data
 			conn.release();
