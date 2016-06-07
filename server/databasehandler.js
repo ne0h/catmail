@@ -455,7 +455,6 @@ function DatabaseHandler(settings) {
 							return;
 						} else {
 							conn.commit(function (err) {
-								conn.release();
 								if (err) {
 									Logger.error("Failed to commit transaction: " + err.stack);
 									callback(new CatMailTypes.InternalException(), null);
@@ -769,7 +768,15 @@ function DatabaseHandler(settings) {
 											return;
 										}
 
-										callback(null, null);
+										conn.commit(function (err) {
+											if (err) {
+												Logger.error("Failed to commit transaction: " + err.stack);
+												callback(new CatMailTypes.InternalException(), null);
+												return;
+											}
+
+											callback(null, null);
+										});
 									});
 								});
 							}
