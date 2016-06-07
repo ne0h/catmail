@@ -91,7 +91,13 @@ var CatMailHandler = {
 	},
 
 	addToChat: function(username, sessionToken, chatId, usersToAdd, callback) {
-		clientHander.addToChat(username, sessionToken, chatId, usersToAdd, function(err, data) {
+		clientHandler.addToChat(username, sessionToken, chatId, usersToAdd, function(err, data) {
+			callback(err, data)
+		})
+	},
+
+	deleteChat: function(username, sessionToken, chatId, callback) {
+		clientHandler.deleteChat(username, sessionToken, chatId, function(err, data) {
 			callback(err, data)
 		})
 	}

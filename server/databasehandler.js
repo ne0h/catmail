@@ -680,6 +680,106 @@ function DatabaseHandler(settings) {
 		});
 	}
 
+	this.deleteChat = function(username, chatId, callback) {
+		pool.getConnection(function(err, conn) {
+			if (err) {
+				conn.release();
+				Logger.error("Failed to get mysql connection from pool: " + err.stack);
+				callback(new CatMailTypes.InternalException(), null);
+				return;
+			}
+
+			conn.beginTransaction(function (err) {
+				if (err) {
+					conn.release();
+					Logger.error("Failed to start transaction: " + err.stack);
+					callback(new CatMailTypes.InternalException(), null);
+					return;
+				}
+
+				// Validate that the chat in question exists
+				existsChat(chatId, conn, function(err, result) {
+					if (err) {
+						conn.release();
+						Logger.error("Failed to check if chat #" + chatId + " exists: " + err.stack);
+						callback(new CatMailTypes.ChatDoesNotExistException(), null);
+						return;
+					}
+
+					if (!result) {
+						conn.commit(function (err) {
+							conn.release();
+							if (err) {
+								Logger.error("Failed to commit transaction: " + err.stack);
+								callback(new CatMailTypes.InternalException(), null);
+								return;
+							}
+
+							callback(new CatMailTypes.ChatDoesNotExistException(), null);
+							return;
+						});
+					} else {
+
+						// Validate that the user in question is in the chat in question
+						isChatMember(username, chatId, conn, function(err, result) {
+							if (err) {
+								conn.release();
+								Logger.error("Failed to check if '" + username + "' is in chat #" + chatId + ": "
+									+ err.stack);
+								callback(new CatMailTypes.ChatDoesNotExistException(), null);
+								return;
+							}
+
+							if (!result) {
+								conn.commit(function (err) {
+									conn.release();
+									if (err) {
+										Logger.error("Failed to commit transaction: " + err.stack);
+										callback(new CatMailTypes.InternalException(), null);
+										return;
+									}
+
+									callback(new CatMailTypes.UserIsNotAllowedException(), null);
+									return;
+								});
+							} else {
+
+								//
+								// Checks finished - delete the chat related stuff
+								//
+
+								// delete from chatmembers table
+								var sql = "DELETE FROM `chatmembers` WHERE `chatid` LIKE ?;";
+								conn.query(sql, [chatId], function(err, result) {
+									if (err) {
+										conn.release();
+										Logger.error("Failed to delete chatmembers from #" + chatId + ": " + err.stack);
+										callback(new CatMailTypes.InternalException(), null);
+										return;
+									}
+
+									// delete the chat stuff
+									sql = "DELETE FROM `chats` WHERE `id`=?;";
+									conn.query(sql, [chatId], function(err, result) {
+										if (err) {
+											conn.release();
+											Logger.error("Failed to delete chats from #" + chatId + ": "
+												+ err.stack);
+											callback(new CatMailTypes.InternalException(), null);
+											return;
+										}
+
+										callback(null, null);
+									});
+								});
+							}
+						});
+					}
+				})
+			});
+		});
+	}
+
 	this.addToChat = function(username, chatId, usersToAdd, callback) {
 		pool.getConnection(function(err, conn) {
 			if (err) {

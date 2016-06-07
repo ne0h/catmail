@@ -232,6 +232,19 @@ function ClientHandler() {
 			});
 		});
 	}
+	
+	this.deleteChat = function(username, sessionToken, chatId, callback) {
+		validateSession(username, sessionToken, function(result) {
+			if (!result) {
+				callback(new CatMailTypes.InvalidSessionException(), null);
+				return;
+			}
+
+			databaseHandler.deleteChat(username, chatId, function(err, result) {
+				callback(err, result)
+			});
+		});
+	}
 
 }
 
