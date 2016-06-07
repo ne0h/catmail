@@ -6,6 +6,8 @@ from thrift.transport.THttpClient import THttpClient
 from thrift.transport.TTransport import TBufferedTransport
 from thrift.protocol.TJSONProtocol import TJSONProtocol
 
+from http.client import RemoteDisconnected
+
 from constants import ErrorCodes
 
 class ServerHandler():
@@ -51,6 +53,8 @@ class ServerHandler():
 	# TODO don't catch TException while debugging...
 	#	except Thrift.TException as ex:
 	#		return (ex, None)
+		except RemoteDisconnected:
+			return (ErrorCodes.ConnectionClosed, None)
 		except InternalException as ex:
 			return (ErrorCodes.InternalServerError, None)
 		except ConnectionRefusedError as ex:

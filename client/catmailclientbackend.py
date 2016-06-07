@@ -59,6 +59,8 @@ class CatMailClientBackend(ClientBackend):
 			message = "Login Failed."
 		elif error == ErrorCodes.ConnectionRefused:
 			message = "Connection refused by server."
+		elif error == ErrorCodes.ConnectionClosed:
+			message = "Connection closed by server."
 		return message
 
 	# TODO join all these __show_foo methods into one + convenience methods
@@ -111,6 +113,7 @@ class CatMailClientBackend(ClientBackend):
 			if err != ErrorCodes.NoError:
 				success = False
 				self.__logger.debug("There is a config, but we can't log in...")
+				self.__show_error("%s" % str(err), nogui)
 				c = self.__show_retry_or_new_credentials(err, nogui)
 				if c == 2:
 					canceled = True
