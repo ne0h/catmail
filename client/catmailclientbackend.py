@@ -16,6 +16,7 @@ from atomic_lists import ContactList
 
 class CatMailClientBackend(ClientBackend):
 
+	# TODO remove: We should never pass the server handler to the outside world
 	def get_server_handler(self):
 		return self.__serverHandler
 
@@ -64,11 +65,11 @@ class CatMailClientBackend(ClientBackend):
 		if not nogui and not self.__frontend is None:
 			rv = self.__frontend.show_error(message)
 		return rv
-	
+
 	def __show_retry_dialog(self, error, nogui):
 		rv = None
 		message = self.__get_message(errro)
-	
+
 		if (nogui):
 			print(message)
 		if not nogui and not self.__frontend is None:
@@ -79,7 +80,7 @@ class CatMailClientBackend(ClientBackend):
 		rv = None
 		message = self.__get_message(error)
 		btns = [(0, 'Retry'), (1, 'Change Credentials'), (2, 'Cancel')]
-		
+
 		if (nogui):
 			print(message)
 		if not nogui and not self.__frontend is None:
@@ -120,7 +121,7 @@ class CatMailClientBackend(ClientBackend):
 	def update_contacts(self, callback):
 		error, response = self.__serverHandler.getContactList(
 				self.__userContext.username,
-				self.__userContext.sessionToken, 
+				self.__userContext.sessionToken,
 				self.__contact_list_revision
 			)
 		if (error == ErrorCodes.NoError and not callback is None):
@@ -159,7 +160,7 @@ class CatMailClientBackend(ClientBackend):
 	def __start_pull_timer(self):
 		# start timer for contactlist updates
 		ContactListTimer().start()
-		
+
 	def login(self,
 			username,
 			password,
@@ -175,7 +176,7 @@ class CatMailClientBackend(ClientBackend):
 		loginHash = cryptohelper.byteHashToString(
 				cryptohelper.kdf(username, passwordHash)
 			)
-		
+
 		err, res = self.__serverHandler.getPrivateKeys(username, loginHash)
 		if err != ErrorCodes.NoError:
 			self.__logger.error("Failed to get private keys: %s" % err)
@@ -231,11 +232,21 @@ class CatMailClientBackend(ClientBackend):
 		else:
 			return res.sessionToken
 
-	def addToContactList(self, username):
+	def addToContactList(self, userToAdd, callback):
+		err, resp = self.__serverHandler.addToContactList(
+				self.__userContext.username,
+				self.__userContext.sessionToken,
+				userToAdd,
+				{} # attributes
+			)
+		callback(err, userToAdd)
+
+	def create_conversation(self, contact_ids, callback):
 		# TODO
 		pass
 
 	def createUser(self, username, password):
+		#TODO
 		return self.__serverHandler.createUser(username, password,
 			cryptohelper.newUser(username, password))
 
