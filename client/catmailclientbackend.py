@@ -39,7 +39,7 @@ class CatMailClientBackend(ClientBackend):
 		if username is None or password is None:
 			rv = ErrorCodes.ServerNotConfigured
 		else:
-			rv = self.login(
+			(rv, session) = self.login(
 					username,
 					password,
 					passwordAlreadyHashed=True
@@ -201,6 +201,8 @@ class CatMailClientBackend(ClientBackend):
 			testlogin=False,
 			passwordAlreadyHashed=False
 		):
+		sessionToken = None
+
 		if not passwordAlreadyHashed:
 			passwordHash = cryptohelper.byteHashToString(
 					cryptohelper.kdf(username, password)
@@ -214,13 +216,13 @@ class CatMailClientBackend(ClientBackend):
 		if not testlogin:
 			err = self.__update_config(username, passwordHash)
 			if err != ErrorCodes.NoError:
-				return err
+				return (err, sessionToken)
 			self.__logger.debug("Connected to: %s." % self.__config.getServerAddress())
 
 		err, res = self.__serverHandler.getPrivateKeys(username, loginHash)
 		if err != ErrorCodes.NoError:
 			self.__logger.error("Failed to get private keys: %s" % err)
-			return err
+			return (err, sessionToken)
 
 		# decrypt secret keys and store them in usercontext
 		userKeyPair = KeyPair(
@@ -245,7 +247,7 @@ class CatMailClientBackend(ClientBackend):
 		err, res = self.__serverHandler.requestLoginChallenge(username)
 		if err != ErrorCodes.NoError:
 			self.__logger.error("Failed to request challenge: %s" % err)
-			return err
+			return (err, sessionToken)
 
 		# sign this challenge
 		signature = cryptohelper.signChallenge(
@@ -257,17 +259,18 @@ class CatMailClientBackend(ClientBackend):
 		err, res = self.__serverHandler.login(username, res.challenge, signature)
 		if err != ErrorCodes.NoError:
 			self.__logger.error("Failed to login: %s" % err)
-			return err
+			return (err, sessionToken)
+		sessionToken = res.sessionToken
 
-		print("Login successful!\nSessionToken: %s" % (res.sessionToken))
+		print("Login successful!\nSessionToken: %s" % (sessionToken))
 
 		# store login data if no testlogin
 		# if testlogin, return sessionToken
 		if testlogin:
-			return res.sessionToken
+			return (ErrorCodes.NoError, sessionToken)
 		else:
-			self.__userContext.sessionToken = res.sessionToken
-			return ErrorCodes.NoError
+			self.__userContext.sessionToken = sessionToken
+			return (ErrorCodes.NoError, sessionToken)
 
 	def addToContactList(self, userToAdd, callback):
 		err, resp = self.__serverHandler.addToContactList(
