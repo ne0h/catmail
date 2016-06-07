@@ -179,17 +179,21 @@ class CatMailClientBackend(ClientBackend):
 		server = username.split('@')[-1]
 		return "%s%s" % ("" if re.match('^http.*', server) else "http://", server)
 
+	def setServerAddress(self, serverAddress):
+		self.__serverHandler.setServerAddress(serverAddress)
+		err = self.__serverHandler.connect()
+		if err != ErrorCodes.NoError:
+			self.__logger.error("Failed to connect.")
+		return err
+
+
 	def __update_config(self, username, passwordHash):
 		self.__config.writeInitialConfig(
 				username,
 				passwordHash,
 				self.__extract_server_address(username))
+		return self.setServerAddress(self.__config.getServerAddress())
 
-		self.__serverHandler.setServerAddress(self.__config.getServerAddress())
-		err = self.__serverHandler.connect()
-		if err != ErrorCodes.NoError:
-			self.__logger.error("Failed to connect.")
-		return err
 
 	def login(self,
 			username,
