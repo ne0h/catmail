@@ -10,6 +10,8 @@ ErrorCodes = Enum("ErrorCodes",
         UserAlreadyExists
         UserDoesNotExist
         InvalidSession
+        ServerNotConfigured
+        ThriftError
         """,
         module=__name__
     )

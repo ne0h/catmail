@@ -2,6 +2,7 @@ import base64, sys, threading
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 import logging
+import re
 
 import cryptohelper
 from view import *
@@ -33,12 +34,16 @@ class CatMailClientBackend(ClientBackend):
 
 	def __try_login(self):
 		username, password = self.__config.getLoginCredentials()
-		logged_in = self.login(
-				username,
-				password,
-				passwordAlreadyHashed=True
-			)
-		return logged_in
+		rv = ErrorCodes.NoError
+		if username is None or password is None:
+			rv = ErrorCodes.ServerNotConfigured
+		else:
+			rv = self.login(
+					username,
+					password,
+					passwordAlreadyHashed=True
+				)
+		return rv
 
 	def __init_gui(self):
 		if self.__frontend is None \
@@ -143,7 +148,11 @@ class CatMailClientBackend(ClientBackend):
 
 	def start(self, nogui=False):
 		success = self.__init_config()
-		err = ErrorCodes.NoError
+		self.__serverHandler.setServerAddress(self.__config.getServerAddress())
+		err = self.__serverHandler.connect()
+		if err != ErrorCodes.NoError:
+			self.__logger.error("Failed to connect.")
+			return err
 		canceled = False
 		self.__logger.debug("Background service started.")
 
@@ -156,10 +165,27 @@ class CatMailClientBackend(ClientBackend):
 			self.__show_main_window()
 		else:
 			self.__logger.info("Exiting...")
+		return err
 
 	def __start_pull_timer(self):
 		# start timer for contactlist updates
 		ContactListTimer().start()
+	
+	def __extract_server_address(self, username):
+		server = username.split('@')[-1]
+		return "%s%s" % ("" if re.match('^http.*', server) else "http://", server)
+
+	def __update_config(self, username, passwordHash):
+		Config().writeInitialConfig(
+				username,
+				passwordHash,
+				self.__extract_server_address(username))
+
+		self.__serverHandler.setServerAddress(self.__config.getServerAddress())
+		err = self.__serverHandler.connect()
+		if err != ErrorCodes.NoError:
+			self.__logger.error("Failed to connect.")
+		return err
 
 	def login(self,
 			username,
@@ -176,6 +202,12 @@ class CatMailClientBackend(ClientBackend):
 		loginHash = cryptohelper.byteHashToString(
 				cryptohelper.kdf(username, passwordHash)
 			)
+
+		if not testlogin:
+			err = self.__update_config(username, passwordHash)
+			if err != ErrorCodes.NoError:
+				return err
+			self.__logger.debug("Connected to: %s." % self.__config.getServerAddress())
 
 		err, res = self.__serverHandler.getPrivateKeys(username, loginHash)
 		if err != ErrorCodes.NoError:
@@ -222,15 +254,12 @@ class CatMailClientBackend(ClientBackend):
 		print("Login successful!\nSessionToken: %s" % (res.sessionToken))
 
 		# store login data if no testlogin
-		if not testlogin:
-			Config().writeInitialConfig(username, passwordHash)
-			self.__userContext.sessionToken = res.sessionToken
-
-			return ErrorCodes.NoError
-
 		# if testlogin, return sessionToken
-		else:
+		if testlogin:
 			return res.sessionToken
+		else:
+			self.__userContext.sessionToken = res.sessionToken
+			return ErrorCodes.NoError
 
 	def addToContactList(self, userToAdd, callback):
 		err, resp = self.__serverHandler.addToContactList(

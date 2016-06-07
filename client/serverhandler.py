@@ -2,27 +2,50 @@ import CatMailService
 from ttypes import *
 
 from thrift import Thrift
-from thrift.transport import THttpClient
-from thrift.transport import TTransport
-from thrift.protocol import TJSONProtocol
+from thrift.transport.THttpClient import THttpClient
+from thrift.transport.TTransport import TBufferedTransport
+from thrift.protocol.TJSONProtocol import TJSONProtocol
 
 from constants import ErrorCodes
 
 class ServerHandler():
 
-	def __init__(self, serveraddress="http://localhost:9000/catmail"):
-		try:
-			transport = THttpClient.THttpClient(serveraddress)
-			transport = TTransport.TBufferedTransport(transport)
-			protocol = TJSONProtocol.TJSONProtocol(transport)
+	def __init__(self):
+		self.__transport		= None
+		self.__serveraddress	= None
+		self.client				= None
 
-			self.client = CatMailService.Client(protocol)
-			transport.open()
+	def setServerAddress(self, serveraddress):
+		self.__serveraddress = serveraddress
 
-		except Thrift.TException:
-			print("text")
+	def disconnect(self):
+		if not self.__transport is None:
+			self.__transport.close()
+			self.__transport	= None
+			self.client			= None
+
+	def connect(self):
+		self.disconnect()
+		rv = ErrorCodes.NoError
+		if self.__serveraddress is None or self.__serveraddress == "":
+			return ErrorCodes.ServerNotConfigured
+		else:
+			try:
+				print("server: %s" % self.__serveraddress)
+				self.__transport	= THttpClient(self.__serveraddress)
+				self.__transport	= TBufferedTransport(self.__transport)
+				protocol			= TJSONProtocol(self.__transport)
+
+				self.client			= CatMailService.Client(protocol)
+				self.__transport.open()
+			except Thrift.TException as e:
+				rv = ErrorCodes.ThriftError
+		return rv
+
 
 	def __sendQuery(self, query, args):
+		if self.client is None:
+			return (ErrorCodes.ServerNotConfigured, None)
 		try:
 			return (ErrorCodes.NoError, eval("self.client." + query)(*args))
 	# TODO don't catch TException while debugging...
