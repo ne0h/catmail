@@ -454,8 +454,16 @@ function DatabaseHandler(settings) {
 							callback(new CatMailTypes.InternalException(), null);
 							return;
 						} else {
-							callback(null, null);
-							return;
+							conn.commit(function (err) {
+								conn.release();
+								if (err) {
+									Logger.error("Failed to commit transaction: " + err.stack);
+									callback(new CatMailTypes.InternalException(), null);
+									return;
+								}
+
+								callback(null, null);
+							});
 						}
 					});
 				});
@@ -602,19 +610,28 @@ function DatabaseHandler(settings) {
 					// insert all the users
 					sql = "INSERT INTO `users` (`username`,`chatid`,`userkey`) VALUES " + values + ";";
 					conn.query(sql, [], function(err, result) {
-						conn.release();
-
 						if (err) {
+							conn.release();
 							Logging.error("Failed to add users to chat #: " + chatId + " | " + err.stack);
 							callback(new CatMailTypes.InternalException(), null);
 							return;
 						}
 
 						if (brokenUsers.length > 0) {
+							conn.release();
 							callback(new CatMailTypes.UserDoesNotExistException(brokenUsers),
 								new CatMailTypes.CreateChatResponse(chatId));
 						} else {
-							callback(null, new CatMailTypes.CreateChatResponse(chatId));
+							conn.commit(function (err) {
+								conn.release();
+								if (err) {
+									Logger.error("Failed to commit transaction: " + err.stack);
+									callback(new CatMailTypes.InternalException(), null);
+									return;
+								}
+
+								callback(null, new CatMailTypes.CreateChatResponse(chatId));
+							});
 						}
 					});
 				});
@@ -657,7 +674,7 @@ function DatabaseHandler(settings) {
 						return;
 					}
 
-					callback();
+					callback(null, null);
 				});
 			})
 		});
@@ -724,7 +741,16 @@ function DatabaseHandler(settings) {
 								return;
 							}
 
-							callback(null, null);
+							conn.commit(function (err) {
+								conn.release();
+								if (err) {
+									Logger.error("Failed to commit transaction: " + err.stack);
+									callback(new CatMailTypes.InternalException(), null);
+									return;
+								}
+
+								callback(null, null);
+							});
 						});
 					});
 				});
