@@ -110,8 +110,8 @@ function DatabaseHandler(settings) {
 	this.validatePasswordLogin = function(username, password, callback) {	
 		pool.getConnection(function(err, conn) {
 			if (err) {
-				conn.release();
 				Logger.error("Failed to get mysql connection from pool: " + err.stack);
+				conn.release();
 				callback(new CatMailTypes.InternalException(), null);
 				return;
 			}
