@@ -1,4 +1,6 @@
 [CatMail]
 username = 
 password = 
-
+server = 
+port = 
+subdir = 
