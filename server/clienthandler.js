@@ -63,6 +63,7 @@ function ClientHandler() {
 
 	this.getPrivateKeys = function(username, password, callback) {
 		Logger.debug(username + " wants to download his secret keys")
+		Logger.debug("Password: '" + password + "', hashed password: '" + cryptoHelper.sha256(password) + "'");
 		databaseHandler.validatePasswordLogin(username, cryptoHelper.sha256(password), function(err, result) {
 			if (err) {callback(new CatMailTypes.InternalException()); return;}
 			if (result == 0) {callback(new CatMailTypes.InvalidLoginCredentialsException(), null); return;}
