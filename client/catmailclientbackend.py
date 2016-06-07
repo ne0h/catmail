@@ -3,6 +3,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 import logging
 import re
+from os.path import expanduser
 
 import cryptohelper
 from view import *
@@ -21,9 +22,9 @@ class CatMailClientBackend(ClientBackend):
 	def get_server_handler(self):
 		return self.__serverHandler
 
-	def __init_config(self):
+	def __init_config(self, configDirectory):
 		success = False
-		self.__config = Config()
+		self.__config = Config(configDirectory)
 		if self.__config.exists():
 			self.__logger.debug("Config exists, using it.")
 			success = True
@@ -146,8 +147,8 @@ class CatMailClientBackend(ClientBackend):
 		# NOTE: The following call is blocking!
 		self.__frontend.wait()
 
-	def start(self, nogui=False):
-		success = self.__init_config()
+	def start(self, configDirectory=expanduser("~") + "/.config/CatMail", nogui=False):
+		success = self.__init_config(configDirectory=configDirectory)
 		self.__serverHandler.setServerAddress(self.__config.getServerAddress())
 		err = self.__serverHandler.connect()
 		if err != ErrorCodes.NoError:
@@ -176,7 +177,7 @@ class CatMailClientBackend(ClientBackend):
 		return "%s%s" % ("" if re.match('^http.*', server) else "http://", server)
 
 	def __update_config(self, username, passwordHash):
-		Config().writeInitialConfig(
+		self.__config.writeInitialConfig(
 				username,
 				passwordHash,
 				self.__extract_server_address(username))

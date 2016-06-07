@@ -1,11 +1,10 @@
 import configparser
 import os
-from os.path import expanduser
 
 class Config:
 	_SECTION="CatMail"
 
-	def __init__(self, configDirectory=expanduser("~") + "/.config/CatMail"):
+	def __init__(self, configDirectory):
 		self.__configDirectory = configDirectory
 		self.__configFile = self.__configDirectory + "/catmail.ini"
 
