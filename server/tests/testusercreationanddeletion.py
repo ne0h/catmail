@@ -32,13 +32,17 @@ class TestUserCreationAndDeletion(unittest.TestCase):
 		# DELETION STUFF
 		#
 
-		# delete user
-		(err, result) = testClient._client.deleteUser(username, testClient._sessionToken)
-		self.assertIsInstance(ErrorCodes.InvalidSession, type(err))
-		if err is not ErrorCodes.InvalidSession:
-			print("Deleted %s. Deletion failed: %s" % (username, err))
+		# log new user in so that he can delete hisself
+		(err, result) = testClient._client.login(username, password)
+		self.assertIsInstance(ErrorCodes.NoError, type(err))
+		#if err is not ErrorCodes.NoError:
+		#	print("Failed to login")
 
-		# log new user in to delete itsself
+		# delete user
+		#(err, result) = testClient._client.deleteUser(username, testClient._sessionToken)
+		#self.assertIsInstance(ErrorCodes.InvalidSession, type(err))
+		#if err is not ErrorCodes.InvalidSession:
+		#	print("Deleted %s. Deletion failed: %s" % (username, err))
 
 if __name__ == "__main__":
 	unittest.main()

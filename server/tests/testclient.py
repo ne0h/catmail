@@ -16,6 +16,9 @@ from serverhandler import ServerHandler
 #
 class TestClient:
 
+	def login(self, username, password):
+		return self._client.login(self._username, password, testlogin=True)
+
 	def __init__(self):
 		from config import Config
 		from catmailclientbackend import CatMailClientBackend
