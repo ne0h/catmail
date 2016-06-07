@@ -42,6 +42,10 @@ exception UserIsNotInChatException {
 	
 }
 
+exception UserIsNotAllowedException {
+	
+}
+
 /**
  * Holds a keypair.
  */
@@ -393,7 +397,9 @@ service CatMailService {
 		/** Combination of username and password is wrong. */
 		2: InvalidSessionException invalidSessionException,
 		/** Indicates that there is no chat with this id. */
-		3: ChatDoesNotExistException chatDoesNotExistException
+		3: ChatDoesNotExistException chatDoesNotExistException,
+		/* Indicates that the user is not allowed to delete this chat */
+		4: UserIsNotAllowedException userIsNotAllowedException
 	),
 
 	/**
