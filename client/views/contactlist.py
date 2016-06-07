@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QWidget, QGridLayout, QListWidget, \
-        QListWidgetItem, QLabel, QTabWidget
+        QListWidgetItem, QLabel, QTabWidget, QPushButton, QVBoxLayout
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, QObject, Qt
 from contact import CatMailContact
 from random import randint
@@ -53,7 +53,11 @@ class ContactListEntry(QWidget):
         self.__init_ui(contact)
 
 class ContactListManager(QObject):
-    contact_db_clicked = pyqtSignal(str, name="contact_db_clicked")
+    contact_db_clicked      = pyqtSignal(str, name="contact_db_clicked")
+    add_contact             = pyqtSignal(name="add_contact")
+    update_contacts         = pyqtSignal(name="update_contacts")
+    add_conversation        = pyqtSignal(name="add_conversation")
+    update_conversations    = pyqtSignal(name="update_conversations")
 
     def __get_contact_id_by_widget_id(self, list_item):
         contactWidget = self.__contactlist.item(list_item)
@@ -85,9 +89,9 @@ class ContactListManager(QObject):
         pass
 
     def get_widget(self):
-        return self.tab_widget
+        return self.widget
 
-    def update_contacts(self):
+    def update_contact_list(self):
         if not self.__catmail_contact_list is None:
             for c in self.__catmail_contact_list.get_contacts_iterator():
                 print("contact test: %s" % str(c))
@@ -101,6 +105,7 @@ class ContactListManager(QObject):
         self.__catmail_contact_list = contact_list
 
     def __init_ui(self):
+        self.tab_widget = QTabWidget(self.widget)
         self.tab_widget.setTabsClosable(False)
         self.tab_widget.setMovable(False)
 
@@ -108,6 +113,25 @@ class ContactListManager(QObject):
         self.tab_widget.addTab(self.__contactlist, "Contacts")
         self.tab_widget.addTab(self.__conversationlist, "Conversations")
     #TODO if there are no conversations, switch to contacts.
+
+        layout = QVBoxLayout(self.widget)
+        layout.addWidget(self.tab_widget)
+        layout.addWidget(self.__btn_update)
+        layout.addWidget(self.__btn_add)
+        self.widget.setLayout(layout)
+
+    def __on_update_clicked(self):
+        if self.tab_widget.currentWidget() == self.__contactlist:
+            self.update_conversations.emit()
+        elif self.tab_widget.currentWidget() == self.__conversationlist:
+            self.add_conversation.emit()
+
+
+    def __on_add_btn_clicked(self):
+        if self.tab_widget.currentWidget() == self.__contactlist:
+            self.add_contact.emit()
+        elif self.tab_widget.currentWidget() == self.__conversationlist:
+            self.update_contacts.emit()
 
     def __connect_signals(self):
         self.__contactlist.itemDoubleClicked.connect(
@@ -117,13 +141,17 @@ class ContactListManager(QObject):
         self.__conversationlist.itemDoubleClicked.connect(
                 self.__on_conversation_db_clicked
             )
+        self.__btn_update.clicked.connect(self.__on_update_clicked)
+        self.__btn_add.clicked.connect(self.__on_add_btn_clicked)
 
     def __init__(self, parent=None):
         super(ContactListManager, self).__init__()
-        self.tab_widget = QTabWidget(parent)
+        self.widget             = QWidget(parent)
 
-        self.__contactlist = QListWidget(self.tab_widget)
-        self.__conversationlist = QListWidget(self.tab_widget)
+        self.__contactlist      = QListWidget(self.widget)
+        self.__conversationlist = QListWidget(self.widget)
+        self.__btn_update       = QPushButton("Update", parent=self.widget)
+        self.__btn_add          = QPushButton("Add", parent=self.widget)
         self.__catmail_contact_list = None
 
         self.__init_ui()
